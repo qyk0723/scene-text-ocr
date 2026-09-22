@@ -23,15 +23,15 @@ class SceneTextOCR:
         boxes, texts, elapsed = ocr.run("path/to/image.jpg")
     """
 
-    def __init__(self, lang: str = "ch", use_gpu: bool = False) -> None:
+    def __init__(self, lang: str = "ch", device: str = "cpu") -> None:
         """初始化。
 
         参数:
             lang: 识别语言，默认 "ch"（中英文）。
-            use_gpu: 是否使用 GPU 推理，默认 False（CPU）。
+            device: 推理设备，默认 "cpu"。
         """
         self.lang = lang
-        self.use_gpu = use_gpu
+        self.device = device
         # 懒加载：首次调用 run 时才真正实例化模型
         self._engine = None
 
@@ -43,8 +43,8 @@ class SceneTextOCR:
             self._engine = PaddleOCR(
                 lang=self.lang,
                 use_angle_cls=True,
-                show_log=False,
-                use_gpu=self.use_gpu,
+                device=self.device,
+                enable_mkldnn=False,
             )
         return self._engine
 
@@ -76,9 +76,11 @@ class SceneTextOCR:
 
         # raw 为 None 表示未检出任何文字
         if raw:
-            for line in raw[0]:
-                box = np.asarray(line[0], dtype=np.float32)
-                text, _confidence = line[1]
+            result = raw[0]
+            dt_polys = result.get("dt_polys") or []
+            rec_texts = result.get("rec_texts") or []
+            for poly, text in zip(dt_polys, rec_texts):
+                box = np.asarray(poly, dtype=np.float32)
                 boxes.append(box)
                 texts.append(text)
 
