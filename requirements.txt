@@ -1,0 +1,8 @@
+paddlepaddle
+paddleocr
+opencv-python
+pillow
+numpy
+gradio
+matplotlib
+pandas
