@@ -1,8 +1,18 @@
-paddlepaddle
-paddleocr
-opencv-python
-pillow
-numpy
-gradio
-matplotlib
-pandas
+# 核心（版本经实测锁定）
+paddlepaddle==3.3.1
+paddleocr==3.7.0
+paddlex==3.7.2
+
+# 图像处理
+# 注意：PaddleOCR 的 OCRResult 依赖 opencv-contrib-python，需用它提供 cv2。
+# 环境里另装有 opencv-python==5.0.0.93，二者会互相覆盖 cv2，请勿同时安装。
+opencv-contrib-python==4.10.0.84
+
+# 界面
+gradio==6.28.0
+
+# 数值与可视化
+numpy==2.3.5
+pillow==12.3.0
+matplotlib==3.11.2
+pandas==3.0.6
