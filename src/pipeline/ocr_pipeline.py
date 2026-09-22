@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 
@@ -42,17 +42,21 @@ class SceneTextOCR:
 
             self._engine = PaddleOCR(
                 lang=self.lang,
-                use_angle_cls=True,
                 device=self.device,
                 enable_mkldnn=False,
+                use_doc_orientation_classify=False,
+                use_doc_unwarping=False,
+                use_textline_orientation=False,
             )
         return self._engine
 
-    def run(self, image_path: str) -> Tuple[List[np.ndarray], List[str], float]:
+    def run(
+        self, image: Union[str, np.ndarray]
+    ) -> Tuple[List[np.ndarray], List[str], float]:
         """对单张图片执行检测 + 识别。
 
         参数:
-            image_path: 输入图片路径。
+            image: 输入图片路径，或 BGR 三通道 numpy 数组。
 
         返回:
             (boxes, texts, elapsed)
@@ -61,14 +65,18 @@ class SceneTextOCR:
             texts: 与 boxes 一一对应的识别文本列表。
             elapsed: 检测 + 识别总耗时（秒）。
         """
-        path = Path(image_path)
-        if not path.is_file():
-            raise FileNotFoundError(f"图片不存在: {image_path}")
+        if isinstance(image, (str, Path)):
+            path = Path(image)
+            if not path.is_file():
+                raise FileNotFoundError(f"图片不存在: {image}")
+            ocr_input: Union[str, np.ndarray] = str(path)
+        else:
+            ocr_input = image
 
         engine = self._get_engine()
 
         start = time.perf_counter()
-        raw = engine.ocr(str(path))
+        raw = engine.ocr(ocr_input)
         elapsed = time.perf_counter() - start
 
         boxes: List[np.ndarray] = []

@@ -2,14 +2,18 @@
 
 用法::
 
-    python main.py path/to/image.jpg [--lang ch] [--device cpu]
+    python main.py path/to/image.jpg [--lang ch] [--device cpu] [--preprocess]
 """
 
 from __future__ import annotations
 
 import argparse
+import time
+
+import cv2
 
 from src.pipeline.ocr_pipeline import SceneTextOCR
+from src.preprocess.enhancer import ImageEnhancer
 
 
 def parse_args() -> argparse.Namespace:
@@ -21,6 +25,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--device", default="cpu", help="推理设备，默认 cpu（可传 gpu / gpu:0）"
     )
+    parser.add_argument(
+        "--preprocess", action="store_true", help="识别前先做图像预处理"
+    )
     return parser.parse_args()
 
 
@@ -28,9 +35,25 @@ def main() -> None:
     args = parse_args()
 
     ocr = SceneTextOCR(lang=args.lang, device=args.device)
-    boxes, texts, elapsed = ocr.run(args.image)
 
-    print(f"检出 {len(boxes)} 个文本框，耗时 {elapsed:.3f}s")
+    if args.preprocess:
+        image = cv2.imread(args.image)
+        if image is None:
+            raise FileNotFoundError(f"图片读取失败: {args.image}")
+
+        enhancer = ImageEnhancer()
+        start = time.perf_counter()
+        processed = enhancer.process(image)
+        prep_elapsed = time.perf_counter() - start
+
+        boxes, texts, ocr_elapsed = ocr.run(processed)
+
+        print(f"预处理耗时 {prep_elapsed:.3f}s，识别耗时 {ocr_elapsed:.3f}s")
+    else:
+        boxes, texts, ocr_elapsed = ocr.run(args.image)
+        print(f"识别耗时 {ocr_elapsed:.3f}s")
+
+    print(f"检出 {len(boxes)} 个文本框")
     print("-" * 40)
     for i, (box, text) in enumerate(zip(boxes, texts), start=1):
         pts = [(round(x, 1), round(y, 1)) for x, y in box]
