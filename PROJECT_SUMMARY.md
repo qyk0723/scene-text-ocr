@@ -57,7 +57,7 @@
 
 ## 五、下一步计划（阶段 2：Gradio 界面）
 
-1. `src/ui/app.py`：Gradio 界面，图片上传 + 预处理开关 + 识别结果可视化（文本框画在图上）+ 耗时展示。
+1. `app.py`：Gradio 界面（项目根目录，`python app.py` 启动），图片上传 + 预处理开关 + 识别结果可视化（OpenCV 画框 + PIL 中文标注）+ 耗时展示。
 2. 复用 `SceneTextOCR` 与 `ImageEnhancer`，不重复造轮子。
 3. 结果可视化可用 `raw[0]["rec_polys"]` + `rec_texts` 画框，或直接用 `OCRResult._to_img()`（需 opencv-contrib-python）。
 

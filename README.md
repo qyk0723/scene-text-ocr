@@ -42,7 +42,7 @@ D:/miniconda3/envs/scene-text/python.exe main.py data/samples/test.jpg --preproc
 ### Gradio 网页界面（阶段 2 开发中）
 
 ```bash
-D:/miniconda3/envs/scene-text/python.exe src/ui/app.py
+D:/miniconda3/envs/scene-text/python.exe app.py
 ```
 
 ## 图像预处理
