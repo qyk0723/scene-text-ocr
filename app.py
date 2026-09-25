@@ -9,6 +9,8 @@
 
 from __future__ import annotations
 
+import base64
+import html
 import os
 import time
 from typing import List, Optional, Tuple
@@ -16,7 +18,6 @@ from typing import List, Optional, Tuple
 import cv2
 import gradio as gr
 import numpy as np
-import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 
 from src.pipeline.ocr_pipeline import SceneTextOCR
@@ -67,18 +68,11 @@ def draw_results(img_bgr: np.ndarray, boxes: List[np.ndarray], texts: List[str])
     return img
 
 
-def _make_table(texts: List[str], scores: List[float]) -> pd.DataFrame:
-    rows = [
-        [i, text, f"{score:.4f}"]
-        for i, (text, score) in enumerate(zip(texts, scores), start=1)
-    ]
-    return pd.DataFrame(rows, columns=["序号", "识别文字", "置信度"])
-
-
 def _status_html(n_boxes: int, ocr_elapsed: float, prep_elapsed: float) -> str:
     style = (
-        "margin-top:16px;padding:12px 16px;background:#eef3ff;"
-        "border:1px solid #dbe4ff;border-radius:12px;color:#374151;font-size:.9rem;"
+        "margin-top:4px;height:36px;display:flex;align-items:center;box-sizing:border-box;"
+        "padding:0 16px;background:#eef3ff;border:1px solid #dbe4ff;border-radius:10px;"
+        "color:#374151;font-size:.85rem;"
     )
     return (
         f'<div style="{style}">模型 PP-OCRv6 &nbsp;|&nbsp; 检测框数 {n_boxes} '
@@ -86,126 +80,258 @@ def _status_html(n_boxes: int, ocr_elapsed: float, prep_elapsed: float) -> str:
     )
 
 
-def predict(image: np.ndarray, preprocess: bool) -> Tuple[np.ndarray, pd.DataFrame, str]:
-    """处理一张上传图片，返回 (标注图, 文本表格, 状态栏 HTML)。"""
+def _img_to_data_uri(rgb: np.ndarray) -> str:
+    """RGB 数组 -> PNG base64 data URI。"""
+    ok, buf = cv2.imencode(".png", cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
+    b64 = base64.b64encode(buf).decode("ascii")
+    return f"data:image/png;base64,{b64}"
+
+
+# 放大 / 复制的内联 JS（gr.HTML 经 innerHTML 注入，<script> 不执行，用内联 onclick）
+_ZOOM_JS = "var o=document.getElementById('zoom-overlay');if(!o){o=document.createElement('div');o.id='zoom-overlay';o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';o.onclick=function(){this.style.display='none';};var img=document.createElement('img');img.src=document.getElementById('result-img').src;img.style.cssText='max-width:90%;max-height:90%;';o.appendChild(img);document.body.appendChild(o);}o.style.display='flex';"
+_COPY_JS = (
+    "var i=document.getElementById('result-img');"
+    "var p=i.src.split(',');"
+    "var b=atob(p[1]);"
+    "var a=new Uint8Array(b.length);"
+    "for(var j=0;j<b.length;j++)a[j]=b.charCodeAt(j);"
+    "var blob=new Blob([a],{type:'image/png'});"
+    "navigator.clipboard.write([new ClipboardItem({'image/png':blob})])"
+    ".then(function(){alert('已复制到剪贴板')})"
+    ".catch(function(e){alert('复制失败：'+e)})"
+)
+
+_ZOOM_SVG = '🔍'
+_COPY_SVG = '📋'
+_BTN_FONT = 'font-size:14px;line-height:1;'
+
+_BTN_STYLE = (
+    "width:30px;height:30px;background:#ffffff;border:1px solid #cbd5e1;"
+    "border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;"
+)
+
+_RESULT_AREA_STYLE = (
+    "height:140px;background:#f7f8fa;border-radius:8px;"
+)
+_TEXT_AREA_STYLE = (
+    "height:500px;overflow-y:auto;width:100%;box-sizing:border-box;"
+    "border:1px solid #eef0f4;border-radius:10px;"
+)
+
+
+def _result_placeholder() -> str:
+    """识别前的占位框：与结果区同高，保持界面稳定。"""
+    return (
+        f'<div style="{_RESULT_AREA_STYLE}display:flex;align-items:center;'
+        'justify-content:center;color:#9ca3af;">识别结果将显示在这里</div>'
+    )
+
+
+def _result_html(data_uri: str) -> str:
+    """检测结果图（占满区域、object-fit 不溢出）+ 右下角放大/复制图标按钮。"""
+    return (
+        f'<div style="position:relative;{_RESULT_AREA_STYLE}display:flex;'
+        'align-items:center;justify-content:center;overflow:hidden;">'
+        f'<img id="result-img" src="{data_uri}" '
+        'style="width:100%;height:100%;object-fit:contain;">'
+        '<div style="position:absolute;bottom:10px;right:10px;display:flex;gap:8px;">'
+        f'<button onclick="{_ZOOM_JS}" title="放大" style="{_BTN_STYLE}">{_ZOOM_SVG}</button>'
+        f'<button onclick="{_COPY_JS}" title="复制" style="{_BTN_STYLE}">{_COPY_SVG}</button>'
+        '</div></div>'
+    )
+
+
+def _text_placeholder() -> str:
+    return (
+        f'<div style="{_TEXT_AREA_STYLE}display:flex;align-items:center;'
+        'justify-content:center;color:#9ca3af;">识别文字将显示在这里</div>'
+    )
+
+
+def _text_html(texts: List[str], scores: List[float]) -> str:
+    """识别文字逐行列表：灰色序号 + 深色文字 + 行尾灰色置信度。"""
+    if not texts:
+        return (
+            f'<div style="{_TEXT_AREA_STYLE}display:flex;align-items:center;'
+            'justify-content:center;color:#9ca3af;">（未检测到文字）</div>'
+        )
+    rows = []
+    for i, (t, s) in enumerate(zip(texts, scores), start=1):
+        rows.append(
+            '<div style="padding:7px 10px;border-bottom:1px solid #f0f0f0;'
+            'display:flex;justify-content:space-between;align-items:baseline;">'
+            f'<span><span style="color:#9ca3af;display:inline-block;width:30px;">{i}</span>'
+            f'<span style="color:#1f2937;">{html.escape(t)}</span></span>'
+            f'<span style="color:#9ca3af;font-size:.8rem;">{s:.4f}</span>'
+            '</div>'
+        )
+    return f'<div style="{_TEXT_AREA_STYLE}">{"".join(rows)}</div>'
+
+
+def predict(image: np.ndarray, preprocess: bool) -> Tuple[str, str, str]:
+    """处理一张上传图片，返回 (结果图 HTML, 识别文字 HTML, 状态栏 HTML)。"""
     if image is None:
-        empty = pd.DataFrame(columns=["序号", "识别文字", "置信度"])
-        return np.zeros((1, 1, 3), dtype=np.uint8), empty, _status_html(0, 0.0, 0.0)
+        return _result_placeholder(), _text_placeholder(), _status_html(0, 0.0, 0.0)
 
-    # Gradio 传入 RGB，OCR / OpenCV 用 BGR
-    img_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    try:
+        # Gradio 传入 RGB，OCR / OpenCV 用 BGR
+        img_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-    prep_elapsed = 0.0
-    if preprocess:
-        start = time.perf_counter()
-        proc = _ENHANCER.process(img_bgr)
-        prep_elapsed = time.perf_counter() - start
-    else:
-        proc = img_bgr
+        prep_elapsed = 0.0
+        if preprocess:
+            start = time.perf_counter()
+            proc = _ENHANCER.process(img_bgr)
+            prep_elapsed = time.perf_counter() - start
+        else:
+            proc = img_bgr
 
-    boxes, texts, scores, ocr_elapsed = _OCR.run_detailed(proc)
+        boxes, texts, scores, ocr_elapsed = _OCR.run_detailed(proc)
 
-    annotated_bgr = draw_results(img_bgr, boxes, texts)
-    annotated_rgb = cv2.cvtColor(annotated_bgr, cv2.COLOR_BGR2RGB)
+        annotated_bgr = draw_results(img_bgr, boxes, texts)
+        annotated_rgb = cv2.cvtColor(annotated_bgr, cv2.COLOR_BGR2RGB)
+        data_uri = _img_to_data_uri(annotated_rgb)
 
-    table = _make_table(texts, scores)
-    status = _status_html(len(boxes), ocr_elapsed, prep_elapsed)
-    return annotated_rgb, table, status
+        return _result_html(data_uri), _text_html(texts, scores), _status_html(
+            len(boxes), ocr_elapsed, prep_elapsed
+        )
+    except Exception as e:
+        import traceback
+        err = traceback.format_exc()
+        print("PREDICT ERROR:", err, flush=True)
+        return (
+            f'<div style="{_RESULT_AREA_STYLE}display:flex;align-items:center;'
+            f'justify-content:center;color:#dc2626;padding:10px;">识别出错：{html.escape(str(e))}</div>',
+            f'<div style="{_TEXT_AREA_STYLE}display:flex;align-items:center;'
+            f'justify-content:center;color:#dc2626;">（出错了，见左侧）</div>',
+            _status_html(0, 0.0, 0.0),
+        )
+
+
+_THEME = gr.themes.Soft(
+    primary_hue="blue",
+    secondary_hue="blue",
+    neutral_hue="slate",
+    font=[
+        "system-ui",
+        "-apple-system",
+        "Segoe UI",
+        "Microsoft YaHei",
+        "PingFang SC",
+        "sans-serif",
+    ],
+)
+
+_CSS = """
+.gradio-container { max-width: 100% !important; }
+.gradio-container .wrap, .gradio-container main.contain {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+footer { display: none !important; }
+.main-row { gap: 16px !important; flex-wrap: nowrap !important; flex-direction: row !important; }
+.main-row > * { min-width: 0 !important; }
+.card {
+    background: #ffffff;
+    border: 1px solid #eef0f4;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    padding: 12px;
+}
+#upload-box { border: 2px dashed #4F6EF7 !important; border-radius: 12px !important; padding: 6px; background: #fafbff !important; }
+.primary-btn button {
+    background: #4F6EF7 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    height: 52px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    width: 100%;
+}
+.primary-btn button:hover { background: #3f5be0 !important; }
+.gradio-container .form { margin-top: 2px !important; margin-bottom: 2px !important; }
+.gradio-container .form .block.padded { padding: 2px 12px !important; min-height: 0 !important; }
+.gradio-container .form { height: 44px !important; overflow: hidden; }
+.upload-container .wrap, .upload-container .or {
+    font-size: 0.85rem !important;
+}
+#upload-box .upload-container span, #upload-box .upload-container p {
+    font-size: 0.85rem !important;
+}
+.right-col { display: flex !important; flex-direction: column !important; overflow: hidden !important; }
+.right-col > .block:first-child { flex: 0 0 auto !important; }
+.right-col > .block:last-child { flex: 1 1 auto !important; min-height: 0 !important; overflow: hidden !important; }
+.right-col > .block:last-child .wrap,
+.right-col > .block:last-child .html-container,
+.right-col > .block:last-child .prose {
+    height: 100% !important;
+    overflow: hidden !important;
+    max-height: 100% !important;
+}
+.right-col > .block:last-child .prose > div {
+    overflow-y: auto !important;
+}
+"""
 
 
 def build_ui() -> gr.Blocks:
-    theme = gr.themes.Soft(
-        primary_hue="blue",
-        secondary_hue="blue",
-        neutral_hue="slate",
-        font=[
-            "system-ui",
-            "-apple-system",
-            "Segoe UI",
-            "Microsoft YaHei",
-            "PingFang SC",
-            "sans-serif",
-        ],
-    )
-    css = """
-    .gradio-container { max-width: 1400px !important; margin: 0 auto !important; }
-    footer { display: none !important; }
-    .main-row {
-        gap: 16px !important;
-        flex-wrap: nowrap !important;
-        flex-direction: row !important;
-    }
-    .main-row > * { min-width: 0 !important; }
-    .card {
-        background: #ffffff;
-        border: 1px solid #eef0f4;
-        border-radius: 12px;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-        padding: 16px;
-    }
-    #upload-box { border: 2px dashed #4F6EF7 !important; border-radius: 12px !important; padding: 6px; }
-    .primary-btn button {
-        background: #4F6EF7 !important;
-        color: #fff !important;
-        border: none !important;
-        border-radius: 12px !important;
-        padding: 12px 20px !important;
-        font-size: 1rem !important;
-        width: 100%;
-    }
-    .primary-btn button:hover { background: #3f5be0 !important; }
-    """
-
-    with gr.Blocks(title="场景文字检测与识别系统", theme=theme, css=css) as demo:
-        # 顶部标题
+    with gr.Blocks(title="场景文字检测与识别系统") as demo:
+        gr.HTML(f"<style>{_CSS}</style>")
+        # 顶部标题栏（约 60px）
         gr.HTML(
             """
             <div style="display:flex;align-items:center;justify-content:space-between;
-                        padding:8px 4px 20px;">
-                <h1 style="color:#1f2937;margin:0;font-size:1.7rem;font-weight:700;">
+                        padding:2px 4px 6px;">
+                <h1 style="color:#1f2937;margin:0;font-size:28px;font-weight:700;">
                     场景文字检测与识别系统
                 </h1>
-                <span style="color:#6b7280;font-size:.9rem;">基于 PaddleOCR PP-OCRv6</span>
+                <span style="color:#6b7280;font-size:15px;">基于 PaddleOCR PP-OCRv6</span>
             </div>
             """
         )
 
         with gr.Row(elem_classes="main-row", equal_height=True):
-            # 左栏：控制区
-            with gr.Column(scale=38, elem_classes="card"):
+            # 左栏 37%：上传 / 预处理 / 按钮 / 检测结果
+            with gr.Column(scale=37, elem_classes="card left-col"):
+                # 不传 sources，保留 Gradio 默认来源（上传 / 摄像头 / 剪贴板）
                 input_img = gr.Image(
-                    type="numpy", label="上传图片", height=320, elem_id="upload-box"
+                    type="numpy", label="上传图片", height=150, elem_id="upload-box"
                 )
                 preprocess = gr.Checkbox(
                     label="预处理：去噪 + 对比度增强 + 锐化", value=True
                 )
                 btn = gr.Button("开始识别", variant="primary", elem_classes="primary-btn")
-                gr.Examples(
-                    examples=[["data/samples/test.jpg"]],
-                    inputs=[input_img],
-                    label="示例图",
+                gr.HTML(
+                    '<div style="font-size:.9rem;font-weight:600;color:#374151;'
+                    'margin-top:14px;margin-bottom:8px;">检测结果</div>'
                 )
+                result_box = gr.HTML(value=_result_placeholder(), sanitize_html=False)
 
-            # 右栏：结果区
-            with gr.Column(scale=62, elem_classes="card"):
-                output_img = gr.Image(type="numpy", label="检测结果", height=400)
-                table = gr.Dataframe(
-                    value=pd.DataFrame(columns=["序号", "识别文字", "置信度"]),
-                    headers=["序号", "识别文字", "置信度"],
-                    interactive=False,
-                    wrap=True,
+            # 右栏 63%：识别文字列表
+            with gr.Column(scale=63, elem_classes="card right-col"):
+                gr.HTML(
+                    '<div style="font-size:.9rem;font-weight:600;color:#374151;'
+                    'margin-bottom:8px;">识别文字</div>'
                 )
+                text_box = gr.HTML(value=_text_placeholder(), sanitize_html=False)
 
-        # 底部状态栏
-        status = gr.HTML(_status_html(0, 0.0, 0.0))
+        # 底部状态栏（约 44px）
+        status = gr.HTML(_status_html(0, 0.0, 0.0), sanitize_html=False)
 
         btn.click(
             predict,
             inputs=[input_img, preprocess],
-            outputs=[output_img, table, status],
+            outputs=[result_box, text_box, status],
         )
     return demo
 
 
 if __name__ == "__main__":
-    build_ui().launch(server_name="127.0.0.1", server_port=7860)
+    build_ui().launch(
+        server_name="127.0.0.1",
+        server_port=7860,
+        theme=_THEME,
+        css=_CSS,
+    )
