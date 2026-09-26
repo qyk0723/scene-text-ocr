@@ -1,6 +1,7 @@
-"""图像预处理模块：灰度化、去噪、对比度增强、锐化、二值化、倾斜校正、尺寸归一化。
+"""图像预处理模块：灰度化、去噪、对比度增强、锐化、二值化、倾斜校正、尺寸归一化、小字放大。
 
-每个功能独立开关，通过构造参数控制。默认开启：去噪 + 对比度增强 + 锐化。
+每个功能独立开关，通过构造参数控制。默认全关，按需显式开启
+（消融结论：清晰图预处理有害，各算子适用域见 docs/evaluation_report.md 第七节）。
 """
 
 from __future__ import annotations
@@ -25,29 +26,33 @@ class ImageEnhancer:
     def __init__(
         self,
         grayscale: bool = False,
-        denoise: bool = True,
-        contrast: bool = True,
-        sharpen: bool = True,
+        denoise: bool = False,
+        contrast: bool = False,
+        sharpen: bool = False,
         binarize: bool = False,
         deskew: bool = False,
         resize: bool = False,
+        upscale: bool = False,
         denoise_method: str = "median",
         binarize_method: str = "otsu",
         resize_long_side: int = 1280,
+        upscale_min_long_side: int = 800,
     ) -> None:
         """初始化并配置开关。
 
         参数:
             grayscale: 灰度化。
-            denoise: 去噪（默认开）。
-            contrast: 对比度增强 CLAHE（默认开）。
-            sharpen: 锐化（默认开）。
+            denoise: 去噪（默认关）。
+            contrast: 对比度增强 CLAHE（默认关）。
+            sharpen: 锐化（默认关）。
             binarize: 二值化。
             deskew: 倾斜校正。
             resize: 尺寸归一化（长边缩放）。
+            upscale: 小字放大（长边不足时放大）。
             denoise_method: 去噪方法 "median" 或 "gaussian"。
             binarize_method: 二值化方法 "otsu" 或 "adaptive"。
             resize_long_side: resize 时目标长边长度（像素）。
+            upscale_min_long_side: 放大时目标长边长度（像素）。
         """
         self.grayscale = grayscale
         self.denoise = denoise
@@ -56,9 +61,11 @@ class ImageEnhancer:
         self.binarize = binarize
         self.deskew = deskew
         self.resize = resize
+        self.upscale = upscale
         self.denoise_method = denoise_method
         self.binarize_method = binarize_method
         self.resize_long_side = resize_long_side
+        self.upscale_min_long_side = upscale_min_long_side
 
     # ---- 各预处理步骤 ----
 
@@ -106,6 +113,9 @@ class ImageEnhancer:
         _, thresh = cv2.threshold(
             gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
         )
+        # 前景占比过半说明选到的是背景（深色底图），反相
+        if thresh.mean() > 127.5:
+            thresh = 255 - thresh
         coords = np.column_stack(np.where(thresh > 0))
         if len(coords) < 10:
             return img  # 几乎无内容，不旋转
@@ -131,6 +141,17 @@ class ImageEnhancer:
         new_w = int(round(w * scale))
         new_h = int(round(h * scale))
         return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+    def upscale_small_text(self, img: np.ndarray) -> np.ndarray:
+        """长边不足目标值时放大（小字放大）。"""
+        h, w = img.shape[:2]
+        long_side = max(h, w)
+        if long_side >= self.upscale_min_long_side:
+            return img
+        scale = self.upscale_min_long_side / long_side
+        new_w = int(round(w * scale))
+        new_h = int(round(h * scale))
+        return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
 
     # ---- 管线 ----
 
@@ -158,6 +179,9 @@ class ImageEnhancer:
 
         if self.resize:
             img = self.resize_long_edge(img)
+
+        if self.upscale:
+            img = self.upscale_small_text(img)
 
         # 统一成 BGR 三通道，供 PaddleOCR 使用
         if img.ndim == 2:

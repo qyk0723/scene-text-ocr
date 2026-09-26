@@ -34,14 +34,21 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
-    ocr = SceneTextOCR(lang=args.lang, device=args.device)
+    # 默认 PP-OCRv6 small，与 Gradio 界面一致；评估基准 medium 由 evaluate.py 承担
+    ocr = SceneTextOCR(
+        lang=args.lang,
+        device=args.device,
+        det_model_name="PP-OCRv6_small_det",
+        rec_model_name="PP-OCRv6_small_rec",
+    )
 
     if args.preprocess:
         image = cv2.imread(args.image)
         if image is None:
             raise FileNotFoundError(f"图片读取失败: {args.image}")
 
-        enhancer = ImageEnhancer()
+        # 显式全开：仅作预处理对比实验用（消融显示清晰图下有害）
+        enhancer = ImageEnhancer(denoise=True, contrast=True, sharpen=True)
         start = time.perf_counter()
         processed = enhancer.process(image)
         prep_elapsed = time.perf_counter() - start

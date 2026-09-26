@@ -23,9 +23,11 @@ from PIL import Image, ImageDraw, ImageFont
 from src.pipeline.ocr_pipeline import SceneTextOCR
 from src.preprocess.enhancer import ImageEnhancer
 
-# 全局单例：模型只加载一次
-_OCR = SceneTextOCR()
-_ENHANCER = ImageEnhancer()
+# 全局单例：模型只加载一次（small 模型：整图 ~22s，精度代价见 docs/evaluation_report.md）
+_OCR = SceneTextOCR(
+    det_model_name="PP-OCRv6_small_det",
+    rec_model_name="PP-OCRv6_small_rec",
+)
 
 
 def _load_font(size: int) -> Optional[ImageFont.FreeTypeFont]:
@@ -168,7 +170,9 @@ def _text_html(texts: List[str], scores: List[float]) -> str:
     return f'<div style="{_TEXT_AREA_STYLE}">{"".join(rows)}</div>'
 
 
-def predict(image: np.ndarray, preprocess: bool) -> Tuple[str, str, str]:
+def predict(
+    image: np.ndarray, use_denoise: bool, use_sharpen: bool, use_upscale: bool
+) -> Tuple[str, str, str]:
     """处理一张上传图片，返回 (结果图 HTML, 识别文字 HTML, 状态栏 HTML)。"""
     if image is None:
         return _result_placeholder(), _text_placeholder(), _status_html(0, 0.0, 0.0)
@@ -178,9 +182,15 @@ def predict(image: np.ndarray, preprocess: bool) -> Tuple[str, str, str]:
         img_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
         prep_elapsed = 0.0
-        if preprocess:
+        if use_denoise or use_sharpen or use_upscale:
             start = time.perf_counter()
-            proc = _ENHANCER.process(img_bgr)
+            # 按勾选组合启用对应预处理（CLAHE/倾斜校正实测无益不进 UI）
+            proc = ImageEnhancer(
+                denoise=use_denoise,
+                sharpen=use_sharpen,
+                upscale=use_upscale,
+                contrast=False,
+            ).process(img_bgr)
             prep_elapsed = time.perf_counter() - start
         else:
             proc = img_bgr
@@ -273,6 +283,35 @@ footer { display: none !important; }
 .right-col > .block:last-child .prose > div {
     overflow-y: auto !important;
 }
+.prep-row input[type="checkbox"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 16px !important;
+    height: 16px !important;
+    border: 1.5px solid #4F6EF7 !important;
+    border-radius: 4px !important;
+    background: #ffffff !important;
+    cursor: pointer;
+    position: relative;
+}
+.prep-row input[type="checkbox"]:checked {
+    background: #4F6EF7 !important;
+}
+.prep-row input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.prep-tip { position: relative; display: inline-flex; align-items: center; height: 100%; }
+.prep-tip .tip-q { cursor: help; color: #6b7280; font-size: .8rem; border: 1px solid #cbd5e1; border-radius: 50%; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; background: #ffffff; }
+.prep-tip .tip-text { display: none; position: absolute; bottom: 140%; right: 0; background: #1f2937; color: #ffffff; padding: 8px 12px; border-radius: 8px; font-size: .75rem; white-space: nowrap; z-index: 60; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }
+.prep-tip:hover .tip-text { display: block; }
 """
 
 
@@ -299,9 +338,17 @@ def build_ui() -> gr.Blocks:
                 input_img = gr.Image(
                     type="numpy", label="上传图片", height=150, elem_id="upload-box"
                 )
-                preprocess = gr.Checkbox(
-                    label="预处理：去噪 + 对比度增强 + 锐化", value=True
-                )
+                with gr.Row(equal_height=True, elem_classes="prep-row"):
+                    use_denoise = gr.Checkbox(label="去噪", value=False, scale=1)
+                    use_sharpen = gr.Checkbox(label="锐化", value=False, scale=1)
+                    use_upscale = gr.Checkbox(label="小字放大", value=False, scale=1)
+                    gr.HTML(
+                        '<div class="prep-tip"><span class="tip-q">?</span>'
+                        '<div class="tip-text">去噪→噪点多/低光 · 锐化→模糊/失焦 · '
+                        '小字放大→文字偏小；清晰图建议全不勾</div></div>',
+                        scale=0,
+                        min_width=28,
+                    )
                 btn = gr.Button("开始识别", variant="primary", elem_classes="primary-btn")
                 gr.HTML(
                     '<div style="font-size:.9rem;font-weight:600;color:#374151;'
@@ -322,7 +369,7 @@ def build_ui() -> gr.Blocks:
 
         btn.click(
             predict,
-            inputs=[input_img, preprocess],
+            inputs=[input_img, use_denoise, use_sharpen, use_upscale],
             outputs=[result_box, text_box, status],
         )
     return demo

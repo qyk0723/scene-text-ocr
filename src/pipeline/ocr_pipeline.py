@@ -32,6 +32,8 @@ class SceneTextOCR:
         det_thresh: Optional[float] = None,
         det_box_thresh: Optional[float] = None,
         rec_batch_size: Optional[int] = None,
+        det_model_name: Optional[str] = None,
+        rec_model_name: Optional[str] = None,
     ) -> None:
         """初始化。
 
@@ -42,12 +44,18 @@ class SceneTextOCR:
             det_box_thresh: 检测框阈值，None 用 PaddleOCR 默认。
             rec_batch_size: 识别批大小，None 用 PaddleOCR 默认
                 （实测 CPU 上拼批无提速，GPU 上可再试）。
+            det_model_name: 检测模型名（如 PP-OCRv6_small_det），
+                None 用默认 PP-OCRv6_medium_det。
+            rec_model_name: 识别模型名（如 PP-OCRv6_small_rec），
+                None 用默认 PP-OCRv6_medium_rec。
         """
         self.lang = lang
         self.device = device
         self.det_thresh = det_thresh
         self.det_box_thresh = det_box_thresh
         self.rec_batch_size = rec_batch_size
+        self.det_model_name = det_model_name
+        self.rec_model_name = rec_model_name
         # 懒加载：首次调用 run 时才真正实例化模型
         self._engine = None
         # 结果缓存：图片内容 hash -> 识别结果，LRU 上限 32 条
@@ -69,6 +77,10 @@ class SceneTextOCR:
             )
             if self.rec_batch_size is not None:
                 kwargs["text_recognition_batch_size"] = self.rec_batch_size
+            if self.det_model_name is not None:
+                kwargs["text_detection_model_name"] = self.det_model_name
+            if self.rec_model_name is not None:
+                kwargs["text_recognition_model_name"] = self.rec_model_name
             if self.det_thresh is not None:
                 kwargs["text_det_thresh"] = self.det_thresh
             if self.det_box_thresh is not None:
