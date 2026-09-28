@@ -1,7 +1,8 @@
 """行级口径检测评估：把词级 GT 合并成行级框后重算检测 P/R/F1。
 
-用途：说明 ICDAR2015 检测指标偏低是「词级标注 vs 行级检测」的粒度错配，
-而非检测质量差。对同一批图同时报「词级口径」与「行级口径」两组指标。
+对同一批图同时报「词级口径」与「行级口径」两组指标，并在
+IoU 0.3 / 0.5 / 0.7 三档阈值下做敏感性分析，用于定位检测指标
+偏低的成因（粒度错位 vs 难例漏检）。
 
 用法::
 
@@ -80,7 +81,6 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="行级口径检测评估")
     parser.add_argument("--limit", type=int, default=30)
     parser.add_argument("--model", choices=["medium", "small"], default="medium")
-    parser.add_argument("--iou", type=float, default=0.5)
     args = parser.parse_args()
 
     data_root = Path("data/icdar2015")
@@ -96,8 +96,11 @@ def main() -> None:
     else:
         ocr = SceneTextOCR()
 
-    gt_word = gt_line = pred = matched_word = matched_line = 0
-    print(f"[{args.model}] 共 {len(img_paths)} 张图，IoU {args.iou}")
+    ious = [0.3, 0.5, 0.7]
+    gt_word = gt_line = pred = 0
+    matched_word = {i: 0 for i in ious}
+    matched_line = {i: 0 for i in ious}
+    print(f"[{args.model}] 共 {len(img_paths)} 张图，IoU {ious}")
 
     for idx, img_path in enumerate(img_paths, start=1):
         gt_path = gt_dir / f"gt_{img_path.stem}.txt"
@@ -111,8 +114,9 @@ def main() -> None:
         gt_word += len(gt_words)
         gt_line += len(gt_lines)
         pred += len(boxes)
-        matched_word += match_boxes(gt_words, boxes, args.iou)
-        matched_line += match_boxes(gt_lines, boxes, args.iou)
+        for i in ious:
+            matched_word[i] += match_boxes(gt_words, boxes, i)
+            matched_line[i] += match_boxes(gt_lines, boxes, i)
 
         if idx % 10 == 0 or idx == len(img_paths):
             print(f"  {idx}/{len(img_paths)} 累计 词级GT={gt_word} 行级GT={gt_line} Pred={pred}")
@@ -123,23 +127,25 @@ def main() -> None:
         f1 = 2 * p * r / (p + r) if (p + r) else 0.0
         return p, r, f1
 
-    p_word, r_word, f1_word = prf(matched_word, gt_word, pred)
-    p_line, r_line, f1_line = prf(matched_line, gt_line, pred)
+    print("=" * 60)
+    print(f"[{args.model}] 词级GT={gt_word} 行级GT={gt_line} Pred={pred}")
+    table_rows = []
+    for i in ious:
+        pw, rw, fw = prf(matched_word[i], gt_word, pred)
+        pl, rl, fl = prf(matched_line[i], gt_line, pred)
+        print(f"IoU {i}: 词级 P {pw:.4f}/R {rw:.4f}/F1 {fw:.4f} | "
+              f"行级 P {pl:.4f}/R {rl:.4f}/F1 {fl:.4f}")
+        table_rows.append(f"| {i} | {pw:.4f} | {rw:.4f} | {fw:.4f} | {pl:.4f} | {rl:.4f} | {fl:.4f} |")
 
-    print("=" * 50)
-    print(f"[{args.model}] 词级口径：P {p_word:.4f} / R {r_word:.4f} / F1 {f1_word:.4f}（GT {gt_word}）")
-    print(f"[{args.model}] 行级口径：P {p_line:.4f} / R {r_line:.4f} / F1 {f1_line:.4f}（GT {gt_line}）")
-
-    out = Path(f"data/results/linelevel_{args.model}.md")
+    out = Path(f"data/results/linelevel_{args.model}_iou.md")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(
-        f"# 行级口径检测评估（{args.model}）\n\n"
-        f"图片数：{len(img_paths)}（ICDAR2015 detection/test），IoU {args.iou}\n\n"
-        f"| 口径 | 精确率 | 召回率 | F1 | GT 框数 |\n"
-        f"| --- | --- | --- | --- | --- |\n"
-        f"| 词级（原始标注） | {p_word:.4f} | {r_word:.4f} | {f1_word:.4f} | {gt_word} |\n"
-        f"| 行级（合并后） | {p_line:.4f} | {r_line:.4f} | {f1_line:.4f} | {gt_line} |\n\n"
-        f"说明：预测框不变，仅将词级 GT 按垂直重叠聚合成行级后重算匹配。\n",
+        f"# 行级口径检测评估 + IoU 敏感性（{args.model}）\n\n"
+        f"图片数：{len(img_paths)}（ICDAR2015 detection/test）\n\n"
+        f"| IoU | 词级 P | 词级 R | 词级 F1 | 行级 P | 行级 R | 行级 F1 |\n"
+        f"| --- | --- | --- | --- | --- | --- | --- |\n"
+        + "\n".join(table_rows)
+        + "\n\n说明：预测框不变，词级 GT 按 y 中心聚合成行级后重算匹配。\n",
         encoding="utf-8",
     )
     print(f"结果已写入 {out}")
