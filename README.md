@@ -39,9 +39,9 @@ D:/miniconda3/envs/scene-text/python.exe main.py data/samples/test.jpg --preproc
 | `image` | 输入图片路径（位置参数） | 必填 |
 | `--lang` | 识别语言 | `ch` |
 | `--device` | 推理设备 | `cpu`（可传 `gpu`） |
-| `--preprocess` | 识别前先做图像预处理 | 关闭 |
+| `--preprocess` | 识别前先做预处理（显式全开，仅对比实验用） | 关闭 |
 
-### Gradio 网页界面（阶段 2 开发中）
+### Gradio 网页界面
 
 ```bash
 D:/miniconda3/envs/scene-text/python.exe app.py
