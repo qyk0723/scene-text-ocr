@@ -187,6 +187,41 @@ def make_model_comparison():
     plt.close(fig)
 
 
+def make_wordline_chart():
+    """检测指标口径对照：词级 vs 行级 F1。"""
+    categories = ["词级口径", "行级口径"]
+    medium = [39.25, 36.31]
+    small = [33.59, 34.10]
+    fig, ax = plt.subplots(figsize=(5.8, 3.9))
+    fig.patch.set_facecolor(SURFACE)
+    ax.set_facecolor(SURFACE)
+    x = np.arange(len(categories))
+    width = 0.34
+    bars1 = ax.bar(x - width / 2, medium, width, color=BLUE, label="medium")
+    bars2 = ax.bar(x + width / 2, small, width, color=ORANGE, label="small")
+    for bars in (bars1, bars2):
+        for b in bars:
+            ax.text(
+                b.get_x() + b.get_width() / 2, b.get_height() + 1,
+                f"{b.get_height():.1f}%", ha="center", va="bottom",
+                color=INK, fontsize=11,
+            )
+    ax.set_xticks(x)
+    ax.set_xticklabels(categories, fontsize=11, color=INK)
+    ax.set_ylim(0, 60)
+    ax.set_ylabel("检测 F1（%）", color=SECONDARY, fontsize=10)
+    _grouped_style(ax)
+    ax.legend(fontsize=10, frameon=False, loc="upper right")
+    ax.set_title(
+        "检测指标口径对照（30 张子集，IoU 0.5）",
+        color=INK, fontsize=13, fontweight="bold", loc="left", pad=12,
+    )
+    plt.tight_layout()
+    fig.savefig(FIG_DIR / "wordline_compare.png", dpi=200,
+                bbox_inches="tight", facecolor=SURFACE)
+    plt.close(fig)
+
+
 def make_operator_chart():
     """各算子在适用场景下的效果：基线 vs 算子开启。"""
     categories = ["去噪\n（噪声图）", "锐化\n（模糊图）", "CLAHE\n（低对比图）",
