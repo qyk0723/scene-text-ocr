@@ -2,7 +2,9 @@
 
 对外只暴露一个类 SceneTextOCR：
     - 懒加载 PaddleOCR 模型（PP-OCR 预训练，不训练）
-    - 输入图片路径，输出文本框坐标、识别文本、耗时
+    - 模型档位可选：medium（评估基准）/ small（系统部署）
+    - run() 返回 (文本框, 文本, 耗时)；run_detailed() 额外返回置信度
+    - 按图片内容 hash 缓存结果（LRU 32 条），同图二次识别约 0s
 """
 
 from __future__ import annotations

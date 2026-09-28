@@ -229,9 +229,10 @@ def evaluate_recognition(ocr: SceneTextOCR, data_root: Path, limit: int, ignore_
 # 报告
 # ---------------------------------------------------------------------------
 
-def render_report(results: List[dict]) -> str:
+def render_report(results: List[dict], model_label: str = "PP-OCRv6 medium（det + rec）") -> str:
     lines = ["# ICDAR2015 评估报告", ""]
     lines.append(f"生成时间：{time.strftime('%Y-%m-%d %H:%M:%S')}")
+    lines.append(f"模型：{model_label}")
     lines.append("")
     lines.append("| 任务 | 图片数 | 指标 | 平均耗时/图 |")
     lines.append("| --- | --- | --- | --- |")
@@ -267,16 +268,24 @@ def main() -> None:
     )
     parser.add_argument("--det-thresh", type=float, default=None, help="检测过滤阈值，默认用 PaddleOCR 内置值")
     parser.add_argument("--det-box-thresh", type=float, default=None, help="检测框阈值，默认用 PaddleOCR 内置值")
+    parser.add_argument(
+        "--model", choices=["medium", "small"], default="medium",
+        help="模型档位：评估基准用 medium，部署系统用 small",
+    )
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--report", default="data/results/evaluation_report.md")
     args = parser.parse_args()
 
     data_root = Path(args.data_root)
-    ocr = SceneTextOCR(
+    kwargs = dict(
         device=args.device,
         det_thresh=args.det_thresh,
         det_box_thresh=args.det_box_thresh,
     )
+    if args.model == "small":
+        kwargs["det_model_name"] = "PP-OCRv6_small_det"
+        kwargs["rec_model_name"] = "PP-OCRv6_small_rec"
+    ocr = SceneTextOCR(**kwargs)
 
     results: List[dict] = []
     if args.task in ("det", "all"):
@@ -284,7 +293,7 @@ def main() -> None:
     if args.task in ("rec", "all"):
         results.append(evaluate_recognition(ocr, data_root, args.limit, args.ignore_case))
 
-    report = render_report(results)
+    report = render_report(results, f"PP-OCRv6 {args.model}（det + rec）")
     print("\n" + report)
 
     report_path = Path(args.report)

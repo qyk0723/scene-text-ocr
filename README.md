@@ -28,7 +28,7 @@ cd E:\project\毕业设计\scene-text-ocr
 # 直接识别
 D:/miniconda3/envs/scene-text/python.exe main.py data/samples/test.jpg
 
-# 先预处理再识别（默认全开配置；消融实验显示清晰图下有害，仅作对比实验用）
+# 先预处理再识别（显式全开配置；消融实验显示清晰图下有害，仅作对比实验用）
 D:/miniconda3/envs/scene-text/python.exe main.py data/samples/test.jpg --preprocess
 ```
 
@@ -70,12 +70,12 @@ Gradio 界面只暴露三个正收益算子，默认全不勾：**小字放大 /
 
 ## 目录
 
-- `src/preprocess/` 图像预处理（去噪、纠偏、增强，可开关用于消融实验）
-- `src/detector/` 文字检测（预留）
-- `src/recognizer/` 文字识别（预留）
-- `src/pipeline/` 完整识别管线（`SceneTextOCR` 封装）
-- `evaluate.py` / `evaluate_ablation.py` 数据集评估与预处理消融脚本（根目录）
-- `src/ui/` Gradio 网页界面（预留）
+- `main.py` 命令行单图识别；`app.py` Gradio 网页界面
+- `src/preprocess/` 图像预处理（`ImageEnhancer`，8 算子可开关）
+- `src/pipeline/` 完整识别管线（`SceneTextOCR` 封装，含结果缓存）
+- `src/detector/` / `src/recognizer/` 文字检测 / 识别（预留）
+- `evaluate.py` 数据集评估；`evaluate_ablation.py` 预处理消融；`evaluate_linelevel.py` 行级口径检测评估
+- `make_figures.py` 论文图表生成；`docs/evaluation_report.md` 评估总报告；`docs/figures/` 图表
 - `data/` 样张、公开数据集、实验结果（已 gitignore）
 
 ## 开发进度

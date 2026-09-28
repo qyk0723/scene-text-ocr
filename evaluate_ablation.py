@@ -2,11 +2,12 @@
 
 用法::
 
-    python evaluate_ablation.py [--limit 200]
+    python evaluate_ablation.py [--limit 200] [--mode clean]
 
-对 ICDAR2015 recognition/test 的单行图，分别用 5 种预处理配置跑完整
-OCR，统计字符准确率 / 行级准确率 / 平均耗时，结果写入
-data/results/ablation_results.md。
+--mode 图像条件：clean 原图 / degraded 噪声图 / lowcontrast 低对比 /
+blur 重模糊 / skew 倾斜 / small 小字图。每种模式跑对应预处理配置，
+统计字符准确率 / 行级准确率 / 平均耗时，结果写入 data/results/
+ablation_<mode>.md。
 """
 
 from __future__ import annotations

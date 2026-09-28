@@ -1,11 +1,13 @@
 """生成论文图表与可视化样例（阶段 4）。
 
 产出到 docs/figures/：
-- recognition_metrics.png  识别性能柱状图
-- detection_metrics.png    检测性能柱状图
-- timing.png               耗时对比柱状图（对数刻度）
-- preprocess_compare.png   预处理前后对比
-- sample_*.png             检测可视化样例
+- recognition_metrics.png / detection_metrics.png  识别、检测性能柱状图（medium 全量）
+- timing.png                耗时对比柱状图（small，对数刻度）
+- model_compare_accuracy.png / model_compare_speed.png  medium vs small 精度、速度对比
+- ablation.png / ablation_degraded.png / ablation_operators.png  预处理消融三图
+- iou_sensitivity.png / wordline_compare.png  检测 IoU 敏感性与口径对照
+- preprocess_compare.png    预处理前后对比
+- sample_*.png              检测可视化样例（small 模型）
 """
 
 from __future__ import annotations
