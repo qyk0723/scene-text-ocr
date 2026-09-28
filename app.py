@@ -77,7 +77,7 @@ def _status_html(n_boxes: int, ocr_elapsed: float, prep_elapsed: float) -> str:
         "color:#374151;font-size:.85rem;"
     )
     return (
-        f'<div style="{style}">模型 PP-OCRv6 &nbsp;|&nbsp; 检测框数 {n_boxes} '
+        f'<div style="{style}">模型 PP-OCRv6 small &nbsp;|&nbsp; 检测框数 {n_boxes} '
         f"&nbsp;|&nbsp; 识别耗时 {ocr_elapsed:.1f}s &nbsp;|&nbsp; 预处理 {prep_elapsed:.1f}s</div>"
     )
 
