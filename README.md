@@ -47,6 +47,14 @@ D:/miniconda3/envs/scene-text/python.exe main.py data/samples/test.jpg --preproc
 D:/miniconda3/envs/scene-text/python.exe app.py
 ```
 
+## 测试
+
+纯函数单元测试（编辑距离、标注解析、框 IoU/匹配、行合并），不加载模型：
+
+```bash
+D:/miniconda3/envs/scene-text/python.exe -m unittest discover -s tests -p "test_*.py"
+```
+
 ## 图像预处理
 
 模块：`src/preprocess/enhancer.py`，类 `ImageEnhancer`。各功能独立开关。
