@@ -21,9 +21,6 @@ data/
 *.pdopt
 *.log
 
-# 临时调试脚本
-_test_predict.py
-
 # IDE / 系统
 .idea/
 .vscode/
