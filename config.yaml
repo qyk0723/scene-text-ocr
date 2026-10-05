@@ -1,6 +1,4 @@
-# 场景文字检测与识别系统配置
-# 说明：本文件是模型/推理/预处理/数据路径的单一配置源，
-# 代码默认读取此处；命令行参数可覆盖（如 evaluate.py --model）。
+# 场景文字检测与识别系统配置（单一事实源，代码默认读此处，CLI 参数可覆盖）
 
 model:
   det: PP-OCRv6_small_det      # 检测模型（small=部署默认，medium=评估基准）
@@ -9,14 +7,10 @@ model:
   lang: ch
 
 inference:
-  enable_mkldnn: false          # Paddle 3.3 MKLDNN 与 PIR 执行器不兼容，必须 false
-  use_doc_orientation_classify: false
-  use_doc_unwarping: false
-  use_textline_orientation: false
-  rec_batch_size: null          # CPU 拼批实测无提速，不设
+  run_mode: paddle             # 必须 paddle：Paddle 3.3 MKLDNN 与 PIR 执行器不兼容
 
 det:
-  thresh: null                  # null = 用模型默认
+  thresh: null                 # null = 用模型默认
   box_thresh: null
   unclip_ratio: null
   limit_side_len: null

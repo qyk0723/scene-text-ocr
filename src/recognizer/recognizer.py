@@ -8,12 +8,15 @@ import numpy as np
 
 import paddlex
 
+from src.config import get_config
+
 
 class TextRecognizer:
     """封装 PaddleX 识别模型，输入单行图（BGR），输出 (文本, 置信度)。"""
 
     def __init__(self, model_name: str, device: str = "cpu") -> None:
-        kwargs: dict = {"engine_config": {"run_mode": "paddle"}}
+        run_mode = get_config().get("inference", {}).get("run_mode", "paddle")
+        kwargs: dict = {"engine_config": {"run_mode": run_mode}}
         if device:
             kwargs["device"] = device
         self._model = paddlex.create_model(model_name, **kwargs)

@@ -6,10 +6,12 @@
 
 from __future__ import annotations
 
-from typing import Tuple
+from typing import Optional, Tuple
 
 import cv2
 import numpy as np
+
+from src.config import get_config
 
 
 class ImageEnhancer:
@@ -35,8 +37,8 @@ class ImageEnhancer:
         upscale: bool = False,
         denoise_method: str = "median",
         binarize_method: str = "otsu",
-        resize_long_side: int = 1280,
-        upscale_min_long_side: int = 800,
+        resize_long_side: Optional[int] = None,
+        upscale_min_long_side: Optional[int] = None,
     ) -> None:
         """初始化并配置开关。
 
@@ -64,8 +66,15 @@ class ImageEnhancer:
         self.upscale = upscale
         self.denoise_method = denoise_method
         self.binarize_method = binarize_method
-        self.resize_long_side = resize_long_side
-        self.upscale_min_long_side = upscale_min_long_side
+        pre = get_config().get("preprocess", {})
+        self.resize_long_side = (
+            resize_long_side if resize_long_side is not None
+            else pre.get("resize_long_side", 1280)
+        )
+        self.upscale_min_long_side = (
+            upscale_min_long_side if upscale_min_long_side is not None
+            else pre.get("upscale_min_long_side", 800)
+        )
 
     # ---- 各预处理步骤 ----
 

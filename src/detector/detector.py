@@ -8,6 +8,8 @@ import numpy as np
 
 import paddlex
 
+from src.config import get_config
+
 
 class TextDetector:
     """封装 PaddleX 检测模型，输入 BGR 图，输出文本框列表。"""
@@ -21,7 +23,8 @@ class TextDetector:
         unclip_ratio: Optional[float] = None,
         limit_side_len: Optional[int] = None,
     ) -> None:
-        kwargs: dict = {"engine_config": {"run_mode": "paddle"}}
+        run_mode = get_config().get("inference", {}).get("run_mode", "paddle")
+        kwargs: dict = {"engine_config": {"run_mode": run_mode}}
         if device:
             kwargs["device"] = device
         if thresh is not None:
