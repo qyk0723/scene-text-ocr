@@ -15,6 +15,10 @@ import os
 import time
 from typing import List, Optional, Tuple
 
+# 本地地址不走代理（配合 Watt Toolkit 系统代理使用）
+os.environ["NO_PROXY"] = "localhost,127.0.0.1"
+os.environ["no_proxy"] = "localhost,127.0.0.1"
+
 import cv2
 import gradio as gr
 import numpy as np

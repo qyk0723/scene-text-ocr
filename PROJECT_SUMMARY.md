@@ -1,6 +1,6 @@
 # 项目交接文档
 
-> 更新日期：2026-09-26
+> 更新日期：2026-09-28
 > 仓库：https://github.com/qyk0723/scene-text-ocr （main 分支）
 
 ## 一、项目现状
@@ -15,7 +15,7 @@
 - 阶段 3：ICDAR2015 全量评估（检测 500 张 + 识别 2074 张）+ 评估报告
 - 阶段 4：论文图表（`docs/figures/`：指标、耗时、模型对比、预处理对比、消融、样例、界面截图）
 
-剩余工作：论文写作 + 用户重截 `gradio_ui.png`（旧图状态栏耗时是 medium 的，与现系统 small 不一致）。
+剩余工作：论文写作。
 
 环境：Windows 11，conda 环境 `scene-text`，解释器 `D:\miniconda3\envs\scene-text\python.exe`。
 
@@ -54,10 +54,10 @@
 ## 四、已知问题 / 注意事项
 
 1. **OpenCV 冲突**：环境同时装了 `opencv-python==5.0.0.93` 与 `opencv-contrib-python==4.10.0.84`，二者都提供 cv2 会互相覆盖；requirements.txt 只锁 contrib 版。
-2. **推理速度**：small 模型整图 ~22s（test.jpg 39 行），清晰图识别 0.536s/行。历史基线 medium 68.9s 在 9-25 后变 115s 未完全查明（重启后 115s，电源已确认高性能），评估数值不受影响（指标与速度无关）。
+2. **推理速度**：small 模型整图 ~22s（test.jpg 39 行），清晰图单行识别 0.162s。连续多次识别会触发 CPU 热节流（单次 43s），间隔测试恢复 22s，非代码问题。
 3. **倾斜校正实现局限**：深色背景 Otsu 反相 bug 已修复；残余角度估计偏差源自 minAreaRect 对真实字符分布的拟合，论文按「±12° 内有害、模型自身有容差」如实写。
-4. **网络代理**：git 需 Watt Toolkit 代理 `127.0.0.1:26561` + 本仓库 `http.sslVerify=false`（中间人解密）。关代理后恢复 `git config http.sslVerify true`。
-5. **token 安全**：推送用过的 PAT 已明文暴露过，建议撤销换新。
+4. **网络代理**：git 需 Watt Toolkit 代理 `127.0.0.1:26561` + 本仓库 `http.sslVerify=false`（中间人解密）。Watt Toolkit 开系统代理会拦截 localhost 导致 Gradio 启动 404，app.py 已设 `NO_PROXY` 绕过（或 Windows 代理勾「对本地地址不使用代理服务器」）。
+5. **token 安全**：旧 PAT 已于 2026-09-28 撤销，git 已配 `credential.helper manager`（凭据存 Windows 凭据管理器，推送不再贴 token）。
 
 ## 五、文件地图
 
@@ -65,7 +65,7 @@
 | --- | --- |
 | `main.py` | CLI 单图识别（默认 small 模型，与界面一致；`--preprocess` 显式全开，仅对比实验用） |
 | `app.py` | Gradio 界面（用户所有，改动前先沟通） |
-| `evaluate.py` | ICDAR2015 检测/识别评估（`--task det/rec`、`--limit`、`--ignore-case`） |
+| `evaluate.py` | ICDAR2015 检测/识别评估（`--task det/rec`、`--limit`、`--ignore-case`、`--model medium/small`） |
 | `evaluate_ablation.py` | 预处理消融（`--mode clean/degraded/lowcontrast/blur/skew/small`） |
 | `evaluate_linelevel.py` | 行级口径检测评估（词级 GT 合并成行后重算 P/R/F1） |
 | `make_figures.py` | 论文图表生成（常量改数值后重跑） |
@@ -76,7 +76,7 @@
 
 ## 六、论文写作要点提示
 
-1. 检测指标低的主因是难例漏检，用排除法论证（阈值、标注粒度均已排除，见报告第五节）。
-2. medium vs small 速度/精度权衡（5.3 倍提速换 -1.3 字符点 / -5 F1 点）。
+1. 检测指标低：主因难例漏检、次因输出粒度介于词/行之间，用排除法 + IoU 敏感性分析论证（阈值、单一粒度口径均已排除，见报告第五节）。
+2. medium vs small 速度/精度权衡（5.3 倍提速换识别字符 -7 点 / 检测 F1 -4 点，全量口径）。
 3. 预处理消融是核心实验亮点：各算子适用域证据表 + 「默认关闭、按需启用」结论。
 4. 系统功能（界面截图、可视化样例）用 small 模型输出，与部署一致。
