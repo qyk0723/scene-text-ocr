@@ -1,8 +1,7 @@
 """场景文字检测与识别统一封装。
 
-对外只暴露一个类 SceneTextOCR：
-    - 懒加载 PaddleOCR 模型（PP-OCR 预训练，不训练）
-    - 模型档位可选：medium（评估基准）/ small（系统部署）
+SceneTextOCR 编排「检测 → 排序 → 裁剪 → 识别」：
+    - 检测、识别模型可独立选择（默认读 config.yaml，部署用 small）
     - run() 返回 (文本框, 文本, 耗时)；run_detailed() 额外返回置信度
     - 按图片内容 hash 缓存结果（LRU 32 条），同图二次识别约 0s
 """
@@ -15,91 +14,85 @@ from collections import OrderedDict
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
 
+import cv2
 import numpy as np
+
+from src.config import get_config
+from src.pipeline.geometry import crop_box, sort_boxes
 
 
 class SceneTextOCR:
-    """基于 PaddleOCR 的文字检测 + 识别管线。
+    """检测 + 识别管线。
 
     用法::
 
-        ocr = SceneTextOCR(lang="ch")
+        ocr = SceneTextOCR()  # 读 config.yaml 默认（small）
         boxes, texts, elapsed = ocr.run("path/to/image.jpg")
     """
 
     def __init__(
         self,
-        lang: str = "ch",
-        device: str = "cpu",
+        lang: Optional[str] = None,
+        device: Optional[str] = None,
         det_thresh: Optional[float] = None,
         det_box_thresh: Optional[float] = None,
-        rec_batch_size: Optional[int] = None,
         det_model_name: Optional[str] = None,
         rec_model_name: Optional[str] = None,
     ) -> None:
-        """初始化。
+        cfg = get_config()
+        model = cfg.get("model", {})
+        det = cfg.get("det", {})
 
-        参数:
-            lang: 识别语言，默认 "ch"（中英文）。
-            device: 推理设备，默认 "cpu"。
-            det_thresh: 检测过滤阈值，None 用 PaddleOCR 默认。
-            det_box_thresh: 检测框阈值，None 用 PaddleOCR 默认。
-            rec_batch_size: 识别批大小，None 用 PaddleOCR 默认
-                （实测 CPU 上拼批无提速，GPU 上可再试）。
-            det_model_name: 检测模型名（如 PP-OCRv6_small_det），
-                None 用默认 PP-OCRv6_medium_det。
-            rec_model_name: 识别模型名（如 PP-OCRv6_small_rec），
-                None 用默认 PP-OCRv6_medium_rec。
-        """
-        self.lang = lang
-        self.device = device
-        self.det_thresh = det_thresh
-        self.det_box_thresh = det_box_thresh
-        self.rec_batch_size = rec_batch_size
-        self.det_model_name = det_model_name
-        self.rec_model_name = rec_model_name
-        # 懒加载：首次调用 run 时才真正实例化模型
-        self._engine = None
-        # 结果缓存：图片内容 hash -> 识别结果，LRU 上限 32 条
+        self.lang = lang or model.get("lang", "ch")
+        self.device = device or model.get("device", "cpu")
+        self.det_model_name = det_model_name or model.get("det")
+        self.rec_model_name = rec_model_name or model.get("rec")
+        self.det_thresh = det_thresh if det_thresh is not None else det.get("thresh")
+        self.det_box_thresh = det_box_thresh if det_box_thresh is not None else det.get("box_thresh")
+        self.det_unclip_ratio = det.get("unclip_ratio")
+        self.det_limit_side_len = det.get("limit_side_len")
+
+        # 懒加载
+        self._detector = None
+        self._recognizer = None
+        # 结果缓存：图片内容 hash -> 结果，LRU 上限 32 条
         self._cache: OrderedDict = OrderedDict()
         self._cache_max = 32
 
-    def _get_engine(self):
-        """延迟创建 PaddleOCR 实例，避免 import 与模型加载开销集中在构造时。"""
-        if self._engine is None:
-            from paddleocr import PaddleOCR
+    def _get_detector(self):
+        if self._detector is None:
+            from src.detector.detector import TextDetector
 
-            kwargs = dict(
-                lang=self.lang,
+            self._detector = TextDetector(
+                self.det_model_name,
                 device=self.device,
-                enable_mkldnn=False,
-                use_doc_orientation_classify=False,
-                use_doc_unwarping=False,
-                use_textline_orientation=False,
+                thresh=self.det_thresh,
+                box_thresh=self.det_box_thresh,
+                unclip_ratio=self.det_unclip_ratio,
+                limit_side_len=self.det_limit_side_len,
             )
-            if self.rec_batch_size is not None:
-                kwargs["text_recognition_batch_size"] = self.rec_batch_size
-            if self.det_model_name is not None:
-                kwargs["text_detection_model_name"] = self.det_model_name
-            if self.rec_model_name is not None:
-                kwargs["text_recognition_model_name"] = self.rec_model_name
-            if self.det_thresh is not None:
-                kwargs["text_det_thresh"] = self.det_thresh
-            if self.det_box_thresh is not None:
-                kwargs["text_det_box_thresh"] = self.det_box_thresh
-            self._engine = PaddleOCR(**kwargs)
-        return self._engine
+        return self._detector
 
-    def _resolve_input(self, image: Union[str, np.ndarray]) -> Union[str, np.ndarray]:
+    def _get_recognizer(self):
+        if self._recognizer is None:
+            from src.recognizer.recognizer import TextRecognizer
+
+            self._recognizer = TextRecognizer(self.rec_model_name, device=self.device)
+        return self._recognizer
+
+    def _load_image(self, image: Union[str, np.ndarray]) -> np.ndarray:
+        """输入路径或 BGR 数组，返回 BGR uint8 数组。"""
         if isinstance(image, (str, Path)):
             path = Path(image)
             if not path.is_file():
                 raise FileNotFoundError(f"图片不存在: {image}")
-            return str(path)
+            img = cv2.imread(str(path))
+            if img is None:
+                raise ValueError(f"图片读取失败: {image}")
+            return img
         return image
 
     def _cache_key(self, image: Union[str, np.ndarray]) -> str:
-        """按图片字节内容生成缓存键。"""
         if isinstance(image, (str, Path)):
             data = Path(image).read_bytes()
         else:
@@ -107,33 +100,10 @@ class SceneTextOCR:
             data = arr.tobytes() + str(arr.shape).encode()
         return hashlib.sha256(data).hexdigest()
 
-    def _parse(
-        self, raw
-    ) -> Tuple[List[np.ndarray], List[str], List[float]]:
-        """解析 ocr() 返回，提取检测框、文本、置信度。"""
-        boxes: List[np.ndarray] = []
-        texts: List[str] = []
-        scores: List[float] = []
-
-        if raw:
-            result = raw[0]
-            dt_polys = result.get("dt_polys") or []
-            rec_texts = result.get("rec_texts") or []
-            for poly, text in zip(dt_polys, rec_texts):
-                boxes.append(np.asarray(poly, dtype=np.float32))
-                texts.append(text)
-            scores = [float(s) for s in (result.get("rec_scores") or [])]
-            scores += [0.0] * (len(texts) - len(scores))
-
-        return boxes, texts, scores
-
     def run_detailed(
         self, image: Union[str, np.ndarray]
     ) -> Tuple[List[np.ndarray], List[str], List[float], float]:
-        """同 run()，额外返回每个文本框的识别置信度。
-
-        命中缓存时耗时约 0（仅计算图片 hash 的时间）。
-        """
+        """检测 + 识别，返回 (文本框, 文本, 置信度, 耗时)。命中缓存耗时约 0。"""
         start = time.perf_counter()
         key = self._cache_key(image)
         if key in self._cache:
@@ -142,14 +112,21 @@ class SceneTextOCR:
             boxes, texts, scores, _elapsed = result
             return boxes, texts, scores, time.perf_counter() - start
 
-        ocr_input = self._resolve_input(image)
-        engine = self._get_engine()
+        img = self._load_image(image)
+        detector = self._get_detector()
+        recognizer = self._get_recognizer()
 
         start = time.perf_counter()
-        raw = engine.ocr(ocr_input)
+        boxes = sort_boxes(detector.detect(img))
+        texts: List[str] = []
+        scores: List[float] = []
+        for box in boxes:
+            crop = crop_box(img, box)
+            text, score = recognizer.recognize(crop)
+            texts.append(text)
+            scores.append(score)
         elapsed = time.perf_counter() - start
 
-        boxes, texts, scores = self._parse(raw)
         self._cache[key] = (boxes, texts, scores, elapsed)
         if len(self._cache) > self._cache_max:
             self._cache.popitem(last=False)
@@ -158,17 +135,6 @@ class SceneTextOCR:
     def run(
         self, image: Union[str, np.ndarray]
     ) -> Tuple[List[np.ndarray], List[str], float]:
-        """对单张图片执行检测 + 识别。
-
-        参数:
-            image: 输入图片路径，或 BGR 三通道 numpy 数组。
-
-        返回:
-            (boxes, texts, elapsed)
-            boxes: 文本框坐标列表，每个元素为 shape (4, 2) 的 numpy 数组，
-                   四点为左上、右上、右下、左下。
-            texts: 与 boxes 一一对应的识别文本列表。
-            elapsed: 检测 + 识别总耗时（秒）。
-        """
+        """检测 + 识别，返回 (文本框, 文本, 耗时)。"""
         boxes, texts, _scores, elapsed = self.run_detailed(image)
         return boxes, texts, elapsed

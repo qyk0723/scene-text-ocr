@@ -19,7 +19,7 @@ from typing import Dict, List, Tuple
 import cv2
 import numpy as np
 
-from evaluate import levenshtein, parse_rec_gt
+from src.evaluator import levenshtein, parse_rec_gt
 from src.pipeline.ocr_pipeline import SceneTextOCR
 from src.preprocess.enhancer import ImageEnhancer
 

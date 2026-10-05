@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy as np
 
-from evaluate import levenshtein, match_boxes, parse_det_gt, quad_iou
+from src.evaluator import levenshtein, match_boxes, parse_det_gt, quad_iou
 
 
 def _q(x0, y0, x1, y1):

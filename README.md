@@ -79,12 +79,14 @@ Gradio 界面只暴露三个正收益算子，默认全不勾：**小字放大 /
 ## 目录
 
 - `main.py` 命令行单图识别；`app.py` Gradio 网页界面
+- `config.yaml` 系统配置（模型 / 推理 / 预处理 / 数据路径）；`src/config.py` 配置加载
 - `src/preprocess/` 图像预处理（`ImageEnhancer`，8 算子可开关）
-- `src/pipeline/` 完整识别管线（`SceneTextOCR` 封装，含结果缓存）
-- `src/detector/` / `src/recognizer/` 文字检测 / 识别（预留）
-- `evaluate.py` 数据集评估；`evaluate_ablation.py` 预处理消融；`evaluate_linelevel.py` 行级口径检测评估
+- `src/detector/` 文字检测（`TextDetector`）；`src/recognizer/` 文字识别（`TextRecognizer`）
+- `src/pipeline/` 检测 + 识别编排（`SceneTextOCR`，含排序 / 透视裁剪 / 缓存）
+- `src/evaluator/` 评估模块（metrics / parsing / runner）
+- `evaluate.py` 评估 CLI；`evaluate_ablation.py` 预处理消融；`evaluate_linelevel.py` 行级口径评估
 - `make_figures.py` 论文图表生成；`docs/evaluation_report.md` 评估总报告；`docs/figures/` 图表
-- `data/` 样张、公开数据集、实验结果（已 gitignore）
+- `tests/` 单元测试；`data/` 样张、公开数据集、实验结果（已 gitignore）
 
 ## 开发进度
 

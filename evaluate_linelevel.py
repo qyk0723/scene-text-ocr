@@ -13,68 +13,9 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import List
 
-import numpy as np
-
-from evaluate import match_boxes, parse_det_gt
+from src.evaluator import match_boxes, merge_to_lines, parse_det_gt
 from src.pipeline.ocr_pipeline import SceneTextOCR
-
-
-def merge_to_lines(quads: List[np.ndarray], y_center_ratio: float = 0.5) -> List[np.ndarray]:
-    """把词级四边形按 y 中心聚类成行，返回每行的贴合合并框。
-
-    用 y 中心距离聚类（阈值 = 0.5 × 中位字高），容忍同行错落、
-    不并相邻行；合并框 y 取 y 中心 ± 半字高，避免跨度膨胀。
-    """
-    words = []
-    for q in quads:
-        ys = q[:, 1]
-        xs = q[:, 0]
-        yc = float((ys.min() + ys.max()) / 2.0)
-        h = float(ys.max() - ys.min())
-        words.append({
-            "q": q, "yc": yc, "h": h,
-            "xmin": float(xs.min()), "xmax": float(xs.max()),
-        })
-    if not words:
-        return []
-
-    med_h = float(np.median([w["h"] for w in words]))
-    if med_h <= 0:
-        med_h = 1.0
-
-    words.sort(key=lambda w: w["yc"])
-    lines = []
-    for w in words:
-        placed = False
-        for line in lines:
-            if abs(w["yc"] - line["yc"]) < y_center_ratio * med_h:
-                line["boxes"].append(w)
-                n = len(line["boxes"])
-                line["yc"] = (line["yc"] * (n - 1) + w["yc"]) / n
-                line["xmin"] = min(line["xmin"], w["xmin"])
-                line["xmax"] = max(line["xmax"], w["xmax"])
-                line["ymin"] = min(line["ymin"], w["yc"] - 0.5 * w["h"])
-                line["ymax"] = max(line["ymax"], w["yc"] + 0.5 * w["h"])
-                placed = True
-                break
-        if not placed:
-            lines.append({
-                "boxes": [w], "yc": w["yc"],
-                "xmin": w["xmin"], "xmax": w["xmax"],
-                "ymin": w["yc"] - 0.5 * w["h"], "ymax": w["yc"] + 0.5 * w["h"],
-            })
-
-    merged = []
-    for line in lines:
-        merged.append(np.array([
-            [line["xmin"], line["ymin"]],
-            [line["xmax"], line["ymin"]],
-            [line["xmax"], line["ymax"]],
-            [line["xmin"], line["ymax"]],
-        ], dtype=np.float32))
-    return merged
 
 
 def main() -> None:

@@ -34,13 +34,8 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
-    # 默认 PP-OCRv6 small，与 Gradio 界面一致；评估基准 medium 由 evaluate.py 承担
-    ocr = SceneTextOCR(
-        lang=args.lang,
-        device=args.device,
-        det_model_name="PP-OCRv6_small_det",
-        rec_model_name="PP-OCRv6_small_rec",
-    )
+    # 模型默认读 config.yaml（small），与 Gradio 界面一致；评估基准 medium 由 evaluate.py --model 指定
+    ocr = SceneTextOCR(lang=args.lang, device=args.device)
 
     if args.preprocess:
         image = cv2.imread(args.image)

@@ -31,25 +31,27 @@
 
 预处理消融总结论（报告第七节）：清晰图预处理有害（全开 -20 字符点）；算子适用域——小字放大 +44.4（最强）、去噪 +15.7（噪声图）、锐化 +3.7（模糊图）、CLAHE 中性、倾斜校正 ±12° 内有害（模型自身有容差）。UI 只暴露三个正收益算子，默认全不勾。
 
-## 三、关键参数配置（踩坑记录，勿回退）
+## 三、关键配置与踩坑记录（勿回退）
 
-### PaddleOCR 3.7 初始化（`src/pipeline/ocr_pipeline.py`）
+### 配置源（config.yaml）
 
-| 参数 | 值 | 原因 |
-| --- | --- | --- |
-| `device` | `"cpu"` | 3.x 已移除 `use_gpu` |
-| `enable_mkldnn` | `False` | Paddle 3.3 MKLDNN 与 PIR 执行器不兼容 |
-| `use_doc_orientation_classify` / `use_doc_unwarping` / `use_textline_orientation` | `False` | 文档模型，场景文字用不到；`use_angle_cls` 与 `use_textline_orientation` 互斥且已废弃 |
-| `text_detection_model_name` / `text_recognition_model_name` | UI 传 small，评估默认 medium | v6 无 mobile 档，档位名 small/tiny |
-| `text_recognition_batch_size` | 默认不传 | 实测 CPU 拼批无提速 |
+模型 / 设备 / 检测阈值 / 数据路径集中在根目录 `config.yaml`，`src/config.py` 加载。命令行参数可覆盖（如 `evaluate.py --model medium`）。
 
-### `ocr()` 返回格式（3.x）
+### 推理引擎（detector / recognizer）
 
-字典列表：`raw[0]["dt_polys"]`（检测框）、`raw[0]["rec_texts"]`、`raw[0]["rec_scores"]`。
+检测、识别拆分为独立模块，各用 `paddlex.create_model(模型名, engine_config={"run_mode": "paddle"})`。
+
+| 要点 | 说明 |
+| --- | --- |
+| `run_mode="paddle"` | 等价旧 `enable_mkldnn=False`：Paddle 3.3 MKLDNN 与 PIR 执行器不兼容，必须关 |
+| 文档模型 | 不再加载（UVDoc / 方向分类 / 文本行方向），纯 det+rec，比一体化管线更快 |
+| det 返回 | `dt_polys`（检测框）、`dt_scores` |
+| rec 返回 | `rec_text`、`rec_score`（注意是**单数**，与一体化管线的 `rec_texts` 不同） |
+| 排序/裁剪 | `src/pipeline/geometry.py` 复刻 PaddleOCR 的 `SortQuadBoxes` + `get_minarea_rect_crop` |
 
 ### 结果缓存
 
-`SceneTextOCR.run_detailed` 按图片内容 hash 缓存结果（LRU 32 条），同图二次识别 <0.1s。UI 与 evaluate.py 共用。
+`SceneTextOCR.run_detailed` 按图片内容 hash 缓存结果（LRU 32 条），同图二次识别 <0.1s。
 
 ## 四、已知问题 / 注意事项
 
@@ -63,14 +65,19 @@
 
 | 文件 | 作用 |
 | --- | --- |
-| `main.py` | CLI 单图识别（默认 small 模型，与界面一致；`--preprocess` 显式全开，仅对比实验用） |
+| `config.yaml` / `src/config.py` | 系统配置 + 加载 |
+| `main.py` | CLI 单图识别（模型默认读 config；`--preprocess` 显式全开，仅对比实验用） |
 | `app.py` | Gradio 界面（用户所有，改动前先沟通） |
-| `evaluate.py` | ICDAR2015 检测/识别评估（`--task det/rec`、`--limit`、`--ignore-case`、`--model medium/small`） |
+| `evaluate.py` | 评估 CLI（`--task`、`--limit`、`--model medium/small`） |
 | `evaluate_ablation.py` | 预处理消融（`--mode clean/degraded/lowcontrast/blur/skew/small`） |
-| `evaluate_linelevel.py` | 行级口径检测评估（词级 GT 合并成行后重算 P/R/F1） |
+| `evaluate_linelevel.py` | 行级口径检测评估 |
 | `make_figures.py` | 论文图表生成（常量改数值后重跑） |
-| `src/pipeline/ocr_pipeline.py` | SceneTextOCR（模型名/阈值/批大小/缓存） |
+| `src/pipeline/ocr_pipeline.py` | SceneTextOCR 编排（检测→排序→裁剪→识别→缓存） |
+| `src/pipeline/geometry.py` | 框排序 + 透视裁剪 |
+| `src/detector/` / `src/recognizer/` | TextDetector / TextRecognizer |
+| `src/evaluator/` | 评估指标 / 解析 / 执行 |
 | `src/preprocess/enhancer.py` | ImageEnhancer（8 算子） |
+| `tests/` | 单元测试（纯函数，不加载模型） |
 | `docs/evaluation_report.md` | 评估总报告（含 medium vs small、消融） |
 | `docs/figures/` | 论文图表 PNG |
 

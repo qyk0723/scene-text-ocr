@@ -4,7 +4,7 @@ import unittest
 
 import numpy as np
 
-from evaluate_linelevel import merge_to_lines
+from src.evaluator import merge_to_lines
 
 
 def _q(x0, y0, x1, y1):
