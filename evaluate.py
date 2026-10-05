@@ -13,13 +13,14 @@ import argparse
 from pathlib import Path
 from typing import List
 
+from src.config import get_config
 from src.evaluator import evaluate_detection, evaluate_recognition, render_report
 from src.pipeline.ocr_pipeline import SceneTextOCR
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="ICDAR2015 检测与识别评估")
-    parser.add_argument("--data-root", default="data/icdar2015", help="数据集根目录")
+    parser.add_argument("--data-root", default=None, help="数据集根目录，默认读 config.yaml")
     parser.add_argument("--task", choices=["det", "rec", "all"], default="all")
     parser.add_argument("--limit", type=int, default=0, help="每任务最多评估图片数，0 为全量")
     parser.add_argument("--iou", type=float, default=0.5, help="检测 IoU 阈值")
@@ -37,7 +38,9 @@ def main() -> None:
     parser.add_argument("--report", default="data/results/evaluation_report.md")
     args = parser.parse_args()
 
-    data_root = Path(args.data_root)
+    data_root = Path(args.data_root) if args.data_root else Path(
+        get_config().get("data", {}).get("root", "data/icdar2015")
+    )
     kwargs = dict(
         device=args.device,
         det_thresh=args.det_thresh,
@@ -46,6 +49,9 @@ def main() -> None:
     if args.model == "small":
         kwargs["det_model_name"] = "PP-OCRv6_small_det"
         kwargs["rec_model_name"] = "PP-OCRv6_small_rec"
+    else:
+        kwargs["det_model_name"] = "PP-OCRv6_medium_det"
+        kwargs["rec_model_name"] = "PP-OCRv6_medium_rec"
     ocr = SceneTextOCR(**kwargs)
 
     results: List[dict] = []

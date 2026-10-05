@@ -32,7 +32,6 @@ class SceneTextOCR:
 
     def __init__(
         self,
-        lang: Optional[str] = None,
         device: Optional[str] = None,
         det_thresh: Optional[float] = None,
         det_box_thresh: Optional[float] = None,
@@ -43,7 +42,6 @@ class SceneTextOCR:
         model = cfg.get("model", {})
         det = cfg.get("det", {})
 
-        self.lang = lang or model.get("lang", "ch")
         self.device = device or model.get("device", "cpu")
         self.det_model_name = det_model_name or model.get("det")
         self.rec_model_name = rec_model_name or model.get("rec")
@@ -51,6 +49,7 @@ class SceneTextOCR:
         self.det_box_thresh = det_box_thresh if det_box_thresh is not None else det.get("box_thresh")
         self.det_unclip_ratio = det.get("unclip_ratio")
         self.det_limit_side_len = det.get("limit_side_len")
+        self.det_limit_type = det.get("limit_type")
 
         # 懒加载
         self._detector = None
@@ -70,6 +69,7 @@ class SceneTextOCR:
                 box_thresh=self.det_box_thresh,
                 unclip_ratio=self.det_unclip_ratio,
                 limit_side_len=self.det_limit_side_len,
+                limit_type=self.det_limit_type,
             )
         return self._detector
 
@@ -99,6 +99,18 @@ class SceneTextOCR:
             arr = np.asarray(image)
             data = arr.tobytes() + str(arr.shape).encode()
         return hashlib.sha256(data).hexdigest()
+
+    def detect(self, image: Union[str, np.ndarray]) -> List[np.ndarray]:
+        """仅检测，返回排序后的文本框列表（不缓存）。"""
+        img = self._load_image(image)
+        detector = self._get_detector()
+        return sort_boxes(detector.detect(img))
+
+    def recognize(self, image: Union[str, np.ndarray]) -> Tuple[str, float]:
+        """仅识别单行图，返回 (文本, 置信度)（不缓存）。"""
+        img = self._load_image(image)
+        recognizer = self._get_recognizer()
+        return recognizer.recognize(img)
 
     def run_detailed(
         self, image: Union[str, np.ndarray]

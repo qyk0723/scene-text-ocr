@@ -22,6 +22,7 @@ class TextDetector:
         box_thresh: Optional[float] = None,
         unclip_ratio: Optional[float] = None,
         limit_side_len: Optional[int] = None,
+        limit_type: Optional[str] = None,
     ) -> None:
         run_mode = get_config().get("inference", {}).get("run_mode", "paddle")
         kwargs: dict = {"engine_config": {"run_mode": run_mode}}
@@ -35,6 +36,8 @@ class TextDetector:
             kwargs["unclip_ratio"] = unclip_ratio
         if limit_side_len is not None:
             kwargs["limit_side_len"] = limit_side_len
+        if limit_type is not None:
+            kwargs["limit_type"] = limit_type
         self._model = paddlex.create_model(model_name, **kwargs)
 
     def detect(self, image_bgr: np.ndarray) -> List[np.ndarray]:

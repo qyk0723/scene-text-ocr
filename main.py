@@ -2,7 +2,7 @@
 
 用法::
 
-    python main.py path/to/image.jpg [--lang ch] [--device cpu] [--preprocess]
+    python main.py path/to/image.jpg [--device cpu] [--preprocess]
 """
 
 from __future__ import annotations
@@ -21,7 +21,6 @@ def parse_args() -> argparse.Namespace:
         description="场景文字检测与识别（PP-OCR 预训练模型）"
     )
     parser.add_argument("image", help="输入图片路径")
-    parser.add_argument("--lang", default="ch", help="识别语言，默认 ch")
     parser.add_argument(
         "--device", default="cpu", help="推理设备，默认 cpu（可传 gpu / gpu:0）"
     )
@@ -35,7 +34,7 @@ def main() -> None:
     args = parse_args()
 
     # 模型默认读 config.yaml（small），与 Gradio 界面一致；评估基准 medium 由 evaluate.py --model 指定
-    ocr = SceneTextOCR(lang=args.lang, device=args.device)
+    ocr = SceneTextOCR(device=args.device)
 
     if args.preprocess:
         image = cv2.imread(args.image)

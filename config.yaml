@@ -4,16 +4,18 @@ model:
   det: PP-OCRv6_small_det      # 检测模型（small=部署默认，medium=评估基准）
   rec: PP-OCRv6_small_rec      # 识别模型
   device: cpu
-  lang: ch
 
 inference:
   run_mode: paddle             # 必须 paddle：Paddle 3.3 MKLDNN 与 PIR 执行器不兼容
 
 det:
-  thresh: null                 # null = 用模型默认
+  # null = 用模型自带 PostProcess 默认（0.2/0.45/1.4），与一体化管线行为一致。
+  # 勿改 0.3/0.6/2.0 —— 那是 PaddleOCR 文档默认，但 PP-OCRv6 的 inference.yml 覆盖了。
+  limit_side_len: null
+  limit_type: null
+  thresh: null
   box_thresh: null
   unclip_ratio: null
-  limit_side_len: null
 
 preprocess:
   resize_long_side: 1280

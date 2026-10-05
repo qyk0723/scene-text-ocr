@@ -19,6 +19,7 @@ from typing import Dict, List, Tuple
 import cv2
 import numpy as np
 
+from src.config import get_config
 from src.evaluator import levenshtein, parse_rec_gt
 from src.pipeline.ocr_pipeline import SceneTextOCR
 from src.preprocess.enhancer import ImageEnhancer
@@ -140,7 +141,7 @@ def main() -> None:
 
     configs, mode_label, out_name = MODES[args.mode]
 
-    data_root = Path("data/icdar2015")
+    data_root = Path(get_config().get("data", {}).get("root", "data/icdar2015"))
     img_dir = data_root / "recognition" / "test"
     pairs = parse_rec_gt(data_root / "recognition" / "test.txt", img_dir)[: args.limit]
 

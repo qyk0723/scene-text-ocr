@@ -32,8 +32,8 @@ def evaluate_detection(ocr: SceneTextOCR, data_root: Path, iou_thresh: float, li
         gt_boxes = parse_det_gt(gt_path)
 
         start = time.perf_counter()
-        boxes, _texts, elapsed = ocr.run(str(img_path))
-        times.append(elapsed)
+        boxes = ocr.detect(str(img_path))
+        times.append(time.perf_counter() - start)
 
         m = match_boxes(gt_boxes, boxes, iou_thresh)
         total_gt += len(gt_boxes)
@@ -79,9 +79,9 @@ def evaluate_recognition(ocr: SceneTextOCR, data_root: Path, limit: int, ignore_
             continue
 
         start = time.perf_counter()
-        _boxes, texts, elapsed = ocr.run(str(img_path))
-        times.append(elapsed)
-        pred = "".join(texts)
+        text, _score = ocr.recognize(str(img_path))
+        times.append(time.perf_counter() - start)
+        pred = text
 
         if ignore_case:
             pred = pred.upper()

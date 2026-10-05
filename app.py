@@ -28,10 +28,7 @@ from src.pipeline.ocr_pipeline import SceneTextOCR
 from src.preprocess.enhancer import ImageEnhancer
 
 # 全局单例：模型只加载一次（small 模型：整图 ~22s，精度代价见 docs/evaluation_report.md）
-_OCR = SceneTextOCR(
-    det_model_name="PP-OCRv6_small_det",
-    rec_model_name="PP-OCRv6_small_rec",
-)
+_OCR = SceneTextOCR()  # 模型默认读 config.yaml（small）
 
 
 def _load_font(size: int) -> Optional[ImageFont.FreeTypeFont]:

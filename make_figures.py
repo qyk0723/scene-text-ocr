@@ -87,7 +87,7 @@ def _h_bar(labels, values, title, xlabel, fmt, out_name, log=False, xlim=None):
 def make_metric_charts():
     _h_bar(
         ["字符准确率", "行级准确率"],
-        [82.89, 71.50],
+        [91.28, 80.62],
         "识别性能（ICDAR2015 recognition/test，2074 张）",
         "准确率（%）",
         "{:.2f}%",
@@ -96,7 +96,7 @@ def make_metric_charts():
     )
     _h_bar(
         ["精确率", "召回率", "F1"],
-        [61.86, 26.23, 36.84],
+        [61.37, 25.91, 36.43],
         "检测性能（ICDAR2015 detection/test，500 张）",
         "指标值（%）",
         "{:.2f}%",
@@ -104,8 +104,8 @@ def make_metric_charts():
         xlim=100,
     )
     _h_bar(
-        ["预处理（整图）", "识别（单行图）", "检测 + 识别（整图）"],
-        [0.10, 0.162, 3.86],
+        ["预处理（整图）", "识别（单行图）", "检测（整图）"],
+        [0.10, 0.111, 2.78],
         "平均耗时对比（CPU，PP-OCRv6 small）",
         "耗时（秒，对数刻度）",
         "{:.3g}s",
@@ -128,8 +128,8 @@ def make_model_comparison():
     """medium vs small 对比图：精度 + 速度。"""
     # 精度对比（分组柱状图，全量口径）
     categories = ["识别字符准确率", "检测 F1"]
-    medium = [82.89, 36.84]
-    small = [75.86, 32.70]
+    medium = [91.28, 36.43]
+    small = [89.66, 30.62]
     fig, ax = plt.subplots(figsize=(6.6, 3.9))
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
@@ -164,8 +164,8 @@ def make_model_comparison():
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
     x = np.arange(1)
-    bars_m = ax.bar(x - width / 2, [115.6], width, color=BLUE, label="medium")
-    bars_s = ax.bar(x + width / 2, [21.7], width, color=ORANGE, label="small")
+    bars_m = ax.bar(x - width / 2, [82.0], width, color=BLUE, label="medium")
+    bars_s = ax.bar(x + width / 2, [11.1], width, color=ORANGE, label="small")
     for bars in (bars_m, bars_s):
         for b in bars:
             ax.text(
@@ -192,8 +192,8 @@ def make_model_comparison():
 def make_wordline_chart():
     """检测指标口径对照：词级 vs 行级 F1。"""
     categories = ["词级口径", "行级口径"]
-    medium = [39.25, 36.31]
-    small = [33.59, 34.10]
+    medium = [38.04, 36.71]
+    small = [29.80, 31.98]
     fig, ax = plt.subplots(figsize=(5.8, 3.9))
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
@@ -227,8 +227,8 @@ def make_wordline_chart():
 def make_iou_sensitivity_chart():
     """检测 IoU 敏感性：词级 vs 行级 F1（medium，30 张）。"""
     categories = ["IoU 0.3", "IoU 0.5", "IoU 0.7"]
-    word_f1 = [53.46, 39.25, 26.17]
-    line_f1 = [49.32, 36.31, 17.89]
+    word_f1 = [51.98, 38.04, 25.24]
+    line_f1 = [47.12, 36.71, 19.18]
     fig, ax = plt.subplots(figsize=(6.4, 3.9))
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
@@ -263,8 +263,8 @@ def make_operator_chart():
     """各算子在适用场景下的效果：基线 vs 算子开启。"""
     categories = ["去噪\n（噪声图）", "锐化\n（模糊图）", "CLAHE\n（低对比图）",
                   "倾斜校正\n（±12°图）", "小字放大\n（小字图）"]
-    baseline = [17.51, 25.58, 68.04, 71.40, 32.07]
-    with_op = [33.16, 29.32, 68.13, 24.81, 76.43]
+    baseline = [15.38, 28.80, 61.40, 59.56, 22.55]
+    with_op = [32.26, 34.36, 48.31, 20.03, 77.96]
     fig, ax = plt.subplots(figsize=(9.5, 4.4))
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
@@ -299,7 +299,7 @@ def make_ablation_chart():
     """预处理消融柱状图（按准确率降序）。"""
     _h_bar(
         ["无预处理", "仅去噪", "仅锐化", "仅CLAHE", "全开（默认）"],
-        [73.51, 72.42, 67.31, 60.01, 53.65],
+        [63.02, 61.11, 52.97, 41.51, 33.10],
         "预处理消融（清晰图）：识别字符准确率（200 张单行图，PP-OCRv6 small）",
         "字符准确率（%）",
         "{:.2f}%",
@@ -308,7 +308,7 @@ def make_ablation_chart():
     )
     _h_bar(
         ["仅去噪", "无预处理", "仅CLAHE", "全开（默认）"],
-        [33.16, 17.51, 17.11, 14.69],
+        [32.26, 15.38, 9.43, 7.85],
         "预处理消融（退化图）：识别字符准确率（200 张单行图，PP-OCRv6 small）",
         "字符准确率（%）",
         "{:.2f}%",

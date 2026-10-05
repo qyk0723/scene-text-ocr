@@ -37,7 +37,6 @@ D:/miniconda3/envs/scene-text/python.exe main.py data/samples/test.jpg --preproc
 | 参数 | 说明 | 默认 |
 | --- | --- | --- |
 | `image` | 输入图片路径（位置参数） | 必填 |
-| `--lang` | 识别语言 | `ch` |
 | `--device` | 推理设备 | `cpu`（可传 `gpu`） |
 | `--preprocess` | 识别前先做预处理（显式全开，仅对比实验用） | 关闭 |
 
@@ -60,8 +59,8 @@ D:/miniconda3/envs/scene-text/python.exe -m unittest discover -s tests -p "test_
 模块：`src/preprocess/enhancer.py`，类 `ImageEnhancer`。各功能独立开关。
 
 消融实验结论（ICDAR2015 200 张单行图，见 `docs/evaluation_report.md` 第七节）：
-- 清晰图：预处理整体有害（全开 -20 字符点），**默认应关闭**
-- 算子适用域：小字放大（+44.4，最强）、去噪（+15.7，噪声图）、锐化（+3.7，模糊图）；CLAHE 中性、倾斜校正有害
+- 清晰图：预处理整体有害（全开 -30 字符点），**默认应关闭**
+- 算子适用域：小字放大（+55.4，最强）、去噪（+16.9，噪声图）、锐化（+5.6，模糊图）；CLAHE、倾斜校正有害
 
 Gradio 界面只暴露三个正收益算子，默认全不勾：**小字放大 / 去噪 / 锐化**。
 

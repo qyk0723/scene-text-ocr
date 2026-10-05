@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from src.config import get_config
 from src.evaluator import match_boxes, merge_to_lines, parse_det_gt
 from src.pipeline.ocr_pipeline import SceneTextOCR
 
@@ -24,7 +25,7 @@ def main() -> None:
     parser.add_argument("--model", choices=["medium", "small"], default="medium")
     args = parser.parse_args()
 
-    data_root = Path("data/icdar2015")
+    data_root = Path(get_config().get("data", {}).get("root", "data/icdar2015"))
     imgs_dir = data_root / "detection" / "test" / "imgs"
     gt_dir = data_root / "detection" / "test" / "gt"
     img_paths = sorted(imgs_dir.glob("img_*.jpg"))[: args.limit]
@@ -35,7 +36,10 @@ def main() -> None:
             rec_model_name="PP-OCRv6_small_rec",
         )
     else:
-        ocr = SceneTextOCR()
+        ocr = SceneTextOCR(
+            det_model_name="PP-OCRv6_medium_det",
+            rec_model_name="PP-OCRv6_medium_rec",
+        )
 
     ious = [0.3, 0.5, 0.7]
     gt_word = gt_line = pred = 0
@@ -50,7 +54,7 @@ def main() -> None:
         gt_words = parse_det_gt(gt_path)
         gt_lines = merge_to_lines(gt_words)
 
-        boxes, _texts, _t = ocr.run(str(img_path))
+        boxes = ocr.detect(str(img_path))
 
         gt_word += len(gt_words)
         gt_line += len(gt_lines)
