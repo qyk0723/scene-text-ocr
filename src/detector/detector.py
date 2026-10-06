@@ -6,8 +6,6 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
-import paddlex
-
 from src.config import get_config
 
 
@@ -24,6 +22,10 @@ class TextDetector:
         limit_side_len: Optional[int] = None,
         limit_type: Optional[str] = None,
     ) -> None:
+        # paddlex 在**此处**才导入：它的导入很重（数秒），而本模块要能被
+        # 不加载模型的测试与工具引用（审计 P2-21 的同类问题）。
+        import paddlex
+
         run_mode = get_config().get("inference", {}).get("run_mode", "paddle")
         kwargs: dict = {"engine_config": {"run_mode": run_mode}}
         if device:

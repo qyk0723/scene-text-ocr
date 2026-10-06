@@ -106,24 +106,44 @@ class SceneTextOCR:
         return self._recognizer
 
     def _load_image(self, image: Union[str, np.ndarray]) -> np.ndarray:
-        """输入路径或 BGR 数组，返回 BGR uint8 数组。"""
+        """输入路径或 BGR 数组，返回 BGR uint8 数组。
+
+        路径读图统一走 :func:`imread_unicode`（`cv2.imread` 在 Windows 上
+        以 ANSI 代码页打开文件，路径含非 ASCII 时静默返回 None）。
+        """
+        if isinstance(image, (str, Path)):
+            return self._load_any(image)
+        return image
+
+    @staticmethod
+    def _load_any(image: Union[str, Path, np.ndarray]) -> Optional[np.ndarray]:
+        """路径 → BGR 数组（读失败返回 None）；数组原样返回。
+
+        与 :meth:`_load_image` 的区别：**对数组输入也做类型收敛**，
+        供 :meth:`run_detailed` 在算缓存键前一次性把输入变成数组用——
+        这样路径输入只解码一次，不会"算键读一次、加载再读一次"。
+        """
         if isinstance(image, (str, Path)):
             path = Path(image)
             if not path.is_file():
                 raise FileNotFoundError(f"图片不存在: {image}")
-            img = imread_unicode(path)
-            if img is None:
-                raise ValueError(f"图片读取失败: {image}")
-            return img
+            return imread_unicode(path)
         return image
 
-    def _cache_key(self, image: Union[str, np.ndarray]) -> str:
-        if isinstance(image, (str, Path)):
-            data = Path(image).read_bytes()
-        else:
-            arr = np.asarray(image)
-            data = arr.tobytes() + str(arr.shape).encode()
-        return hashlib.sha256(data).hexdigest()
+    @staticmethod
+    def _cache_key(img: np.ndarray) -> str:
+        """按**解码后的数组内容**生成缓存键。
+
+        输入是数组而不是路径，是本方法的核心约定（见 :meth:`run_detailed`）。
+
+        **审计 P2-21 的修复**：原实现按输入类型分两种算法——路径取
+        ``sha256(文件字节)``、数组取 ``sha256(数组字节 + str(shape))``。
+        两条键的构成不同，于是**同一张图经不同入口进来就有两个身份**，
+        会重复推理、并让缓存里同时存在两份同样的结果（实测已确证）。
+        现在统一为"解码后数组的内容哈希"，两条入口自然合流。
+        """
+        arr = np.asarray(img)
+        return hashlib.sha256(arr.tobytes() + str(arr.shape).encode()).hexdigest()
 
     def detect_detailed(
         self, image: Union[str, np.ndarray]
@@ -147,20 +167,27 @@ class SceneTextOCR:
         img = self._load_image(image)
         recognizer = self._get_recognizer()
         return recognizer.recognize(img)
-
     def run_detailed(
         self, image: Union[str, np.ndarray]
     ) -> Tuple[List[np.ndarray], List[str], List[float], float]:
-        """检测 + 识别，返回 (文本框, 文本, 置信度, 耗时)。命中缓存耗时约 0。"""
+        """检测 + 识别，返回 (文本框, 文本, 置信度, 耗时)。命中缓存耗时约 0。
+
+        路径输入在此**只解码一次**：先解码成数组，缓存键与后续推理共用同一份数组
+        （原实现"先按路径算键读一次文件、再 `_load_image` 读一次"，冷调用读两遍）。
+        """
         start = time.perf_counter()
-        key = self._cache_key(image)
+        # 先解码一次：路径输入只有这一次文件读取，缓存键与推理共用同一份数组
+        img = self._load_any(image)
+        if img is None:
+            raise ValueError(f"图片读取失败: {image}")
+
+        key = self._cache_key(img)
         if key in self._cache:
             result = self._cache.pop(key)
             self._cache[key] = result  # 移到队尾（LRU）
             boxes, texts, scores, _elapsed = result
             return boxes, texts, scores, time.perf_counter() - start
 
-        img = self._load_image(image)
         detector = self._get_detector()
         recognizer = self._get_recognizer()
 
