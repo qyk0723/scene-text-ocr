@@ -72,7 +72,7 @@ def check_metrics_in_sync() -> None:
     """
     global CHECKS
     CHECKS += 1
-    directly_produced = {"e2e.json"}
+    directly_produced = {"e2e.json", "small_text.json"}
     spec = importlib.util.spec_from_file_location(
         "gen_metrics_for_check", PROJ / "tools" / "gen_metrics.py")
     mod = importlib.util.module_from_spec(spec)
@@ -89,7 +89,8 @@ def check_metrics_in_sync() -> None:
                              "既非 gen_metrics 从产物派生，也不在 directly_produced 中；"
                              "请归类，否则无法判断其数字来源"))
         for p in sorted((PROJ / "metrics").glob("*.json")):
-            if p.name in directly_produced:
+            # 未归类的文件已在上面报过一次，这里跳过，避免同一个问题报两遍
+            if p.name in directly_produced or p.name not in derived:
                 continue
             q = Path(td) / p.name
             if not q.is_file():
@@ -168,6 +169,9 @@ def main() -> int:
     check("报告 §五 有口径更正块", "docs/evaluation_report.md", "本节口径更正")
     check_absent("README 不得再说 CLAHE 中性", "README.md", "CLAHE | 不暴露（实测中性）")
     check("make_figures 检测口径为 deteval", "make_figures.py", 'DETECTION_PROTOCOL = "deteval"')
+    check_absent("README 不得再写「小字放大 +55.4 最强」", "README.md", "小字放大（+55.4，最强）")
+    check_absent("报告不得再写倾斜校正「-39.5 有害」为结论", "docs/evaluation_report.md",
+                 "| **-39.5 有害** |")
 
     print()
     if FAILURES:

@@ -93,6 +93,73 @@ def evaluate_arm(det, rec, img, quads, dnc, texts, iou_thresh=0.5):
     return det_recall, det_n, rec_acc, len(boxes)
 
 
+def build_report(rows, meta) -> str:
+    """由指标生成报告文本。与推理分离，可用 ``--from-json`` 只重出文本。"""
+    deploy_side = meta["deploy_upscale_min_long_side"]
+    model, n_img, seed, scale = meta["model"], meta["images"], meta["sample_seed"], meta["scale"]
+    # 检测器内部的输入上限。**config.yaml 里是 null**，生效值只存在于模型自身的
+    # inference.yml（PP-OCRv6 为 960）——这正是审计 P1-4 指出的"没有任何产物能自证
+    # 用了什么参数"。这里显式写出，避免报告里印出 "limit_side_len=None" 这种误导。
+    eff_lim = meta.get("effective_limit_side_len", 960)
+
+    d0, a_arm, b_arm, c_arm = rows[0], rows[1], rows[2], rows[3]
+    body = ["# 小字放大算子的可信消融（整图、四臂、det/rec 分离）", "",
+            f"模型：PP-OCRv6 {model}；整图 {n_img} 张（种子 {seed}）；"
+            f"降采样倍率 {scale}；部署值 `upscale_min_long_side = {deploy_side}`", "",
+            "| 臂 | det 召回（deteval） | 有效 GT 框 | rec 字符准确率 | 检出框数/图 | 秒/图 |",
+            "| --- | --- | --- | --- | --- | --- |"]
+    for r in rows:
+        body.append(f"| {r['arm']} | {r['det_recall']:.4f} | {r['det_n']} | "
+                    f"{r['rec_char_acc']:.4f} | {r['boxes_per_image']:.2f} | "
+                    f"{r['seconds_per_image']:.2f} |")
+
+    dd, ad = d0["det_recall"], a_arm["det_recall"]
+    dr, ar = d0["rec_char_acc"], a_arm["rec_char_acc"]
+    br, cr = b_arm["rec_char_acc"], c_arm["rec_char_acc"]
+    bd, cd = b_arm["det_recall"], c_arm["det_recall"]
+
+    body += ["", "## 判读", "",
+             f"1. **降采样确实制造了困难**：det 召回 {dd:.4f} → {ad:.4f}（{ad-dd:+.4f}），"
+             f"rec 字符准确率 {dr:.4f} → {ar:.4f}（{ar-dr:+.4f}）。"
+             "所以「小字确实更难」成立。",
+             f"2. **放大算子只恢复了损失的一部分**：A → B 使 det 召回 {ad:.4f} → {bd:.4f}"
+             f"（{bd-ad:+.4f}）、rec {ar:.4f} → {br:.4f}（{br-ar:+.4f}）。方向为正，但幅度不大。",
+             f"3. **而且不如「原样放回原尺寸」**：C 的 det 召回 {cd:.4f}、rec {cr:.4f}，"
+             f"**两项都高于 B**（det {cd-bd:+.4f}、rec {cr-br:+.4f}）。"
+             "即部署所用的「放大到 "
+             f"{deploy_side}」并不优于把图直接还原到原尺寸。",
+             f"4. **两者都没能回到原图水平**：D 的 det 召回 {dd:.4f} / rec {dr:.4f}，"
+             f"最好的臂（C）仍差 det {cd-dd:+.4f} / rec {cr-dr:+.4f}。"
+             "因为下采样丢掉的像素无法靠插值找回。",
+             "",
+             "**结论**：旧结论「小字放大 +55.4，最强算子」是**实验设计的产物**——"
+             "旧实验把长边中位数仅 54px 的单行裁剪图 ÷2 再放大到 400px，"
+             "相对原图净放大 **+641%**，等于凭空给检测器加了大量像素；"
+             "而在**整图 + 部署值**的正确设定下，该算子只是**部分恢复**了降采样造成的损失，"
+             "且**不如直接还原原尺寸**。因此不应再把它写成「最强的正收益算子」。",
+             "",
+             "## 机制（决定了怎么解读上表）", "",
+             f"检测模型内部按 `limit_side_len={eff_lim} / limit_type=max` 处理输入——**只缩不放**。",
+             f"（⚠️ `config.yaml` 里该项为 `null`，生效值只存在于模型自身的 `inference.yml`；"
+             f"报告里显式写出，避免印出误导性的 `None`。这是审计 P1-4 的问题。）",
+             "",
+             f"- 臂 A 的图低于该上限，检测器**按原样**处理 → 文字确实小；",
+             f"- 臂 B（放大到 {deploy_side}）与臂 C（还原原尺寸）**都达到/超过上限**，"
+             f"检测器会再把两者缩到 {eff_lim} —— 于是两者看到的有效分辨率接近，"
+             f"差异主要来自插值质量（B 的放大倍率更大，反而略差）。",
+             "",
+             "**所以「小字放大」的真实机制是**：把**低于检测器输入上限**的小图抬到上限附近，"
+             "让检测器拿到比原图更多的像素；一旦达到上限，再放大就没有额外收益。",
+             "这解释了旧消融为何在 54px 的裁剪图上测出巨大收益——那些图远低于上限，"
+             "放大等于凭空给检测器加像素；而两个对照臂相差 15 倍，"
+             "结论无法与「就是喂了张大图」分离。",
+             "",
+             "> 与旧结论的区别：旧消融在**单行裁剪图**上度量**联合 det+rec 拼接串**，"
+             "两个臂像素高度差约 15 倍，且用的是部署不存在的 400px；本表在**整图**上"
+             "**分离** det-only 与 rec-only，并使用部署值。"]
+    return "\n".join(body) + "\n"
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="小字放大算子的可信消融（整图、四臂、det/rec 分离）")
     ap.add_argument("--limit", type=int, default=100)
@@ -101,8 +168,20 @@ def main() -> None:
     ap.add_argument("--model", choices=["small", "medium"], default="small")
     ap.add_argument("--iou", type=float, default=0.5)
     ap.add_argument("--report", default="data/results/small_text_ablation.md")
+    ap.add_argument("--from-json", default=None,
+                    help="跳过推理，直接从已有的 metrics JSON 重新生成报告")
     ap.add_argument("--metrics-json", default="metrics/small_text.json")
     args = ap.parse_args()
+
+    if args.from_json:
+        payload = json.loads(Path(args.from_json).read_text(encoding="utf-8"))
+        body = build_report(payload["arms"], payload)
+        out = Path(args.report)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(body, encoding="utf-8")
+        print(body)
+        print(f"报告已由 {args.from_json} 重新生成 -> {out}")
+        return
 
     cfg = get_config()
     data_root = Path(cfg.get("data", {}).get("root", "data/icdar2015"))
@@ -172,59 +251,24 @@ def main() -> None:
                      "boxes_per_image": float(np.mean(a["boxes"])) if a["boxes"] else 0.0,
                      "seconds_per_image": float(np.mean(a["t"])) if a["t"] else 0.0})
 
-    d0 = rows[0]
-    body = ["# 小字放大算子的可信消融（整图、四臂、det/rec 分离）", "",
-            f"模型：PP-OCRv6 {args.model}；整图 {len(paths)} 张（种子 {args.sample_seed}）；"
-            f"降采样倍率 {args.scale}；部署值 `upscale_min_long_side = {deploy_side}`", "",
-            "| 臂 | det 召回（deteval） | 有效 GT 框 | rec 字符准确率 | 检出框数/图 | 秒/图 |",
-            "| --- | --- | --- | --- | --- | --- |"]
-    for r in rows:
-        body.append(f"| {r['arm']} | {r['det_recall']:.4f} | {r['det_n']} | "
-                    f"{r['rec_char_acc']:.4f} | {r['boxes_per_image']:.2f} | "
-                    f"{r['seconds_per_image']:.2f} |")
-    det_d, det_a = d0["det_recall"], rows[1]["det_recall"]
-    rec_d, rec_a = d0["rec_char_acc"], rows[1]["rec_char_acc"]
-    rec_b, rec_c = rows[2]["rec_char_acc"], rows[3]["rec_char_acc"]
-    body += ["", "## 判读", "",
-             f"- **降采样确实制造了困难**：det 召回 {det_d:.4f} → {det_a:.4f}"
-             f"（{det_a - det_d:+.4f}），rec 字符准确率 {rec_d:.4f} → {rec_a:.4f}"
-             f"（{rec_a - rec_d:+.4f}）。",
-             f"- **放大到部署值({deploy_side}) vs 放回原尺寸**：rec {rec_c:.4f} → {rec_b:.4f}"
-             f"（{rec_b - rec_c:+.4f}）。",
-             f"- **能否恢复到原图水平**：原图 rec {rec_d:.4f}，放大臂 {rec_b:.4f}"
-             f"（{rec_b - rec_d:+.4f}）。"]
-
-    # 机制说明：检测器内部有 limit_side_len/limit_type='max'，只缩不放。
-    lim = get_config().get("det", {}).get("limit_side_len")
-    body += ["", "## 机制（这一点决定了怎么解读上表）", "",
-             f"检测模型内部按 `limit_side_len={lim} / limit_type=max` 处理输入——**只缩不放**。因此：",
-             "",
-             f"- 臂 A 的图低于该上限，检测器**按原样**处理 → 文字确实小；",
-             f"- 臂 B（放大到 {deploy_side}）与臂 C（回到原尺寸）**都已达到/超过上限**，"
-             f"检测器会把两者都缩到 {lim} —— 于是 **B 与 C 看到的是同一个有效分辨率**，"
-             f"只差插值质量。",
-             "",
-             "**所以「小字放大」的真实机制是**：把一个**低于检测器输入上限**的小图抬到上限附近，"
-             "让检测器拿到比原图更多的像素；一旦达到上限，再放大就没有额外收益（B ≈ C 即此意）。",
-             "这解释了为什么旧消融在 54px 的单行裁剪图上测出巨大收益——那些图远低于上限，"
-             "放大等于凭空给检测器加了像素；而两个对照臂相差 15 倍，"
-             "结论无法与「就是喂了张大图」分离。"]
-
-    body += ["", "> 与旧结论的区别：旧消融在**单行裁剪图**上度量**联合 det+rec 拼接串**，"
-             "两个臂像素高度差约 15 倍，且用的是部署不存在的 400px；本表在**整图**上"
-             "**分离** det-only 与 rec-only，并使用部署值。"]
+    payload = {
+        "model": args.model, "images": len(paths), "sample_seed": args.sample_seed,
+        "scale": args.scale, "deploy_upscale_min_long_side": deploy_side,
+        # 检测器内部生效的输入上限。config.yaml 里是 null，生效值来自模型自身
+        # 的 inference.yml（PP-OCRv6 为 960）——审计 P1-4 指出的问题。
+        "effective_limit_side_len": 960,
+        "arms": rows,
+    }
+    body = build_report(rows, payload)
     out = Path(args.report)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text("\n".join(body) + "\n", encoding="utf-8")
-    print("\n" + "\n".join(body))
+    out.write_text(body, encoding="utf-8")
+    print("\n" + body)
 
     mj = Path(args.metrics_json)
     mj.parent.mkdir(parents=True, exist_ok=True)
-    mj.write_text(json.dumps({
-        "model": args.model, "images": len(paths), "sample_seed": args.sample_seed,
-        "scale": args.scale, "deploy_upscale_min_long_side": deploy_side,
-        "arms": rows, "source": str(out),
-    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    payload["source"] = str(out)
+    mj.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"\n报告 {out}\n指标 {mj}")
 
 

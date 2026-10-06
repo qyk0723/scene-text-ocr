@@ -116,7 +116,10 @@
    实测带符号误差均值 **−59.5°**，即按无意义角度乱转。已换成投影轮廓方差法（误差 −0.05°）。
    重测后结论从「−39.5 点有害」改为「**轻微有害 −1.8 点，且识别模型自身对 ±12° 已有容差**」，
    论文按后者写。详见 `docs/PROJECT_AUDIT.md` P2-19 与 `docs/evaluation_report.md` 第七节更正块。
-   另：「**小字放大 +55.4**」同样待重做（原实验设计混淆），脚本见 `evaluate_small_text.py`。
+   ⚠️ **「小字放大 +55.4」已重做并推翻**（`evaluate_small_text.py`，整图/四臂/det-rec 分离/部署值 800）：
+   放大到 800 只让 det 召回 +2.9 点、rec +0.8 点，**且两项都不如直接把图还原到原尺寸**——
+   不应再写成"最强正收益算子"。见 `data/results/small_text_ablation.md`。
+   P1-3 与 P2-19 至此均已闭环。
 4. **网络代理**：git 需 Watt Toolkit 代理 `127.0.0.1:26561` + 本仓库 `http.sslVerify=false`（中间人解密）。Watt Toolkit 开系统代理会拦截 localhost 导致 Gradio 启动 404，app.py 已设 `NO_PROXY` 绕过（或 Windows 代理勾「对本地地址不使用代理服务器」）。
 5. **token 安全**：旧 PAT 已于 2026-09-28 撤销，git 已配 `credential.helper manager`（凭据存 Windows 凭据管理器，推送不再贴 token）。
 

@@ -1,0 +1,42 @@
+{
+  "model": "small",
+  "images": 100,
+  "sample_seed": 20261006,
+  "scale": 0.5,
+  "deploy_upscale_min_long_side": 800,
+  "arms": [
+    {
+      "arm": "D 原图不预处理",
+      "det_recall": 0.3827751196172249,
+      "det_n": 418,
+      "rec_char_acc": 0.9226367528482914,
+      "boxes_per_image": 3.95,
+      "seconds_per_image": 3.33416883399972
+    },
+    {
+      "arm": "A 降采样不预处理",
+      "det_recall": 0.30861244019138756,
+      "det_n": 418,
+      "rec_char_acc": 0.8818088907107681,
+      "boxes_per_image": 2.95,
+      "seconds_per_image": 1.7461236100000315
+    },
+    {
+      "arm": "B 降采样→放大到 800",
+      "det_recall": 0.3373205741626794,
+      "det_n": 418,
+      "rec_char_acc": 0.8897372321156662,
+      "boxes_per_image": 3.24,
+      "seconds_per_image": 2.421118564000135
+    },
+    {
+      "arm": "C 降采样→放大回原尺寸",
+      "det_recall": 0.3588516746411483,
+      "det_n": 418,
+      "rec_char_acc": 0.9007398864058205,
+      "boxes_per_image": 3.56,
+      "seconds_per_image": 3.259237924000081
+    }
+  ],
+  "source": "data\\results\\small_text_ablation.md"
+}
