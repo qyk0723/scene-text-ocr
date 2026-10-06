@@ -20,55 +20,36 @@ os.environ["NO_PROXY"] = "localhost,127.0.0.1"
 os.environ["no_proxy"] = "localhost,127.0.0.1"
 
 import cv2
-import gradio as gr
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
 
 from src.pipeline.ocr_pipeline import SceneTextOCR
-from src.preprocess.enhancer import ImageEnhancer
+from src.preprocess.enhancer import ImageEnhancer, ProcessInfo
 
-# 全局单例：模型只加载一次（small 模型：整图 ~22s，精度代价见 docs/evaluation_report.md）
-_OCR = SceneTextOCR()  # 模型默认读 config.yaml（small）
-
-
-def _load_font(size: int) -> Optional[ImageFont.FreeTypeFont]:
-    """加载 Windows 中文字体，找不到则返回 None。"""
-    candidates = [
-        "C:/Windows/Fonts/simhei.ttf",
-        "C:/Windows/Fonts/msyh.ttc",
-        "C:/Windows/Fonts/simsun.ttc",
-    ]
-    for path in candidates:
-        if os.path.exists(path):
-            try:
-                return ImageFont.truetype(path, size, index=0)
-            except Exception:
-                continue
-    return None
+# 绘制与坐标映射住在 src/visualize/draw.py：那是**不依赖 gradio / 模型**的轻量模块，
+# 供 make_figures.py 与测试直接引用（原先都住在 app.py，谁 import 都要拉起 GUI）。
+# 这里再导出一次，保持 `from app import draw_results` 这类既有用法仍然可用。
+from src.visualize.draw import (  # noqa: F401  (向后兼容再导出)
+    _load_font,
+    annotate_results,
+    draw_results,
+    map_boxes_to_original,
+)
 
 
-def draw_results(img_bgr: np.ndarray, boxes: List[np.ndarray], texts: List[str]) -> np.ndarray:
-    """在原图上用 OpenCV 画检测框，用 PIL 叠加中文标注。"""
-    img = img_bgr.copy()
-    for box in boxes:
-        pts = box.astype(np.int32).reshape(-1, 1, 2)
-        cv2.polylines(img, [pts], isClosed=True, color=(0, 255, 0), thickness=2)
+def _get_ocr() -> SceneTextOCR:
+    """返回全局单例 `SceneTextOCR`（**首次调用才加载模型**）。
 
-    font = _load_font(16)
-    if font is not None:
-        rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        pil = Image.fromarray(rgb)
-        draw = ImageDraw.Draw(pil)
-        for box, text in zip(boxes, texts):
-            x = int(min(p[0] for p in box))
-            y = int(min(p[1] for p in box)) - 22
-            y = max(y, 0)
-            width = len(text) * 16
-            draw.rectangle([x, y, x + width, y + 20], fill=(0, 0, 0))
-            draw.text((x + 2, y + 2), text, font=font, fill=(0, 255, 0))
-        img = cv2.cvtColor(np.array(pil), cv2.COLOR_RGB2BGR)
+    **为什么懒加载**：原先写成模块级 `_OCR = SceneTextOCR()`，于是**只要
+    `import app` 就会加载模型**——测试导入它算坐标映射也要付一次加载代价
+    （审计 P2-21 记录在案）。改成首次使用时加载，界面行为不变。
+    """
+    global _OCR
+    if _OCR is None:
+        _OCR = SceneTextOCR()  # 模型默认读 config.yaml（small）
+    return _OCR
 
-    return img
+
+_OCR: Optional[SceneTextOCR] = None  # 单例：模型只加载一次（small 整图 3~17s）
 
 
 def _model_label() -> str:
@@ -77,7 +58,7 @@ def _model_label() -> str:
     原先这里写死 "PP-OCRv6 small"，而模型名已改为从 config.yaml 读取——
     一旦配置改成 medium，界面就会显示错误信息。
     """
-    name = getattr(_OCR, "det_model_name", "") or ""
+    name = getattr(_get_ocr(), "det_model_name", "") or ""
     return name.replace("_det", "").replace("_", " ") or "未知模型"
 
 
@@ -196,19 +177,21 @@ def predict(
         if use_denoise or use_sharpen or use_upscale:
             start = time.perf_counter()
             # 按勾选组合启用对应预处理（CLAHE/倾斜校正实测无益不进 UI）
-            proc = ImageEnhancer(
+            proc, info = ImageEnhancer(
                 denoise=use_denoise,
                 sharpen=use_sharpen,
                 upscale=use_upscale,
                 contrast=False,
-            ).process(img_bgr)
+            ).process_with_info(img_bgr)
             prep_elapsed = time.perf_counter() - start
         else:
-            proc = img_bgr
+            proc = img_bgr  # 无预处理时 proc 就是原图，坐标天然一致
+            info = ProcessInfo.from_shapes(img_bgr.shape[:2], img_bgr.shape[:2])
 
-        boxes, texts, scores, ocr_elapsed = _OCR.run_detailed(proc)
+        boxes, texts, scores, ocr_elapsed = _get_ocr().run_detailed(proc)
 
-        annotated_bgr = draw_results(img_bgr, boxes, texts)
+        # boxes 属于 proc 的坐标系，必须先映射回原图再画（勾选「小字放大」时 proc 更大）
+        annotated_bgr = draw_results(img_bgr, map_boxes_to_original(boxes, info), texts)
         annotated_rgb = cv2.cvtColor(annotated_bgr, cv2.COLOR_BGR2RGB)
         data_uri = _img_to_data_uri(annotated_rgb)
 
@@ -228,19 +211,41 @@ def predict(
         )
 
 
-_THEME = gr.themes.Soft(
-    primary_hue="blue",
-    secondary_hue="blue",
-    neutral_hue="slate",
-    font=[
-        "system-ui",
-        "-apple-system",
-        "Segoe UI",
-        "Microsoft YaHei",
-        "PingFang SC",
-        "sans-serif",
-    ],
-)
+def _ensure_gradio():
+    """**首次真正要用界面时才导入 gradio**，返回模块对象。
+
+    gradio 的导入实测约 7.7s（连带 gradio.workflow / interface 等）。原先在模块顶部
+    `import gradio as gr`，于是任何 `import app` 的场合都要付这笔钱——测试导入它取
+    绘制/映射函数、`make_figures.py` 取 `draw_results` 都会被拖慢
+    （审计 P2-21：`import app` 的副作用）。界面本身的行为不受影响。
+    """
+    global gr
+    if gr is None:
+        import gradio as _gr
+
+        gr = _gr
+    return gr
+
+
+gr = None  # 由 _ensure_gradio() 延迟填充（只影响模块属性访问时机）
+
+
+def _theme():
+    """构造渐变主题（会导入 gradio）。"""
+    g = _ensure_gradio()
+    return g.themes.Soft(
+        primary_hue="blue",
+        secondary_hue="blue",
+        neutral_hue="slate",
+        font=[
+            "system-ui",
+            "-apple-system",
+            "Segoe UI",
+            "Microsoft YaHei",
+            "PingFang SC",
+            "sans-serif",
+        ],
+    )
 
 _CSS = """
 .gradio-container { max-width: 100% !important; }
@@ -326,7 +331,9 @@ footer { display: none !important; }
 """
 
 
-def build_ui() -> gr.Blocks:
+def build_ui():
+    """构造界面（首次调用时导入 gradio，之后复用）。"""
+    _ensure_gradio()
     with gr.Blocks(title="场景文字检测与识别系统") as demo:
         gr.HTML(f"<style>{_CSS}</style>")
         # 顶部标题栏（约 60px）
@@ -390,6 +397,6 @@ if __name__ == "__main__":
     build_ui().launch(
         server_name="127.0.0.1",
         server_port=7860,
-        theme=_THEME,
+        theme=_theme(),
         css=_CSS,
     )

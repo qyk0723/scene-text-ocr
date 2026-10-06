@@ -23,7 +23,7 @@ import numpy as np
 from PIL import Image as PILImage
 from PIL import ImageDraw
 
-from app import _load_font, draw_results
+from src.visualize.draw import _load_font, draw_results
 from src.evaluator.metrics_store import MissingMetric, by_iou, get, load, pct
 from src.pipeline.ocr_pipeline import SceneTextOCR, imread_unicode
 from src.preprocess.enhancer import ImageEnhancer
