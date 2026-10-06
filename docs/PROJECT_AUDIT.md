@@ -45,6 +45,8 @@
 | P2-11 `src` 是隐式命名空间包 | 随 `src/__init__.py` 一并成为常规包 | `src/__init__.py` |
 | **P1-6 消融耗时口径不可信** | 耗时计入预处理、丢弃首张预热、配置间清缓存、报中位数/p95，并新增**检出框数/张**列以解释"有害配置反而更快" | `evaluate_ablation.py` |
 | P1-6 补充：读图健壮性 | 消融脚本读图统一走 `imread_unicode`；新增 `--out` | `evaluate_ablation.py` |
+| **P1-16 图表硬编码数值** | 新增 `src/evaluator/metrics_store.py` 与 `metrics/`（6 个 JSON + README）；`make_figures.py` 全部字面量改为从 store 读取，缺键抛带路径的错误；新增 `DETECTION_PROTOCOL` 开关一行切换口径。数值由 `tools/gen_metrics.py` **从产物解析**，无证据的集中放 `manual.json` | `make_figures.py`、`src/evaluator/metrics_store.py`、`metrics/`、`tools/gen_metrics.py` |
+| P1-4 补充：`unclip_ratio` 无法扫描 | 新增 `evaluate.py --det-unclip-ratio`，与 `--det-thresh`/`--det-box-thresh` 对称 | `evaluate.py`、`src/pipeline/ocr_pipeline.py` |
 
 ## 新增能力
 
@@ -72,6 +74,14 @@
    **逐位一致（程序化比对 17/17 OK）** → 第七节的准确率表格仍然有效，只有耗时列被升级。
 9. **产物复查**：`preprocess_compare.png` 重新生成后与 HEAD **逐字节相同**，左右两半平均绝对差 16.27
    —— 证明该图本来就是有效的（详见「更正 1」）。
+10. **图表重构的保真验证**：`make_figures.py` 改为从 `metrics/` 取数后重生成全部图表，
+    与仓库版本逐字节比对 → **10 张里 9 张完全一致**；唯一差异是 `timing.png`，
+    因旧脚本写的是四舍五入后的 `2.78`、现在直接读产物得 `2.779`，
+    两者**只有 412 / 1 331 960 个像素不同（0.031%）**，是柱状图边缘的亚像素差，非数据变化。
+11. **参数覆写有效性**：打印模型生效参数确认 `--det-thresh/--det-box-thresh/--det-unclip-ratio`
+    确实生效（默认 `0.2/0.45/1.4`，传 `0.30` 后 `thresh=0.3`，传 `2.0` 后 `unclip_ratio=2.0`）。
+12. **参数扫描的显著性**：4 个变体对基线的两比例差检验 |z| 最大约 1.5，**均未达 0.05 显著**。
+    因此结论只写趋势（单调次序），不写具体点数。
 
 ## 未做（留给你决定 / 待你执行）
 
@@ -248,8 +258,14 @@ PermissionError: [Errno 13] Permission denied:
   但报告写的 +1.7% 幅度偏乐观**（且基于 20 张）。
 - 额外收获：离线过滤 0.35 的 dump 到 0.45，与 0.45 那次运行的原始输出**逐位一致** →
   以后调阈值不必重跑模型。
-- 仍待做：`thresh`（二值图阈值）与 `unclip_ratio` 尚未扫——后两者会改变候选生成，
-  **必须重跑**，不能靠 dump 离线推出。
+- **✅ `thresh` 与 `unclip_ratio` 已扫（第 6 轮，100 张随机子集，见「补充验证记录」）**：
+  新增 `--det-unclip-ratio`（此前只能从 config 读、无法扫描，已实测确认覆写生效）。
+  结果：两个口径下均呈 `unclip 1.0 > 1.4 > 1.8` 的**单调次序**，
+  松开框时精确率与召回率同时下降 → **支持报告「输出粒度介于词/行之间」的论断**，
+  且比原来的「以空结果排除」更有说服力。
+  但**没有任何单个配置达到显著**（n=418，最大 |z|≈1.5），所以只能写趋势、不能写具体点数。
+  **决定：暂不改 `config.yaml` 默认值**（收益未达显著，而改默认会让已有全部结果失效）。
+  产物：`data/results/sweep_params_summary.md`。
 
 ## P1-5 速度结论不可复现（互斥值差近 2 倍，且无存档）
 
