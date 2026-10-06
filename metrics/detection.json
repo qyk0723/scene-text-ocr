@@ -1,14 +1,18 @@
 {
   "medium": {
-    "source": "data/results/eval_medium_det_final.md",
+    "source": "data/results/eval_medium_det_deteval.md",
     "legacy": {
       "precision": 0.6137,
       "recall": 0.2591,
       "f1": 0.3643
     },
-    "deteval": null,
-    "seconds_per_image": 11.264,
-    "deteval_pending": "medium 的 deteval 口径需要一次全量重跑（约 3.7 小时）：python evaluate.py --task det --model medium --dump-pred data/results/pred_medium_det_500.jsonl --report data/results/eval_medium_det_deteval.md"
+    "deteval": {
+      "precision": 0.5115,
+      "recall": 0.4299,
+      "f1": 0.4672
+    },
+    "seconds_per_image": 13.555,
+    "legacy_source": "data/results/eval_medium_det_final.md"
   },
   "small": {
     "source": "data/results/eval_small_det_deteval.md",
