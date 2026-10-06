@@ -264,7 +264,10 @@ def _score_end2end_set(gt_boxes, gt_texts, pred_boxes, pred_norm, dnc_quads, iou
         else:
             fp += 1
 
-    return tp, fp, fn, ignored, char_accs
+    return {
+        "tp": tp, "fp": fp, "fn": fn, "ignored": ignored,
+        "char_accs": char_accs, "pairs": pairs, "cands": cands, "used": used,
+    }
 
 
 def evaluate_end2end(
@@ -273,6 +276,7 @@ def evaluate_end2end(
     iou_thresh: float = 0.5,
     limit: int = 0,
     sample_seed: int = None,
+    dump_lines=None,
 ):
     """**端到端（整图）系统评测**：det → crop → rec 全流程，判定读对与否。
 
@@ -312,6 +316,13 @@ def evaluate_end2end(
     times: List[float] = []
     print(f"[e2e] 共 {len(img_paths)} 张整图，IoU 阈值 {iou_thresh}（端到端 det→crop→rec）")
 
+    dump_handle = None
+    if dump_lines is not None:
+        dump_path = Path(dump_lines)
+        dump_path.parent.mkdir(parents=True, exist_ok=True)
+        dump_handle = open(dump_path, "w", encoding="utf-8")
+        print(f"[e2e] 行级明细写入 {dump_path}")
+
     for idx, img_path in enumerate(img_paths, start=1):
         gt_path = gt_dir / f"gt_{img_path.stem}.txt"
         if not gt_path.is_file():
@@ -332,22 +343,53 @@ def evaluate_end2end(
         times.append(time.perf_counter() - start)
         pred_norm = {pi: _norm_text(t) for pi, t in enumerate(pred_texts)}
 
+        res_line = None
         for level, gt_boxes, texts in (
             ("word", care_quads, [_norm_text(t) for t in care_texts]),
             ("line", line_boxes, line_texts),
         ):
-            tp, fp, fn, ign, accs = _score_end2end_set(
+            r = _score_end2end_set(
                 gt_boxes, texts, boxes, pred_norm, dnc_quads, iou_thresh
             )
             a = acc[level]
-            a[0] += tp
-            a[1] += fp
-            a[2] += fn
-            a[3] += ign
-            a[4].extend(accs)
+            a[0] += r["tp"]
+            a[1] += r["fp"]
+            a[2] += r["fn"]
+            a[3] += r["ignored"]
+            a[4].extend(r["char_accs"])
+            if level == "line":
+                res_line = r
+
+        if dump_handle is not None and res_line is not None:
+            # 行级明细：便于事后做错误分类（读对 / 读错 / 漏读 / 多余 / 忽略）
+            pairs, cands = res_line["pairs"], res_line["cands"]
+            for j, gt in enumerate(line_texts):
+                got = cands.get(j, [])
+                status = "correct" if (gt and gt in got) else "wrong_text" if got else "missed"
+                # 该行与**任何**预测框的最大 IoU：用来区分"压根没检出"与"检出了但框对不上"
+                best_iou = max((quad_iou(b, line_boxes[j]) for b in boxes), default=0.0)
+                dump_handle.write(json.dumps({
+                    "image": img_path.stem, "level": "line", "index": j,
+                    "gt_text": gt, "status": status,
+                    "matched_pred_texts": got,
+                    "n_matched": len(got),
+                    "best_iou": round(float(best_iou), 4),
+                }, ensure_ascii=False) + "\n")
+            for pi, p in enumerate(boxes):
+                if pi in pairs:
+                    continue
+                on_dnc = any(quad_iou(p, d) >= iou_thresh for d in dnc_quads)
+                dump_handle.write(json.dumps({
+                    "image": img_path.stem, "level": "line", "index": -1,
+                    "gt_text": "", "status": "ignored" if on_dnc else "spurious",
+                    "matched_pred_texts": [pred_norm[pi]], "n_matched": 0,
+                }, ensure_ascii=False) + "\n")
 
         if idx % 20 == 0 or idx == len(img_paths):
             print(f"  {idx}/{len(img_paths)} 累计 词级 TP={acc['word'][0]} 行级 TP={acc['line'][0]}")
+
+    if dump_handle is not None:
+        dump_handle.close()
 
     out = {"task": "端到端", "images": len(img_paths),
            "avg_time": float(np.mean(times)) if times else 0.0}

@@ -34,6 +34,8 @@ def main() -> None:
     parser.add_argument("--iou", type=float, default=0.5, help="行匹配 IoU 阈值")
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--report", default="data/results/e2e_report.md")
+    parser.add_argument("--dump-lines", default=None,
+                        help="把行级明细写入 JSONL（读对/读错/漏读/多余/忽略），供错误分类")
     parser.add_argument("--metrics-json", default="metrics/e2e.json",
                         help="把结果写成机器可读 JSON，供图表使用（单一数据源）")
     args = parser.parse_args()
@@ -47,7 +49,8 @@ def main() -> None:
         ocr = SceneTextOCR(det_model_name="PP-OCRv6_medium_det",
                            rec_model_name="PP-OCRv6_medium_rec", device=args.device)
 
-    r = evaluate_end2end(ocr, data_root, args.iou, args.limit, args.sample_seed)
+    r = evaluate_end2end(ocr, data_root, args.iou, args.limit, args.sample_seed,
+                         args.dump_lines)
     w, ln = r["word"], r["line"]
 
     body = (
