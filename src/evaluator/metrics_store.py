@@ -48,6 +48,14 @@ def pct(value: float) -> float:
     return round(float(value) * 100, 2)
 
 
+class MissingMetric(Exception):
+    """某项指标尚未测量。
+
+    用于区分"数值算错了"和"这项还没跑"——后者需要给出**具体要运行的命令**，
+    而不是让人对着一个 KeyError 猜。
+    """
+
+
 def by_iou(entries, iou: float) -> Dict[str, Any]:
     """从行级评估的列表里按 IoU 取值（列表是因为键里的小数点会破坏点分路径）。"""
     for e in entries:

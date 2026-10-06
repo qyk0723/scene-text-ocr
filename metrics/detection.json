@@ -7,7 +7,8 @@
       "f1": 0.3643
     },
     "deteval": null,
-    "seconds_per_image": 11.264
+    "seconds_per_image": 11.264,
+    "deteval_pending": "medium 的 deteval 口径需要一次全量重跑（约 3.7 小时）：python evaluate.py --task det --model medium --dump-pred data/results/pred_medium_det_500.jsonl --report data/results/eval_medium_det_deteval.md"
   },
   "small": {
     "source": "data/results/eval_small_det_deteval.md",

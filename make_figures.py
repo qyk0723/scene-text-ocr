@@ -24,7 +24,7 @@ from PIL import Image as PILImage
 from PIL import ImageDraw
 
 from app import _load_font, draw_results
-from src.evaluator.metrics_store import by_iou, get, load, pct
+from src.evaluator.metrics_store import MissingMetric, by_iou, get, load, pct
 from src.pipeline.ocr_pipeline import SceneTextOCR, imread_unicode
 from src.preprocess.enhancer import ImageEnhancer
 
@@ -40,15 +40,33 @@ _ABL = load("ablation")
 _TIMING = load("timing")
 _MANUAL = load("manual")
 
-# 检测指标口径：'legacy'（历史口径，全部 GT 计入，**不可与已发表结果比较**）
-# 或 'deteval'（ICDAR2015 官方口径，do-not-care 不计入）。
-# 论文最终采用哪一套由 docs/PROJECT_AUDIT.md 的 P0-1 决定；切换只需改这一行。
-DETECTION_PROTOCOL = "legacy"
+# 检测指标口径：'deteval'（ICDAR2015 官方口径，**论文主口径**，do-not-care 不计入）
+# 或 'legacy'（历史口径，全部 GT 计入，不可与已发表结果比较）。
+# 论文按"两套都报、deteval 为主"处理；此开关决定**图表**用哪一套。
+DETECTION_PROTOCOL = "deteval"
+
+# medium 的 deteval 口径需要一次全量重跑才会存在（约 3.7 小时）。缺失时下面
+# 会抛出 MissingMetric 并**打印这条命令**，而不是回退到 legacy 静默混用口径。
+_MEDIUM_DET_RUN = (
+    "python evaluate.py --task det --model medium "
+    "--dump-pred data/results/pred_medium_det_500.jsonl "
+    "--report data/results/eval_medium_det_deteval.md"
+)
 
 
 def _det(model: str, key: str) -> float:
-    """取某模型某口径的检测指标，转成百分数。"""
-    return pct(get(_DET, f"{model}.{DETECTION_PROTOCOL}.{key}"))
+    """取某模型某口径的检测指标，转成百分数。
+
+    该口径尚未测量时抛 :class:`MissingMetric`，并给出需要运行的命令——
+    **绝不回退到另一套口径**，否则图表会在无人察觉的情况下混用口径。
+    """
+    block = get(_DET, f"{model}.{DETECTION_PROTOCOL}")
+    if block is None:
+        raise MissingMetric(
+            f"{model} 的 {DETECTION_PROTOCOL} 口径检测指标尚未测量。\n"
+            f"    请先运行（约 3.7 小时）：\n        {_MEDIUM_DET_RUN}"
+        )
+    return pct(block[key])
 
 
 def _abl(mode: str, config: str) -> float:
@@ -109,7 +127,7 @@ def _h_bar(labels, values, title, xlabel, fmt, out_name, log=False, xlim=None):
     plt.close(fig)
 
 
-def make_metric_charts():
+def make_recognition_chart():
     _h_bar(
         ["字符准确率", "行级准确率"],
         [pct(get(_REC, "medium.char_acc")), pct(get(_REC, "medium.line_acc"))],
@@ -119,15 +137,21 @@ def make_metric_charts():
         "recognition_metrics.png",
         xlim=100,
     )
+
+
+def make_detection_chart():
     _h_bar(
         ["精确率", "召回率", "F1"],
         [_det("medium", "precision"), _det("medium", "recall"), _det("medium", "f1")],
-        "检测性能（ICDAR2015 detection/test，500 张）",
+        f"检测性能（ICDAR2015 detection/test，500 张，{DETECTION_PROTOCOL} 口径）",
         "指标值（%）",
         "{:.2f}%",
         "detection_metrics.png",
         xlim=100,
     )
+
+
+def make_timing_chart():
     _h_bar(
         ["预处理（整图）", "识别（单行图）", "检测（整图）"],
         [get(_MANUAL, "preprocess_whole_image_s.value"),
@@ -141,6 +165,13 @@ def make_metric_charts():
     )
 
 
+def make_metric_charts():
+    """兼容旧调用：依次生成识别 / 检测 / 耗时三张图。"""
+    make_recognition_chart()
+    make_detection_chart()
+    make_timing_chart()
+
+
 def _grouped_style(ax):
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
@@ -151,9 +182,8 @@ def _grouped_style(ax):
     ax.set_axisbelow(True)
 
 
-def make_model_comparison():
-    """medium vs small 对比图：精度 + 速度。"""
-    # 精度对比（分组柱状图，全量口径）
+def make_model_accuracy_chart():
+    """medium vs small 精度对比（依赖检测口径，故单独成函数）。"""
     categories = ["识别字符准确率", "检测 F1"]
     medium = [pct(get(_REC, "medium.char_acc")), _det("medium", "f1")]
     small = [pct(get(_REC, "small.char_acc")), _det("small", "f1")]
@@ -186,7 +216,10 @@ def make_model_comparison():
                 bbox_inches="tight", facecolor=SURFACE)
     plt.close(fig)
 
-    # 速度对比（test.jpg 整图耗时）
+
+def make_model_speed_chart():
+    """medium vs small 速度对比（只用 test.jpg 耗时，与检测口径无关）。"""
+    width = 0.34
     fig, ax = plt.subplots(figsize=(5.8, 3.8))
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
@@ -216,6 +249,12 @@ def make_model_comparison():
     fig.savefig(FIG_DIR / "model_compare_speed.png", dpi=200,
                 bbox_inches="tight", facecolor=SURFACE)
     plt.close(fig)
+
+
+def make_model_comparison():
+    """兼容旧调用：精度图 + 速度图。"""
+    make_model_accuracy_chart()
+    make_model_speed_chart()
 
 
 def make_wordline_chart():
@@ -417,24 +456,37 @@ def make_detection_samples():
         print(f"  检出 {len(boxes)} 框")
 
 
+def _run_chart(fn, label, outputs=()):
+    """生成一张图；若所依赖的指标尚未测量，**跳过、删掉旧图并说明要跑什么**。
+
+    删掉旧图是有意的：留着上一套口径的 PNG，会让"图"与"代码声明的口径"静默不一致
+    ——这正是审计里反复出现的那类问题。宁可暂时没有图，也不要一张口径错误的图。
+    """
+    try:
+        fn()
+        print(f"{label} 完成")
+    except MissingMetric as e:
+        for name in outputs:
+            stale = FIG_DIR / name
+            if stale.is_file():
+                stale.unlink()
+                print(f"[删除] 旧图 {name}（口径已不一致）")
+        print(f"[跳过] {label}：{e}")
+
+
 def main():
     FIG_DIR.mkdir(parents=True, exist_ok=True)
-    make_metric_charts()
-    print("图表 4/5/6 完成")
-    make_model_comparison()
-    print("模型对比图完成")
-    make_wordline_chart()
-    print("词级/行级口径对照图完成")
-    make_iou_sensitivity_chart()
-    print("IoU 敏感性图完成")
-    make_ablation_chart()
-    print("消融图完成")
-    make_operator_chart()
-    print("算子适用域图完成")
-    make_preprocess_comparison()
-    print("图表 3 完成")
-    make_detection_samples()
-    print("图表 2 完成")
+    _run_chart(make_recognition_chart, "识别性能图", ["recognition_metrics.png"])
+    _run_chart(make_timing_chart, "耗时对比图", ["timing.png"])
+    _run_chart(make_detection_chart, "检测性能图", ["detection_metrics.png"])
+    _run_chart(make_model_accuracy_chart, "模型精度对比图", ["model_compare_accuracy.png"])
+    _run_chart(make_model_speed_chart, "模型速度对比图", ["model_compare_speed.png"])
+    _run_chart(make_wordline_chart, "词级/行级口径对照图", ["wordline_compare.png"])
+    _run_chart(make_iou_sensitivity_chart, "IoU 敏感性图", ["iou_sensitivity.png"])
+    _run_chart(make_ablation_chart, "消融图", ["ablation.png", "ablation_degraded.png"])
+    _run_chart(make_operator_chart, "算子适用域图", ["ablation_operators.png"])
+    _run_chart(make_preprocess_comparison, "预处理对比图", ["preprocess_compare.png"])
+    _run_chart(make_detection_samples, "检测可视化样例")
 
 
 if __name__ == "__main__":

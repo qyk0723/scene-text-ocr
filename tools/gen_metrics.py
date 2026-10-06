@@ -154,6 +154,14 @@ def main():
             "legacy": find_det_row(med_det_final, "medium"),
             "deteval": deteval_row(med_det_final),
             "seconds_per_image": det_time(med_det_final),
+            # medium 的官方口径尚未全量测量（eval_medium_det_final.md 只有 legacy 行）。
+            # 不填估算值、不回退口径——图表会据此抛出带命令的 MissingMetric。
+            "deteval_pending": (
+                "medium 的 deteval 口径需要一次全量重跑（约 3.7 小时）："
+                "python evaluate.py --task det --model medium "
+                "--dump-pred data/results/pred_medium_det_500.jsonl "
+                "--report data/results/eval_medium_det_deteval.md"
+            ),
         },
         "small": {
             "source": "data/results/eval_small_det_deteval.md",

@@ -91,8 +91,17 @@
   12 个日志集中到 `data/results/logs/`，删除 4 个无证据价值的文件与空目录 `data/ctw1500`。
   未动 `data/icdar2015/`（含 87MB `train` 分片——判定为**有用**，可作留出泛化集）。
 - ✅ **已合并进 main**（第 5 轮）：`a7bad5c`。`main` 领先 `origin/main` 6 个提交，**未推送**。
-- ❌ **未改写 `docs/evaluation_report.md` 的结论数字**——把 do-not-care 提升为论文主口径属于结论层面的决定（已向你解释，等你定）。
-- ❌ **未改装任何 Python 包**（`opencv-python` 与 `opencv-contrib-python` 冲突，已向你解释，等你定）。
+- ✅ **do-not-care 主口径已定（第 7 轮）**：按"**两套都报、deteval 为主**"处理。
+  已更新 `docs/evaluation_report.md`（§二 拆成 deteval / legacy 两张表 + §四 写明官方忽略规则与引用 +
+  §五 加口径更正块）与 `PROJECT_SUMMARY.md`；`make_figures.py` 的 `DETECTION_PROTOCOL` 已切到 `"deteval"`。
+  **但 medium 的 deteval 尚未测量**——图表会跳过并**删掉口径不一致的旧图**，不会静默混用口径。
+  这是当前唯一挡在"图表与正文口径一致"前面的依赖。
+- ✅ **OpenCV 冲突已解决（第 7 轮）**：已卸载 `opencv-python`，只留 `opencv-contrib-python==4.10.0.84`。
+  校验：`cv2.__version__ == 4.10.0`、CLAHE/`intersectConvexConvex` 正常、42 项单测通过、真实推理正常。
+  ⚠️ **重要教训**：两个包共用同一个 `cv2` 目录，直接 `pip uninstall opencv-python`
+  **会带走 contrib 也需要的共享文件**，导致 `cv2` 损坏（`module 'cv2' has no attribute '__version__'`）；
+  必须随后 `pip install --force-reinstall --no-deps opencv-contrib-python==4.10.0.84` 修复。
+  已写入 `PROJECT_SUMMARY.md` 的已知问题第 1 条。
 - ❌ **未改 `config.yaml` 的 `limit_side_len`**——small 上有收益、medium 上复测无收益（见 P1-8 更正），没有依据改。
 - ❌ **未改 `deskew` 的角度估计**（P2-19）。它能修，但 deskew 是**被实测过的算子**（±12° 下 -39.5 点），
   改了就必须重测消融；而它默认关闭、也不在 UI 里，收益低而联动大 → 留给你决定。
