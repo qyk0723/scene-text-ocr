@@ -106,7 +106,12 @@
    `pip install --force-reinstall --no-deps opencv-contrib-python==4.10.0.84` 修复。本次即如此处理。
    **切勿再安装 `opencv-python`**。
 2. **推理速度**：small 整图 ~11s（test.jpg 39 行）、单行识别 0.111s；medium 整图 ~82s、单行 0.877s。**但耗时波动极大**——同一操作（small 整图 test.jpg）实测见过 11.1s 与 29.0s 的差异，39 张单行图串行也见过 3.89s 与 5.27s（差 35%）。引用耗时数字前应预热 + 重复取中位数；连续多次识别会触发 CPU 热节流，非代码问题。
-3. **倾斜校正实现局限**：深色背景 Otsu 反相 bug 已修复；残余角度估计偏差源自 minAreaRect 对真实字符分布的拟合，论文按「±12° 内有害、模型自身有容差」如实写。
+3. **倾斜校正（实现已修，结论也变了）**：深色背景 Otsu 反相 bug 早已修复；更根本的是
+   **角度估计原本完全无效**——`cv2.minAreaRect` 的角度按"宽高谁更长"而模 90° 歧义，
+   实测带符号误差均值 **−59.5°**，即按无意义角度乱转。已换成投影轮廓方差法（误差 −0.05°）。
+   重测后结论从「−39.5 点有害」改为「**轻微有害 −1.8 点，且识别模型自身对 ±12° 已有容差**」，
+   论文按后者写。详见 `docs/PROJECT_AUDIT.md` P2-19 与 `docs/evaluation_report.md` 第七节更正块。
+   另：「**小字放大 +55.4**」同样待重做（原实验设计混淆），脚本见 `evaluate_small_text.py`。
 4. **网络代理**：git 需 Watt Toolkit 代理 `127.0.0.1:26561` + 本仓库 `http.sslVerify=false`（中间人解密）。Watt Toolkit 开系统代理会拦截 localhost 导致 Gradio 启动 404，app.py 已设 `NO_PROXY` 绕过（或 Windows 代理勾「对本地地址不使用代理服务器」）。
 5. **token 安全**：旧 PAT 已于 2026-09-28 撤销，git 已配 `credential.helper manager`（凭据存 Windows 凭据管理器，推送不再贴 token）。
 
