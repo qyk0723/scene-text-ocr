@@ -9,6 +9,12 @@
 
 环境：Windows 11，conda 环境 `scene-text`，解释器 `D:\miniconda3\envs\scene-text\python.exe`。
 
+> **📁 项目路径已于 2026-10-06 迁移**：`E:\project\毕业设计\scene-text-ocr` → **`E:\project\scene-text-ocr`**。
+> 原因：旧路径含中文，导致 `cv2.imread` 在 Windows 上读**绝对路径**时静默返回 `None`
+> （见 `docs/PROJECT_AUDIT.md` 的"非 ASCII 路径"一节）。迁移后绝对路径已可正常读取（实测通过）。
+> 同盘重命名，git 历史与提交数不变。**注意**：`imread_unicode` 等代码级修复仍然保留——
+> 项目可能被放到任何位置，代码不应依赖"路径恰好没有中文"。
+
 ### 1.1 阶段进度
 
 功能阶段 0~4 均已完成：

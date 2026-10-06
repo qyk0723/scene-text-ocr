@@ -24,9 +24,12 @@ from src.pipeline.geometry import crop_box, sort_box_indices, sort_boxes
 def imread_unicode(path: Union[str, Path]) -> Optional[np.ndarray]:
     """读取图片，兼容含非 ASCII 字符的路径；语义与 ``cv2.imread`` 一致（失败返回 None）。
 
-    cv2.imread 在 Windows 上以 ANSI 代码页打开文件，路径含中文时**返回 None**
-    （本项目位于 `E:\\project\\毕业设计\\...`，任何绝对路径都含中文）。
+    cv2.imread 在 Windows 上以 ANSI 代码页打开文件，**路径含中文时返回 None**
+    （实测：项目原先位于 `E:\\project\\毕业设计\\...`，任何绝对路径都含中文，必然踩到）。
     改用 np.fromfile + cv2.imdecode 走 Python 文件读取，不受编码影响。
+
+    注：项目已于 2026-10-06 迁到 `E:\\project\\scene-text-ocr`（纯 ASCII），
+    但本函数**必须保留**——用户可以把项目放在任何位置，代码不应依赖"路径恰好没有中文"。
     """
     p = Path(path)
     if not p.is_file():

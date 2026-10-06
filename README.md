@@ -23,7 +23,7 @@ D:/miniconda3/envs/scene-text/python.exe -m pip install -r requirements.txt
 （CLI 默认 PP-OCRv6 small 模型，与界面一致；评估基准 medium 由 `evaluate.py` 承担。）
 
 ```bash
-cd E:\project\毕业设计\scene-text-ocr
+cd E:\project\scene-text-ocr
 
 # 直接识别
 D:/miniconda3/envs/scene-text/python.exe main.py data/samples/test.jpg

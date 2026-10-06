@@ -929,13 +929,18 @@ GT 坐标范围  x [0, 1279]   y [0, 719]      图像尺寸 1280 x 720
 
 **起因**：本轮做分辨率实验时整批结果为 0，排查发现读图全失败。
 
-**实测结果**（cv2 4.10.0，工作目录 `E:\project\毕业设计\scene-text-ocr`）：
+**实测结果**（cv2 4.10.0，当时工作目录为 `E:\project\毕业设计\scene-text-ocr`）：
 
 | 调用 | 结果 |
 | --- | --- |
 | `cv2.imread("data/samples/test.jpg")`（相对 ASCII 路径） | ✅ OK |
 | `cv2.imread(r"E:\project\毕业设计\scene-text-ocr\data\samples\test.jpg")` | ❌ **返回 None** |
 | `cv2.imdecode(np.fromfile(同绝对路径, np.uint8), IMREAD_COLOR)` | ✅ OK |
+
+> **📌 项目已于 2026-10-06 迁到 `E:\project\scene-text-ocr`（纯 ASCII）**，
+> 因此**绝对路径现在也能读**（已实测：`cv2.imread` 返回 (1706, 1279, 3)）。
+> 但上表的根因与代码修复**仍然有效且必须保留**——用户可以把项目放在任何位置，
+> 代码不该依赖"路径恰好没有中文"。详见下方"修复"一节的补充说明。
 
 **根因**：OpenCV 的 `imread` 在 Windows 上以 ANSI 代码页打开文件，路径含中文即失败；`imdecode` 走 Python 文件读取，不受影响。
 
@@ -949,9 +954,11 @@ if img is None: raise ValueError(f"图片读取失败: {image}")
 于是：
 
 - `python main.py data/samples/test.jpg`（README 的写法，`cd` 后相对路径）**正常**；
-- `python main.py "E:\project\毕业设计\scene-text-ocr\data\samples\test.jpg"`（从资源管理器"复制文件地址"得到的绝对路径）→ **抛"图片读取失败"**。
+- `python main.py "<旧路径>\data\samples\test.jpg"`（从资源管理器"复制文件地址"得到的绝对路径）→ **抛"图片读取失败"**。
+- ⚠️ **`--preprocess` 分支当时仍是裸 `cv2.imread`（第 13 轮发现，全仓库最后一处漏网）**：
+  迁移到 ASCII 路径后这条不再触发，但**代码缺陷依然存在**，应改用 `imread_unicode`。
 
-而项目恰好放在 `毕业设计` 目录下，**任何绝对路径都含中文**，所以只要用户不用相对路径就必然踩到。Gradio 界面传的是 numpy 数组，不受影响；`evaluate*.py` 走 `config.yaml` 的相对路径，也不受影响——所以这个 bug 一直没暴露。
+而项目当时恰好放在 `毕业设计` 目录下，**任何绝对路径都含中文**，所以只要用户不用相对路径就必然踩到。Gradio 界面传的是 numpy 数组，不受影响；`evaluate*.py` 走 `config.yaml` 的相对路径，也不受影响——所以这个 bug 一直没暴露。
 
 **修复（约 2 行）**：`_load_image` 改用 `cv2.imdecode(np.fromfile(str(path), np.uint8), cv2.IMREAD_COLOR)`；建议同时给 `main.py` 加一条更友好的报错（提示改用相对路径或检查路径）。**顺带**：`import cv2` 之后的任何写图/读图（如 `make_figures.py`、`app.py`）都有同类风险，可统一封装一个 `imread_unicode()` 工具函数。
 
