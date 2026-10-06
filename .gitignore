@@ -32,3 +32,6 @@ data/*
 *.swp
 .DS_Store
 Thumbs.db
+
+# 测试用临时目录（tests/test_robustness.py 的中文路径夹具；见该文件说明为什么不用 tempfile）
+.tmp_tests/

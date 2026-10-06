@@ -23,8 +23,11 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
+import shutil
 import sys
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 
 PROJ = Path(__file__).resolve().parent.parent
@@ -39,6 +42,29 @@ CHECKS = 0
 def _pct(x: float) -> str:
     """0.4221 -> '42.21'（百分比，两位小数）。"""
     return f"{round(float(x) * 100, 2):.2f}"
+
+
+@contextmanager
+def _temp_dir():
+    """临时目录：优先项目内，其次系统临时目录。
+
+    **为什么不用 ``tempfile``**：在受限沙箱下，**由 ``tempfile.mkdtemp()`` 创建的目录
+    完全不可用**——实测其下任何文件写入都报 ``PermissionError``（连清理都失败），
+    校验器会因此在与被测内容无关的地方崩溃。这里改用普通 ``mkdir`` 在项目内建目录：
+    同样可写、可重复清理，且失败时会明确报出来而不是静默用一个坏目录。
+    """
+    base = PROJ / ".tmp_tests"
+    try:
+        base.mkdir(parents=True, exist_ok=True)
+        td = base / f"consistency_{os.getpid()}"
+        shutil.rmtree(td, ignore_errors=True)
+        td.mkdir()
+    except OSError:
+        td = Path(tempfile.mkdtemp())  # 项目目录不可写时退回系统临时目录
+    try:
+        yield str(td)
+    finally:
+        shutil.rmtree(td, ignore_errors=True)
 
 
 def check(label: str, doc: str, needle: str) -> None:
@@ -77,7 +103,7 @@ def check_metrics_in_sync() -> None:
         "gen_metrics_for_check", PROJ / "tools" / "gen_metrics.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    with tempfile.TemporaryDirectory() as td:
+    with _temp_dir() as td:
         mod.main(td)
         derived = {p.name for p in Path(td).glob("*.json")}
         # 结构性检查：metrics/ 下每个文件都必须"有归属"——要么由 gen_metrics 从产物派生，

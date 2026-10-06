@@ -90,13 +90,19 @@ class TestImreadUnicode(unittest.TestCase):
     """含非 ASCII 字符的路径必须能读图。
 
     注：不断言 cv2.imread 一定失败（那是环境细节）；只断言我们的封装能读。
+
+    **不用 ``tempfile.mkdtemp()``**：它创建出来的目录在受限沙箱下不可写
+    （实测在 DSH 沙箱里对该目录的任何写操作都报 PermissionError），
+    会让这条测试在**与被测代码无关**的地方失败。改用项目内的固定临时目录，
+    同样是"真实磁盘上的中文路径"，但可写、且可重复清理。
     """
 
+    _TMP_ROOT = Path(__file__).resolve().parent.parent / ".tmp_tests"
+
     def test_reads_image_under_non_ascii_path(self):
-        tmp = tempfile.mkdtemp(prefix="stocr_test_")
+        d = self._TMP_ROOT / "unicode_path" / "毕业设计"
         try:
-            d = Path(tmp) / "毕业设计"
-            d.mkdir()
+            d.mkdir(parents=True, exist_ok=True)
             p = d / "样本.png"
             ok, buf = cv2.imencode(".png", np.full((8, 8, 3), 200, np.uint8))
             self.assertTrue(ok)
@@ -107,7 +113,7 @@ class TestImreadUnicode(unittest.TestCase):
             self.assertIsNotNone(img, "imread_unicode 应能读含中文的路径")
             self.assertEqual(img.shape, (8, 8, 3))
         finally:
-            shutil.rmtree(tmp, ignore_errors=True)
+            shutil.rmtree(self._TMP_ROOT / "unicode_path", ignore_errors=True)
 
     def test_missing_file_returns_none(self):
         self.assertIsNone(imread_unicode(Path(tempfile.gettempdir()) / "不存在的图_xyz.jpg"))
