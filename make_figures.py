@@ -331,15 +331,21 @@ def make_iou_sensitivity_chart():
 
 
 def make_operator_chart():
-    """各算子在适用场景下的效果：基线 vs 算子开启。"""
+    """各算子在适用场景下的效果：基线 vs 算子开启。
+
+    ⚠️ **不含「小字放大」**：该算子的旧消融（`ablation_small.md`，单行裁剪图上 ÷2 再放大到 400px）
+    已被审计 P1-3 推翻——两个对照臂像素高度差约 15 倍，收益无法与"就是喂了张大图"分离；
+    按整图 + 四臂 + 部署值 800 重做后，它只部分恢复损失、且不如直接还原原尺寸。
+    把一个已被推翻的 +55.4 留在论文图里，正是这次审计一直在清理的"图文不一致"，
+    所以这里只画设计有效的四个算子；小字放大的正确证据见
+    `data/results/small_text_ablation.md`。
+    """
     categories = ["去噪\n（噪声图）", "锐化\n（模糊图）", "CLAHE\n（低对比图）",
-                  "倾斜校正\n（±12°图）", "小字放大\n（小字图）"]
+                  "倾斜校正\n（±12°图）"]
     baseline = [_abl("degraded", "无预处理"), _abl("blur", "无预处理"),
-                _abl("lowcontrast", "无预处理"), _abl("skew", "无预处理"),
-                _abl("small", "无预处理")]
+                _abl("lowcontrast", "无预处理"), _abl("skew", "无预处理")]
     with_op = [_abl("degraded", "仅去噪"), _abl("blur", "仅锐化"),
-               _abl("lowcontrast", "仅CLAHE"), _abl("skew", "仅倾斜校正"),
-               _abl("small", "仅放大")]
+               _abl("lowcontrast", "仅CLAHE"), _abl("skew", "仅倾斜校正")]
     fig, ax = plt.subplots(figsize=(9.5, 4.4))
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
@@ -361,8 +367,9 @@ def make_operator_chart():
     _grouped_style(ax)
     ax.legend(fontsize=10, frameon=False, loc="upper right")
     ax.set_title(
-        "各算子适用场景消融（200 张单行图，PP-OCRv6 small）",
-        color=INK, fontsize=13, fontweight="bold", loc="left", pad=12,
+        "各算子适用场景消融（200 张单行图，PP-OCRv6 small）\n"
+        "注：「小字放大」旧结果已推翻、不在此图中，见 data/results/small_text_ablation.md",
+        color=INK, fontsize=12, fontweight="bold", loc="left", pad=12,
     )
     plt.tight_layout()
     fig.savefig(FIG_DIR / "ablation_operators.png", dpi=200,

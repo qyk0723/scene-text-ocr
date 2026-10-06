@@ -130,17 +130,17 @@
         "char_acc": 0.5956,
         "line_acc": 0.51,
         "boxes_per_image": 0.66,
-        "median_s": 0.118,
-        "mean_s": 0.095,
-        "p95_s": 0.163
+        "median_s": 0.127,
+        "mean_s": 0.104,
+        "p95_s": 0.189
       },
       "仅倾斜校正": {
-        "char_acc": 0.2003,
-        "line_acc": 0.145,
-        "boxes_per_image": 0.54,
-        "median_s": 0.106,
-        "mean_s": 0.085,
-        "p95_s": 0.153
+        "char_acc": 0.5827,
+        "line_acc": 0.51,
+        "boxes_per_image": 0.65,
+        "median_s": 0.132,
+        "mean_s": 0.108,
+        "p95_s": 0.174
       }
     }
   },
