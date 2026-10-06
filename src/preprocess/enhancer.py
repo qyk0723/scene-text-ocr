@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Optional, Tuple
 
 import cv2
@@ -83,6 +84,79 @@ def estimate_skew_angle(
     return float(best_a)
 
 
+@dataclass(frozen=True)
+class ProcessInfo:
+    """``process_with_info()`` 的伴生信息：**预处理图坐标系如何映射回原图**。
+
+    **为什么需要它**（审计第 13 轮的真实缺陷）：``upscale``（小字放大）会把长边不足
+    目标值的图放大，于是 ``process()`` 的输出比输入大。检测框是在**预处理图**上算出来的，
+    属于预处理图的坐标系；若直接把它们画到原图上就会整体错位
+    （实测 299×400 的图勾选后 124/156 个坐标点越界）。
+
+    ``process()`` 只返回图像，调用方拿不到任何变换信息，是这个缺陷的结构性原因。
+    本类补上这一半：调用方拿 ``image_shape`` 与 ``scale_x/scale_y`` 就能把检测框映射回原图。
+
+    ``scale`` 是**按实际形状测出来的比值**（原图 / 预处理图），不是从算子参数推算的，
+    因此以后再加任何改变尺寸的算子（``resize``、``deskew``……）也不必改这里。
+    """
+
+    resized: bool
+    """预处理是否改变了尺寸。**为 False 时坐标可直接通用**，无需缩放。"""
+
+    image_shape: Tuple[int, int]
+    """预处理图的 ``(高, 宽)``。"""
+
+    scale_x: float
+    """``原图宽 / 预处理图宽``。"""
+
+    scale_y: float
+    """``原图高 / 预处理图高``。"""
+
+    orig_shape: Tuple[int, int] = (0, 0)
+    """原图 ``(高, 宽)``，用于把映射结果裁剪回合法范围。"""
+
+    def map_point(self, x: float, y: float) -> Tuple[float, float]:
+        """把预处理图坐标系的**一个点**映射回原图坐标系。"""
+        return x * self.scale_x, y * self.scale_y
+
+    @classmethod
+    def from_shapes(
+        cls, orig_shape: Tuple[int, int], proc_shape: Tuple[int, int]
+    ) -> "ProcessInfo":
+        """按原图/预处理图的 ``(高, 宽)`` 构造映射信息（等价于 :meth:`ImageEnhancer.process_with_info` 的推导）。
+
+        供只拿到两张图、没有 enhancer 实例的场合使用（例如 ``app.annotate_results``）。
+        """
+        h, w = int(orig_shape[0]), int(orig_shape[1])
+        ph, pw = int(proc_shape[0]), int(proc_shape[1])
+        resized = (ph, pw) != (h, w)
+        return cls(
+            resized=resized,
+            image_shape=(ph, pw),
+            scale_x=(w / pw) if resized else 1.0,
+            scale_y=(h / ph) if resized else 1.0,
+            orig_shape=(h, w),
+        )
+
+    def map_box(self, box: np.ndarray) -> np.ndarray:
+        """把预处理图坐标系的 ``(N, 2)`` 框映射回原图坐标系。
+
+        映射后按原图尺寸**裁剪**：检测框本就被上游裁剪到预处理图边界内，
+        缩放回去必然落在原图内；这里多做一步是为了防御上游行为变化
+        （例如框超出边界时不会画到画布外）。
+        """
+        out = np.asarray(box, dtype=np.float32).copy()
+        if not self.resized or out.size == 0:
+            return out
+        out[:, 0] = np.round(out[:, 0] * self.scale_x)
+        out[:, 1] = np.round(out[:, 1] * self.scale_y)
+        if self.orig_shape[0] > 0 and self.orig_shape[1] > 0:
+            h, w = self.orig_shape
+            out[:, 0] = np.clip(out[:, 0], 0, w)
+            out[:, 1] = np.clip(out[:, 1], 0, h)
+        return out
+
+
 class ImageEnhancer:
     """可开关的图像预处理管线。
 
@@ -92,6 +166,9 @@ class ImageEnhancer:
         processed = enhancer.process(image_bgr)
 
     ``image_bgr`` 为 OpenCV 读取的 BGR 三通道 uint8 数组。
+
+    若要在预处理图上跑模型、再把结果（检测框等）画回**原图**，改用
+    ``process_with_info()`` 并按其返回的 :class:`ProcessInfo` 映射坐标。
     """
 
     def __init__(
@@ -231,7 +308,36 @@ class ImageEnhancer:
     # ---- 管线 ----
 
     def process(self, image: np.ndarray) -> np.ndarray:
-        """按开启的开关顺序执行预处理，返回 BGR 三通道 uint8 图。"""
+        """按开启的开关顺序执行预处理，返回 BGR 三通道 uint8 图。
+
+        只返回图像。**若预处理改变了尺寸，调用方无法把结果坐标映射回原图**——
+        需要映射时请用 :meth:`process_with_info`。
+        """
+        return self._pipeline(image)[0]
+
+    def process_with_info(self, image: np.ndarray) -> Tuple[np.ndarray, ProcessInfo]:
+        """等价于 :meth:`process`，但**一并返回坐标映射信息**。
+
+        返回 ``(预处理图, info)``；用 ``info.map_box(box)`` / ``info.map_point(x, y)``
+        可把在预处理图上算出的坐标（检测框等）映射回原图坐标系。
+
+        典型用法（Gradio 界面，见 ``app.py``）::
+
+            enhancer = ImageEnhancer(upscale=True)
+            proc, info = enhancer.process_with_info(img_bgr)
+            boxes, texts, scores, elapsed = ocr.run_detailed(proc)
+            # boxes 属于 proc 的坐标系，必须映射回 img_bgr 才能在原图上画
+            draw_results(img_bgr, [info.map_box(b) for b in boxes], texts)
+        """
+        proc, img = self._pipeline(image)
+        return proc, ProcessInfo.from_shapes(img.shape[:2], proc.shape[:2])
+
+    def _pipeline(self, image: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """执行算子链，返回 ``(BGR 三通道结果图, 原始输入图)``。
+
+        原图一并返回，是为了让 :meth:`process_with_info` **按实际形状**算出映射系数，
+        而不是从算子参数反推（反推在叠加多个改尺寸算子时会错）。
+        """
         img = image
 
         if self.grayscale:
@@ -262,4 +368,4 @@ class ImageEnhancer:
         if img.ndim == 2:
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
-        return img
+        return img, image
