@@ -6,13 +6,20 @@
 
 --mode 图像条件：clean 原图 / degraded 噪声图 / lowcontrast 低对比 /
 blur 重模糊 / skew 倾斜 / small 小字图。每种模式跑对应预处理配置，
-统计字符准确率 / 行级准确率 / 平均耗时，结果写入 data/results/
-ablation_<mode>.md。
+统计字符准确率 / 行级准确率 / 耗时（中位数·平均·p95），结果写入
+data/results/ablation_<mode>.md。
+
+耗时口径（2026-10-06 修正，见 docs/PROJECT_AUDIT.md 的 P1-6）：
+- 计入**预处理本身**的开销（原实现只累计 OCR 耗时，于是算子越多反而"越快"）；
+- 每个配置丢弃首张作为预热，但**仍计入准确率**，保证与历史准确率可比；
+- 配置之间清空 OCR 结果缓存，避免缓存命中（elapsed≈0）被当成耗时统计进去。
+- 报中位数与 p95，而不是只报平均——实测同一操作两次测量可差 35%。
 """
 
 from __future__ import annotations
 
 import argparse
+import time
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -21,7 +28,7 @@ import numpy as np
 
 from src.config import get_config
 from src.evaluator import levenshtein, parse_rec_gt
-from src.pipeline.ocr_pipeline import SceneTextOCR
+from src.pipeline.ocr_pipeline import SceneTextOCR, imread_unicode
 from src.preprocess.enhancer import ImageEnhancer
 
 # 配置名 -> ImageEnhancer 构造参数（其余开关默认关）
@@ -105,27 +112,49 @@ def run_config(
     ocr: SceneTextOCR,
     inputs: List[Tuple[np.ndarray, str]],
     cfg: dict,
-) -> Tuple[float, float, float]:
+    warmup: int = 1,
+) -> Dict[str, float]:
+    """跑一个预处理配置，返回准确率与可信的耗时统计。
+
+    返回 ``{"n","char_acc","line_acc","mean","median","p95"}``；耗时单位为秒/张，
+    并且**包含预处理本身的开销**。
+    """
     enhancer = ImageEnhancer(**cfg)
+    ocr._cache.clear()  # 防止缓存命中（elapsed≈0）污染耗时统计
+
     char_accs: List[float] = []
-    line_ok = 0
     times: List[float] = []
+    line_ok = 0
+    n_boxes = 0
 
     for img, gt_text in inputs:
+        t0 = time.perf_counter()
         proc = enhancer.process(img)
-        _boxes, texts, _scores, t = ocr.run_detailed(proc)
+        prep_t = time.perf_counter() - t0
+
+        boxes, texts, _scores, ocr_t = ocr.run_detailed(proc)
+        n_boxes += len(boxes)
+
         pred = "".join(texts).upper()
         gt = gt_text.upper()
         char_accs.append(1.0 - levenshtein(pred, gt) / max(len(pred), len(gt), 1))
         if pred == gt:
             line_ok += 1
-        times.append(t)
+        times.append(prep_t + ocr_t)
 
     n = len(char_accs)
-    char_acc = sum(char_accs) / n if n else 0.0
-    line_acc = line_ok / n if n else 0.0
-    avg_t = sum(times) / n if n else 0.0
-    return char_acc, line_acc, avg_t
+    timed = times[warmup:] if len(times) > warmup else times
+    return {
+        "n": float(n),
+        "char_acc": sum(char_accs) / n if n else 0.0,
+        "line_acc": line_ok / n if n else 0.0,
+        "mean": float(np.mean(timed)) if timed else 0.0,
+        "median": float(np.median(timed)) if timed else 0.0,
+        "p95": float(np.percentile(timed, 95)) if timed else 0.0,
+        # 每张图平均检出的文本框数。**这是耗时的主要驱动因素**：每个框都要跑一次识别，
+        # 所以一个把检测"弄坏"的配置会因为框变少而显得很快——必须与准确率一起看。
+        "avg_boxes": n_boxes / n if n else 0.0,
+    }
 
 
 def main() -> None:
@@ -136,6 +165,10 @@ def main() -> None:
         choices=list(MODES),
         default="clean",
         help="图像条件：clean / degraded / lowcontrast / blur / skew / small",
+    )
+    parser.add_argument(
+        "--out", default=None,
+        help="输出 md 路径，默认 data/results/ablation_<mode>.md",
     )
     args = parser.parse_args()
 
@@ -154,7 +187,7 @@ def main() -> None:
     inputs: List[Tuple[np.ndarray, str]] = []
     rng = np.random.default_rng(42)
     for img_path, gt_text in pairs:
-        img = cv2.imread(str(img_path))
+        img = imread_unicode(img_path)
         if img is None:
             continue
         inputs.append((transform(img, args.mode, rng), gt_text))
@@ -162,19 +195,39 @@ def main() -> None:
     lines = ["# 预处理消融实验结果", ""]
     lines.append(f"图片数：{len(inputs)}（ICDAR2015 recognition/test 单行图，{mode_label}）")
     lines.append("模型：PP-OCRv6 small（det + rec），忽略大小写")
+    lines.append("")
+    lines.append(
+        "耗时口径：**包含预处理本身**的秒/张；每配置丢弃首张作预热（仍计入准确率）；"
+        "配置间清空结果缓存。报中位数而非平均值——实测同一操作两次测量可差 35%。"
+    )
+    lines.append("")
+    lines.append(
+        "> ⚠️ **耗时必须与「检出框数」一起看**：每个检出框都要跑一次识别，所以耗时主要由"
+        "**检出框数**决定。一个把检测弄坏的配置会因为框变少而显得很快（例如清晰图下的"
+        "「全开」），把它解读为「算法更快」是错的。"
+    )
     if args.mode == "degraded":
+        lines.append("")
         lines.append("退化参数：GaussianBlur 5x5 σ=1.2 + 对比度×0.7 -15 + 高斯噪声 σ=15（种子 42）")
     lines.append("")
-    lines.append("| 配置 | 字符准确率 | 行级准确率 | 平均耗时/张 |")
-    lines.append("| --- | --- | --- | --- |")
+    lines.append("| 配置 | 字符准确率 | 行级准确率 | 检出框数/张 | 耗时中位数/张 | 平均 | p95 |")
+    lines.append("| --- | --- | --- | --- | --- | --- | --- |")
+    lines.append("")
 
     print(f"共 {len(inputs)} 张图 × {len(configs)} 配置（{mode_label}）")
     for name, cfg in configs.items():
-        char_acc, line_acc, avg_t = run_config(ocr, inputs, cfg)
-        print(f"{name}: char={char_acc:.4f} line={line_acc:.4f} avg={avg_t:.3f}s")
-        lines.append(f"| {name} | {char_acc:.4f} | {line_acc:.4f} | {avg_t:.3f}s |")
+        r = run_config(ocr, inputs, cfg)
+        print(
+            f"{name}: char={r['char_acc']:.4f} line={r['line_acc']:.4f} "
+            f"boxes={r['avg_boxes']:.2f} median={r['median']:.3f}s "
+            f"mean={r['mean']:.3f}s p95={r['p95']:.3f}s"
+        )
+        lines.append(
+            f"| {name} | {r['char_acc']:.4f} | {r['line_acc']:.4f} | {r['avg_boxes']:.2f} | "
+            f"{r['median']:.3f}s | {r['mean']:.3f}s | {r['p95']:.3f}s |"
+        )
 
-    out = Path("data/results") / out_name
+    out = Path(args.out) if args.out else Path("data/results") / out_name
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(lines), encoding="utf-8")
     print(f"结果已写入 {out}")
