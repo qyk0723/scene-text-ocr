@@ -47,6 +47,8 @@
 | P1-6 补充：读图健壮性 | 消融脚本读图统一走 `imread_unicode`；新增 `--out` | `evaluate_ablation.py` |
 | **P1-16 图表硬编码数值** | 新增 `src/evaluator/metrics_store.py` 与 `metrics/`（6 个 JSON + README）；`make_figures.py` 全部字面量改为从 store 读取，缺键抛带路径的错误；新增 `DETECTION_PROTOCOL` 开关一行切换口径。数值由 `tools/gen_metrics.py` **从产物解析**，无证据的集中放 `manual.json` | `make_figures.py`、`src/evaluator/metrics_store.py`、`metrics/`、`tools/gen_metrics.py` |
 | P1-4 补充：`unclip_ratio` 无法扫描 | 新增 `evaluate.py --det-unclip-ratio`，与 `--det-thresh`/`--det-box-thresh` 对称 | `evaluate.py`、`src/pipeline/ocr_pipeline.py` |
+| **P1-13 缺端到端（整图）系统指标** | 新增 `evaluate_end2end.py` 与 `runner.evaluate_end2end()`：整图 det→crop→rec，词级与行级两套严格口径，只把有效转写计入分母。实测端到端行级 F1 **0.3359**（100 张），而 rec-only 是 89.66% 字符准确率 | `evaluate_end2end.py`、`src/evaluator/runner.py` |
+| P1-13 配套 | 新增 `cluster_line_groups()`（按索引分组的行聚类，供拼接行文本）与 `parse_det_gt_full()`（返回转写原文）。重构后 `merge_to_lines` 行为**逐位不变**：120 张真实 GT、690 行比对一致 | `src/evaluator/metrics.py`、`src/evaluator/parsing.py` |
 
 ## 新增能力
 
@@ -108,7 +110,8 @@
 - ⏳ **medium 全量检测重跑未做**——实测 26.65 s/张，全量 500 张约 **3.7 小时**。而且**后台任务会在回合边界被终止**（`box_thresh=0.35` 那次只跑到 344/500 被截断），所以这个时长无法在单回合内完成。建议你在场时跑，或用 `--limit` 分批。**这是拿到论文头条 medium deteval 数字的唯一途径。**
 - ⏳ **`thresh`（二值图阈值）与 `unclip_ratio` 的敏感性未扫**——这两个会改变候选生成，**不能靠 dump 离线推出**，必须重跑。
 - ⏳ **文献对比表未填**——我特意没有代填（见 P1-12 的说明），列定义与注意事项已写在 P1-12。
-- ⏳ **`make_figures.py` 的数值仍是硬编码常量**（P1-16）。之所以没动：口径变更后哪些数字成为"定稿值"尚未决定，此时重构数据源等于把未定稿的数值固化下来。建议等口径定案后再做。
+- ⏳ **`make_figures.py` 的数值仍是硬编码常量**（P1-16）——**已于第 6 轮解决**，见「已完成的修复」。
+- ✅ **端到端（整图）系统指标**（P1-13）——**已于第 7 轮实现并实测**，见该节。
 - ⏳ **`docs/evaluation_report.md` 未按新口径重写**，只在 `PROJECT_SUMMARY` 里加了口径警告。
 - ⏳ **端到端（整图）系统指标仍缺**（P1-13）——最有价值的缺失实验。
 
@@ -456,6 +459,23 @@ PermissionError: [Errno 13] Permission denied:
 部署形态就是 det→crop→rec（`ocr_pipeline.py:131-140`），但项目**删掉了唯一的端到端数字**，并把删除称为精度改进（`docs:45`，82.89% → 91.28%）。对**系统**类论文这是反的：用户实际体验的正是被删掉的那个数。现在仅存的端到端测量是"单行裁剪图上的预处理消融"——域不匹配（把场景文字检测器跑在 19–289 px 的单行小图上，还 `"".join(texts)` 把检测到的东西拼起来）。
 
 **需要**：整图 E2E 行级 P/R/F1（GT 行判定为正确 = 匹配到的预测框文本完全一致，含 do-not-care 处理）+ E2E 字符准确率。**这是最有价值的缺失实验，且正是 P0-1 的直接推论。**
+
+**✅ 已实现并实测（第 7 轮）**：新增 `evaluate_end2end.py` + `runner.evaluate_end2end()`，
+整图走完 det→crop→rec，只把**有真实转写**的 GT 计入分母（`###` 为 do-not-care，命中它的预测被忽略），
+识别文本与 GT **去空白、忽略大小写**后要求完全一致。100 张随机子集（种子 20261006，small）：
+
+| 口径 | 有效数 | 读对 | P | R | **F1** | 字符准确率 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 词级（严格 1:1） | 418 词 | 113 | 0.3324 | 0.2703 | **0.2982** | 0.3509 |
+| 行级（严格） | 297 行 | 107 | 0.3147 | 0.3603 | **0.3359** | 0.5159 |
+
+**这条数字很重要**：系统**端到端只能正确读出约 1/3 的文字行**，而 rec-only（在给定裁剪图上）是
+89.66% 字符准确率。差距主要来自**检测**——与 deteval 检测召回 0.3755 一致：
+约 38% 的词被检出 × 其中约 71% 被完全读对 ≈ 27% 词级端到端召回，两个数字自洽。
+
+⚠️ **两个口径都不是官方 IC15 端到端方案**：官方允许**一对多**匹配，本实现是严格 1:1 IoU，
+会惩罚"一个框覆盖多个词"的预测 → **数值偏低、不可与文献直接比较**（与检测指标同一个问题）。
+只能作自我对照与趋势分析。产物：`data/results/e2e_small_100.md`、`metrics/e2e.json`。
 
 ## P1-14 置信度被丢弃
 

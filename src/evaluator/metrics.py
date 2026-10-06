@@ -127,37 +127,40 @@ def levenshtein(a: str, b: str) -> int:
     return prev[-1]
 
 
-def merge_to_lines(quads: List[np.ndarray], y_center_ratio: float = 0.5) -> List[np.ndarray]:
-    """把词级四边形按 y 中心聚类成行，返回每行的贴合合并框。
+def cluster_line_groups(
+    quads: List[np.ndarray], y_center_ratio: float = 0.5
+) -> List[List[int]]:
+    """把词级四边形按 y 中心聚类成行，返回**每行由哪些输入四边形组成**（索引分组）。
 
-    用 y 中心距离聚类（阈值 = 0.5 × 中位字高），容忍同行错落、
-    不并相邻行；合并框 y 取 y 中心 ± 半字高，避免跨度膨胀。
+    与 :func:`merge_to_lines` 共用同一套聚类规则（后者由本函数实现），
+    用于需要知道"哪些词属于同一行"的场景——例如端到端评测要把一行的词拼成行文本。
     """
+    if not quads:
+        return []
+
     words = []
-    for q in quads:
+    for i, q in enumerate(quads):
         ys = q[:, 1]
         xs = q[:, 0]
         yc = float((ys.min() + ys.max()) / 2.0)
         h = float(ys.max() - ys.min())
         words.append({
-            "q": q, "yc": yc, "h": h,
+            "i": i, "yc": yc, "h": h,
             "xmin": float(xs.min()), "xmax": float(xs.max()),
         })
-    if not words:
-        return []
 
     med_h = float(np.median([w["h"] for w in words]))
     if med_h <= 0:
         med_h = 1.0
 
     words.sort(key=lambda w: w["yc"])
-    lines = []
+    lines: List[dict] = []
     for w in words:
         placed = False
         for line in lines:
             if abs(w["yc"] - line["yc"]) < y_center_ratio * med_h:
-                line["boxes"].append(w)
-                n = len(line["boxes"])
+                line["items"].append(w["i"])
+                n = len(line["items"])
                 line["yc"] = (line["yc"] * (n - 1) + w["yc"]) / n
                 line["xmin"] = min(line["xmin"], w["xmin"])
                 line["xmax"] = max(line["xmax"], w["xmax"])
@@ -167,17 +170,29 @@ def merge_to_lines(quads: List[np.ndarray], y_center_ratio: float = 0.5) -> List
                 break
         if not placed:
             lines.append({
-                "boxes": [w], "yc": w["yc"],
+                "items": [w["i"]], "yc": w["yc"],
                 "xmin": w["xmin"], "xmax": w["xmax"],
                 "ymin": w["yc"] - 0.5 * w["h"], "ymax": w["yc"] + 0.5 * w["h"],
             })
+    return [line["items"] for line in lines]
 
+
+def merge_to_lines(quads: List[np.ndarray], y_center_ratio: float = 0.5) -> List[np.ndarray]:
+    """把词级四边形按 y 中心聚类成行，返回每行的贴合合并框。
+
+    用 y 中心距离聚类（阈值 = 0.5 × 中位字高），容忍同行错落、
+    不并相邻行；合并框 y 取 y 中心 ± 半字高，避免跨度膨胀。
+    """
     merged = []
-    for line in lines:
+    for idxs in cluster_line_groups(quads, y_center_ratio):
+        sub = [quads[i] for i in idxs]
+        xs = [float(q[:, 0].min()) for q in sub] + [float(q[:, 0].max()) for q in sub]
+        ys = [float(q[:, 1].min()) for q in sub] + [float(q[:, 1].max()) for q in sub]
+        xmin, xmax, ymin, ymax = min(xs), max(xs), min(ys), max(ys)
         merged.append(np.array([
-            [line["xmin"], line["ymin"]],
-            [line["xmax"], line["ymin"]],
-            [line["xmax"], line["ymax"]],
-            [line["xmin"], line["ymax"]],
+            [xmin, ymin],
+            [xmax, ymin],
+            [xmax, ymax],
+            [xmin, ymax],
         ], dtype=np.float32))
     return merged
