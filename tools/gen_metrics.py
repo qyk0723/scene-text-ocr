@@ -149,21 +149,19 @@ def main(out_dir=None):
     sml_det = read("eval_small_det_deteval.md")
     med_final = read("eval_medium_final.md")
     sml_v2 = read("eval_small_v2.md")
+    # medium 的 deteval 来自**另一次全量重跑**（旧的 eval_medium_det_final.md 里只有 legacy 行）。
+    # 一旦该产物存在就自动取用；不存在则保持 null，让图表抛出带命令的 MissingMetric——
+    # 绝不回退到 legacy 口径，否则图表会在无人察觉的情况下混用口径。
+    med_de = read("eval_medium_det_deteval.md") if (RES / "eval_medium_det_deteval.md").is_file() else None
 
     detection = {
         "medium": {
-            "source": "data/results/eval_medium_det_final.md",
+            "source": ("data/results/eval_medium_det_deteval.md" if med_de else
+                       "data/results/eval_medium_det_final.md"),
             "legacy": find_det_row(med_det_final, "medium"),
-            "deteval": deteval_row(med_det_final),
-            "seconds_per_image": det_time(med_det_final),
-            # medium 的官方口径尚未全量测量（eval_medium_det_final.md 只有 legacy 行）。
-            # 不填估算值、不回退口径——图表会据此抛出带命令的 MissingMetric。
-            "deteval_pending": (
-                "medium 的 deteval 口径需要一次全量重跑（约 3.7 小时）："
-                "python evaluate.py --task det --model medium "
-                "--dump-pred data/results/pred_medium_det_500.jsonl "
-                "--report data/results/eval_medium_det_deteval.md"
-            ),
+            "deteval": deteval_row(med_de) if med_de else None,
+            "seconds_per_image": det_time(med_de) if med_de else det_time(med_det_final),
+            "legacy_source": "data/results/eval_medium_det_final.md",
         },
         "small": {
             "source": "data/results/eval_small_det_deteval.md",
