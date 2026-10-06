@@ -23,6 +23,14 @@ def main() -> None:
     parser.add_argument("--data-root", default=None, help="数据集根目录，默认读 config.yaml")
     parser.add_argument("--task", choices=["det", "rec", "all"], default="all")
     parser.add_argument("--limit", type=int, default=0, help="每任务最多评估图片数，0 为全量")
+    parser.add_argument(
+        "--sample-seed", type=int, default=None,
+        help="与 --limit 配合：用该种子随机抽样，而不是取字典序前 N 张（推荐）",
+    )
+    parser.add_argument(
+        "--dump-pred", default=None,
+        help="把逐图检测框与置信度写入该 JSONL 文件，供离线阈值/口径分析",
+    )
     parser.add_argument("--iou", type=float, default=0.5, help="检测 IoU 阈值")
     parser.add_argument(
         "--ignore-case", action=argparse.BooleanOptionalAction, default=True,
@@ -56,11 +64,22 @@ def main() -> None:
 
     results: List[dict] = []
     if args.task in ("det", "all"):
-        results.append(evaluate_detection(ocr, data_root, args.iou, args.limit))
+        results.append(
+            evaluate_detection(
+                ocr, data_root, args.iou, args.limit, args.sample_seed, args.dump_pred
+            )
+        )
     if args.task in ("rec", "all"):
-        results.append(evaluate_recognition(ocr, data_root, args.limit, args.ignore_case))
+        results.append(
+            evaluate_recognition(
+                ocr, data_root, args.limit, args.ignore_case, args.sample_seed
+            )
+        )
 
-    report = render_report(results, f"PP-OCRv6 {args.model}（det + rec）")
+    # 报告标签按**实际执行的任务**生成，避免 --task det 的产物声称跑过 rec
+    _task_label = {"检测": "det", "识别": "rec"}
+    tasks = "+".join(_task_label.get(r["task"], r["task"]) for r in results)
+    report = render_report(results, f"PP-OCRv6 {args.model}（{tasks}）", args.iou)
     print("\n" + report)
 
     report_path = Path(args.report)

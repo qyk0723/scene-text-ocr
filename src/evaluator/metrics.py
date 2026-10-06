@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List
+from typing import Dict, List
 
 import cv2
 import numpy as np
@@ -40,6 +40,70 @@ def match_boxes(gt_boxes: List[np.ndarray], pred_boxes: List[np.ndarray], iou_th
             matched_gt.add(best_j)
             matched += 1
     return matched
+
+
+def match_boxes_dnc(
+    gt_boxes: List[np.ndarray],
+    gt_is_dnc: np.ndarray,
+    pred_boxes: List[np.ndarray],
+    iou_thresh: float,
+) -> Dict[str, int]:
+    """don't-care 感知的一对一匹配（ICDAR2015 官方 deteval 语义）。
+
+    与 :func:`match_boxes` 的区别在于它区分两类 GT：
+
+    - 预测命中**真实文本框** → TP
+    - 预测命中 **do-not-care 框** → ignored（既不计 TP 也不计 FP）
+    - 未参与匹配、但与任一 do-not-care 框重叠 ≥ 阈值 → ignored
+    - 其余未参与匹配 → FP
+    - 召回率分母只含真实文本框（FN 只统计未被匹配的真实文本框）
+
+    匹配本身仍复用项目原有的贪心策略，以保证与旧口径可比。
+
+    返回 ``{"tp","fp","ignored","fn","matched_dnc"}``。
+    """
+    gt_is_dnc = np.asarray(gt_is_dnc, dtype=bool)
+    used_gt = set()
+    matched_pred: Dict[int, int] = {}
+
+    for pi, p in enumerate(pred_boxes):
+        best_j, best_iou = -1, 0.0
+        for j, g in enumerate(gt_boxes):
+            if j in used_gt:
+                continue
+            iou = quad_iou(p, g)
+            if iou > best_iou:
+                best_iou, best_j = iou, j
+        if best_j >= 0 and best_iou >= iou_thresh:
+            used_gt.add(best_j)
+            matched_pred[pi] = best_j
+
+    tp = sum(1 for j in matched_pred.values() if not gt_is_dnc[j])
+    matched_dnc = sum(1 for j in matched_pred.values() if gt_is_dnc[j])
+
+    dnc_idx = [j for j in range(len(gt_boxes)) if gt_is_dnc[j]]
+    ignored = matched_dnc
+    fp = 0
+    for pi, p in enumerate(pred_boxes):
+        if pi in matched_pred:
+            continue
+        if any(quad_iou(p, gt_boxes[j]) >= iou_thresh for j in dnc_idx):
+            ignored += 1
+        else:
+            fp += 1
+
+    fn = sum(
+        1 for j in range(len(gt_boxes)) if not gt_is_dnc[j] and j not in used_gt
+    )
+    return {"tp": tp, "fp": fp, "ignored": ignored, "fn": fn, "matched_dnc": matched_dnc}
+
+
+def prf_from_counts(tp: int, fp: int, fn: int) -> Dict[str, float]:
+    """由 TP/FP/FN 计算精确率、召回率、F1。"""
+    precision = tp / (tp + fp) if (tp + fp) else 0.0
+    recall = tp / (tp + fn) if (tp + fn) else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
+    return {"precision": precision, "recall": recall, "f1": f1}
 
 
 def levenshtein(a: str, b: str) -> int:

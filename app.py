@@ -71,6 +71,16 @@ def draw_results(img_bgr: np.ndarray, boxes: List[np.ndarray], texts: List[str])
     return img
 
 
+def _model_label() -> str:
+    """按**实际加载的模型**生成界面标签。
+
+    原先这里写死 "PP-OCRv6 small"，而模型名已改为从 config.yaml 读取——
+    一旦配置改成 medium，界面就会显示错误信息。
+    """
+    name = getattr(_OCR, "det_model_name", "") or ""
+    return name.replace("_det", "").replace("_", " ") or "未知模型"
+
+
 def _status_html(n_boxes: int, ocr_elapsed: float, prep_elapsed: float) -> str:
     style = (
         "margin-top:4px;height:36px;display:flex;align-items:center;box-sizing:border-box;"
@@ -78,7 +88,7 @@ def _status_html(n_boxes: int, ocr_elapsed: float, prep_elapsed: float) -> str:
         "color:#374151;font-size:.85rem;"
     )
     return (
-        f'<div style="{style}">模型 PP-OCRv6 small &nbsp;|&nbsp; 检测框数 {n_boxes} '
+        f'<div style="{style}">模型 {_model_label()} &nbsp;|&nbsp; 检测框数 {n_boxes} '
         f"&nbsp;|&nbsp; 识别耗时 {ocr_elapsed:.1f}s &nbsp;|&nbsp; 预处理 {prep_elapsed:.1f}s</div>"
     )
 

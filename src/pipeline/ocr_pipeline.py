@@ -18,7 +18,26 @@ import cv2
 import numpy as np
 
 from src.config import get_config
-from src.pipeline.geometry import crop_box, sort_boxes
+from src.pipeline.geometry import crop_box, sort_box_indices, sort_boxes
+
+
+def imread_unicode(path: Union[str, Path]) -> Optional[np.ndarray]:
+    """读取图片，兼容含非 ASCII 字符的路径；语义与 ``cv2.imread`` 一致（失败返回 None）。
+
+    cv2.imread 在 Windows 上以 ANSI 代码页打开文件，路径含中文时**返回 None**
+    （本项目位于 `E:\\project\\毕业设计\\...`，任何绝对路径都含中文）。
+    改用 np.fromfile + cv2.imdecode 走 Python 文件读取，不受编码影响。
+    """
+    p = Path(path)
+    if not p.is_file():
+        return None
+    try:
+        buf = np.fromfile(str(p), dtype=np.uint8)
+    except OSError:
+        return None
+    if buf.size == 0:
+        return None
+    return cv2.imdecode(buf, cv2.IMREAD_COLOR)
 
 
 class SceneTextOCR:
@@ -86,7 +105,7 @@ class SceneTextOCR:
             path = Path(image)
             if not path.is_file():
                 raise FileNotFoundError(f"图片不存在: {image}")
-            img = cv2.imread(str(path))
+            img = imread_unicode(path)
             if img is None:
                 raise ValueError(f"图片读取失败: {image}")
             return img
@@ -100,11 +119,22 @@ class SceneTextOCR:
             data = arr.tobytes() + str(arr.shape).encode()
         return hashlib.sha256(data).hexdigest()
 
-    def detect(self, image: Union[str, np.ndarray]) -> List[np.ndarray]:
-        """仅检测，返回排序后的文本框列表（不缓存）。"""
+    def detect_detailed(
+        self, image: Union[str, np.ndarray]
+    ) -> Tuple[List[np.ndarray], List[float]]:
+        """仅检测，返回 (排序后的文本框, 与之对位的置信度)（不缓存）。
+
+        保留置信度是为了支持离线阈值分析：一次推理拿到分数后，改阈值只需重算匹配。
+        """
         img = self._load_image(image)
         detector = self._get_detector()
-        return sort_boxes(detector.detect(img))
+        boxes, scores = detector.detect_with_scores(img)
+        order = sort_box_indices(boxes)
+        return [boxes[i] for i in order], [scores[i] for i in order]
+
+    def detect(self, image: Union[str, np.ndarray]) -> List[np.ndarray]:
+        """仅检测，返回排序后的文本框列表（不缓存）。"""
+        return self.detect_detailed(image)[0]
 
     def recognize(self, image: Union[str, np.ndarray]) -> Tuple[str, float]:
         """仅识别单行图，返回 (文本, 置信度)（不缓存）。"""
@@ -134,6 +164,10 @@ class SceneTextOCR:
         scores: List[float] = []
         for box in boxes:
             crop = crop_box(img, box)
+            if crop.size == 0:  # 退化框：保持 boxes/texts 对位，记空串
+                texts.append("")
+                scores.append(0.0)
+                continue
             text, score = recognizer.recognize(crop)
             texts.append(text)
             scores.append(score)
