@@ -10,9 +10,7 @@ from __future__ import annotations
 import argparse
 import time
 
-import cv2
-
-from src.pipeline.ocr_pipeline import SceneTextOCR
+from src.pipeline.ocr_pipeline import SceneTextOCR, imread_unicode
 from src.preprocess.enhancer import ImageEnhancer
 
 
@@ -37,11 +35,23 @@ def main() -> None:
     ocr = SceneTextOCR(device=args.device)
 
     if args.preprocess:
-        image = cv2.imread(args.image)
+        # 必须用 imread_unicode：cv2.imread 在 Windows 上以 ANSI 代码页打开文件，
+        # **路径含非 ASCII 字符时静默返回 None**（审计记录：项目原先位于 毕业设计
+        # 目录下，任何绝对路径都含中文，必然踩到）。项目已迁到纯 ASCII 路径，
+        # 但代码不应依赖"路径恰好没有中文"。
+        image = imread_unicode(args.image)
         if image is None:
-            raise FileNotFoundError(f"图片读取失败: {args.image}")
+            raise FileNotFoundError(
+                f"图片读取失败: {args.image}\n"
+                "  请确认路径存在、且是可读的图片格式（jpg/png/bmp 等）。"
+            )
 
-        # 显式全开：仅作预处理对比实验用（消融显示清晰图下有害）
+        # 显式全开：仅作预处理对比实验用（消融显示清晰图下有害）。
+        # 注：这里只开 denoise/contrast/sharpen —— 都**不改变图像尺寸**，所以
+        # 检测框与原图坐标天然一致。若将来加入 resize/upscale 等改尺寸算子，
+        # 输出的 box 坐标会变成预处理图坐标系，必须按
+        # `ImageEnhancer.process_with_info()` 返回的 ProcessInfo 映射回原图
+        # （app.py 的坐标缺陷就是这么来的，见 docs/PROJECT_AUDIT.md 第 13 轮）。
         enhancer = ImageEnhancer(denoise=True, contrast=True, sharpen=True)
         start = time.perf_counter()
         processed = enhancer.process(image)
