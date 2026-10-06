@@ -54,6 +54,7 @@ class SceneTextOCR:
         device: Optional[str] = None,
         det_thresh: Optional[float] = None,
         det_box_thresh: Optional[float] = None,
+        det_unclip_ratio: Optional[float] = None,
         det_model_name: Optional[str] = None,
         rec_model_name: Optional[str] = None,
     ) -> None:
@@ -66,7 +67,9 @@ class SceneTextOCR:
         self.rec_model_name = rec_model_name or model.get("rec")
         self.det_thresh = det_thresh if det_thresh is not None else det.get("thresh")
         self.det_box_thresh = det_box_thresh if det_box_thresh is not None else det.get("box_thresh")
-        self.det_unclip_ratio = det.get("unclip_ratio")
+        self.det_unclip_ratio = (
+            det_unclip_ratio if det_unclip_ratio is not None else det.get("unclip_ratio")
+        )
         self.det_limit_side_len = det.get("limit_side_len")
         self.det_limit_type = det.get("limit_type")
 

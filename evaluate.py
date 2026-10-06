@@ -39,6 +39,11 @@ def main() -> None:
     parser.add_argument("--det-thresh", type=float, default=None, help="检测过滤阈值，默认用 PaddleOCR 内置值")
     parser.add_argument("--det-box-thresh", type=float, default=None, help="检测框阈值，默认用 PaddleOCR 内置值")
     parser.add_argument(
+        "--det-unclip-ratio", type=float, default=None,
+        help="检测框外扩比例，默认用模型内置值（PP-OCRv6 为 1.4）。它直接决定框的大小，"
+             "可用于检验「输出粒度介于词/行之间」的假设",
+    )
+    parser.add_argument(
         "--model", choices=["medium", "small"], default="medium",
         help="模型档位：评估基准用 medium，部署系统用 small",
     )
@@ -53,6 +58,7 @@ def main() -> None:
         device=args.device,
         det_thresh=args.det_thresh,
         det_box_thresh=args.det_box_thresh,
+        det_unclip_ratio=args.det_unclip_ratio,
     )
     if args.model == "small":
         kwargs["det_model_name"] = "PP-OCRv6_small_det"
