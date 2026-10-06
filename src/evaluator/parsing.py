@@ -40,3 +40,30 @@ def parse_rec_gt(gt_txt: Path, img_dir: Path) -> List[Tuple[Path, str]]:
         img_path = img_dir / fname
         pairs.append((img_path, parts[1]))
     return pairs
+
+
+def parse_det_gt_flagged(gt_path: Path) -> Tuple[List[np.ndarray], np.ndarray]:
+    """解析检测标注，**同时保留** do-not-care 标记（转写字段为 ``###``）。
+
+    ICDAR2015 官方评测把转写为 ``###`` 的区域视为 don't care：既不计入召回率分母，
+    命中它的预测也应被忽略。``parse_det_gt`` 只取前 8 个数字、丢弃了该字段，
+    所以那套口径无法实现——本函数把它保留下来。
+
+    返回 ``(quads, is_dont_care)``，``is_dont_care`` 是与 quads 等长的布尔数组。
+    """
+    quads: List[np.ndarray] = []
+    flags: List[bool] = []
+    for line in gt_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        fields = line.split(",")
+        if len(fields) < 8:
+            continue
+        try:
+            vals = [float(v) for v in fields[:8]]
+        except ValueError:
+            continue
+        quads.append(np.asarray(vals, dtype=np.float32).reshape(4, 2))
+        flags.append(len(fields) > 8 and fields[8].strip() == "###")
+    return quads, np.asarray(flags, dtype=bool)

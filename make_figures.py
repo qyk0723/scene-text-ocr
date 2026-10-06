@@ -24,7 +24,7 @@ from PIL import Image as PILImage
 from PIL import ImageDraw
 
 from app import _load_font, draw_results
-from src.pipeline.ocr_pipeline import SceneTextOCR
+from src.pipeline.ocr_pipeline import SceneTextOCR, imread_unicode
 from src.preprocess.enhancer import ImageEnhancer
 
 FIG_DIR = Path("docs/figures")
@@ -318,8 +318,15 @@ def make_ablation_chart():
 
 
 def make_preprocess_comparison():
-    img = cv2.imread(str(DATA / "samples" / "test.jpg"))
-    enhanced = ImageEnhancer().process(img)
+    img = imread_unicode(DATA / "samples" / "test.jpg")
+    # 必须显式开启算子：ImageEnhancer() 的默认是**全部关闭**，process() 是 no-op，
+    # 之前这里写成 ImageEnhancer().process(img)，导致"预处理后"面板与"原图"逐像素相同。
+    enhancer = ImageEnhancer(denoise=True, contrast=True, sharpen=True)
+    enhanced = enhancer.process(img)
+    if np.array_equal(img, enhanced):
+        raise RuntimeError(
+            "preprocess_compare 两张面板完全相同：预处理算子未生效，请检查 ImageEnhancer 开关"
+        )
 
     def to_rgb(bgr):
         return cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
@@ -367,7 +374,7 @@ def make_detection_samples():
 
     for p in imgs:
         print(f"OCR {p.name} ...")
-        img = cv2.imread(str(p))
+        img = imread_unicode(p)
         boxes, texts, _elapsed = ocr.run(str(p))
         annotated = draw_results(img, boxes, texts)
         cv2.imwrite(str(FIG_DIR / f"sample_{p.stem}.png"), annotated)
@@ -380,6 +387,10 @@ def main():
     print("图表 4/5/6 完成")
     make_model_comparison()
     print("模型对比图完成")
+    make_wordline_chart()
+    print("词级/行级口径对照图完成")
+    make_iou_sensitivity_chart()
+    print("IoU 敏感性图完成")
     make_ablation_chart()
     print("消融图完成")
     make_operator_chart()
