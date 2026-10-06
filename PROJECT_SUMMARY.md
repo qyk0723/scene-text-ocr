@@ -7,17 +7,44 @@
 
 《面向生活场景的文字检测与识别系统》本科毕业设计项目。技术栈 Python 3.11 + PaddleOCR（PP-OCR 预训练）+ OpenCV + Gradio。**不训练模型**，只做应用集成 + ICDAR2015 对比实验。
 
-**阶段 0~4 全部完成**：
+环境：Windows 11，conda 环境 `scene-text`，解释器 `D:\miniconda3\envs\scene-text\python.exe`。
+
+### 1.1 阶段进度
+
+功能阶段 0~4 均已完成：
 
 - 阶段 0：最小闭环（`SceneTextOCR` 管线 + `main.py` CLI）
 - 阶段 1：图像预处理模块（`ImageEnhancer`，8 算子独立开关）
-- 阶段 2：Gradio 界面（用户自改的蓝白布局，放大/复制按钮，勾选式预处理）
+- 阶段 2：Gradio 界面（用户自改的蓝白布局，放大/复制按钮、勾选式预处理）
 - 阶段 3：ICDAR2015 全量评估（检测 500 张 + 识别 2074 张）+ 评估报告
-- 阶段 4：论文图表（`docs/figures/`：指标、耗时、模型对比、预处理对比、消融、样例、界面截图）
+- 阶段 4：论文图表（`docs/figures/`）
 
-剩余工作：论文写作。
+### 1.2 ⚠️ 2026-10-06 审计后的真实状态（**接手请先读这一节**）
 
-环境：Windows 11，conda 环境 `scene-text`，解释器 `D:\miniconda3\envs\scene-text\python.exe`。
+2026-10-06 做了一次全项目审计（**`docs/PROJECT_AUDIT.md`**，31 项问题 + 逐轮实测记录），
+结论是**"阶段 0~4 完成、只剩写作"这个判断过于乐观**：代码里有多处真实缺陷，
+且若干已发表数字建立在**非标准评测口径**上。审计在 `main` 上已落实的改进：
+
+| 类别 | 已完成 |
+| --- | --- |
+| **真实缺陷修复** | 非 ASCII 路径读图失败（`main.py` 传绝对路径必失败）、`crop_box` 退化框静默返回整图、`render_report` 硬编码 IoU、报告标签把 det-only 标成 det+rec、`preprocess_compare` 的 no-op 代码回归 |
+| **评测口径** | 新增 ICDAR2015 官方 **do-not-care 双口径**（legacy/deteval 并存，一次推理同时算出）；`evaluate.py` 报告两套都报，**以 deteval 为主** |
+| **新增指标** | **端到端（整图）系统指标** `evaluate_end2end.py`（词级+行级）+ `--dump-lines` 错误分类；`--sample-seed` 随机抽样 |
+| **可复现性** | `--dump-pred` 预测框+置信度落盘；图表数值改为从 **`metrics/`** 单一数据源读取（`tools/gen_metrics.py` 从产物解析生成，缺键报错）；统一 UTF-8 输出；消融耗时口径修正 |
+| **环境** | 卸载 `opencv-python`，只留 `opencv-contrib-python==4.10.0.84` |
+| **测试** | 单测 23 → **49 项**，全部通过 |
+
+**尚未完成、且需要你决定或授权的**：
+
+1. **medium 的 deteval 全量重跑**（约 3.7 小时，后台任务活不过回合边界）。
+   **这是"图表与正文口径一致"的唯一阻塞项**——`detection_metrics.png` 与
+   `model_compare_accuracy.png` 已因口径不一致被删除，补齐后才重新生成。
+   命令见 §2 与 `docs/evaluation_report.md` §2.1。
+2. `docs/evaluation_report.md` §五 的结论按 deteval 重写（需先有第 1 项的数字）。
+3. 审计列出的其余决定项：结果产物是否入库（P1-15）、`deskew` 是否修复（P2-19）、
+   预处理消融是否重做（P1-3，需先定"哪些数字是定稿值"）。
+
+**剩余工作**：论文写作 + 上述 3 项待决事项。
 
 ## 二、评估结论速览（详见 docs/evaluation_report.md）
 
