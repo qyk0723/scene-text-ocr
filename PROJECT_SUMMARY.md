@@ -38,7 +38,9 @@
 | **新增指标** | **端到端（整图）系统指标** `evaluate_end2end.py`（词级+行级）+ `--dump-lines` 错误分类；`--sample-seed` 随机抽样 |
 | **可复现性** | `--dump-pred` 预测框+置信度落盘；图表数值改为从 **`metrics/`** 单一数据源读取（`tools/gen_metrics.py` 从产物解析生成，缺键报错）；统一 UTF-8 输出；消融耗时口径修正 |
 | **环境** | 卸载 `opencv-python`，只留 `opencv-contrib-python==4.10.0.84` |
-| **测试** | 单测 23 → **49 项**，全部通过 |
+| **界面缺陷修复（第 14–15 轮）** | `app.py` 勾选「小字放大」时检测框画错位置（框属放大图坐标系却画在原图上，实测 299×400 的图 **79% 坐标点越界**）。改为 `ImageEnhancer.process_with_info()` 返回坐标映射，绘制前映射回原图；**并用真实模型端到端验证**（`data/results/app_display_validation.md`：映射后框内文字密度 0.0509 vs 旧行为 **0.0**）。顺带缓存字体、按实际渲染尺寸量标注底宽 |
+| **系统完善（第 15 轮，§待办 5 项全部完成）** | ①检测框坐标（上）②`main.py --preprocess` 的裸 `cv2.imread` → `imread_unicode` ③补齐 `SceneTextOCR` 管线集成测试（原先**零覆盖**）④P2-21 三项隐患：路径输入不再读两遍、**缓存键统一为"解码后数组内容哈希"**（原先路径/数组是两种身份）、`import app` 不再加载模型也不再拉起 gradio（**8.5s → 0.6s**）⑤绘制函数拆到 `src/visualize/draw.py`（`make_figures` 不再依赖 Gradio）。单测 **95 项 1.5s** 跑完 |
+| **测试** | 单测 23 → **95 项**，全部通过（1.5s 跑完，不加载模型） |
 
 **✅ medium 的 deteval 全量重跑已完成（2026-10-06 23:11，500 张，耗时约 3 小时）**：
 **deteval P 0.5115 / R 0.4299 / F1 0.4672**；同一次运行算出的 legacy 为 0.6137/0.2591/0.3643，
@@ -54,7 +56,15 @@
 3. 审计列出的其余事项：结果产物入库（P1-15，**已完成**，见 `.gitignore`）、
    `deskew` 修复（P2-19，**已完成**）、日志编码（P2-20，**已完成**）。
 
-**剩余工作**：论文写作 + 上述第 1、2 项。
+**当前主线已改为「先把系统做好，论文相关全部推后」**（用户指定）：
+
+- ✅ **`docs/PROJECT_AUDIT.md` §待办：系统完善 5 项已全部完成**（第 14–15 轮）：
+  ①`app.py` 检测框坐标系（已真机验证）②`main.py --preprocess` 读图
+  ③`SceneTextOCR` 管线集成测试 ④P2-21 三项隐患 ⑤界面打磨。
+  单测 23 → **95 项**（1.5s），`tools/check_consistency.py` 30 项一致。
+- ⏭ **下一步方向待用户确认**（系统侧建议项已清空）。
+
+**剩余工作**：系统侧暂无 —— 上表第 1、2 项（论文阶段）仍按用户要求推后。
 
 ## 二、评估结论速览（详见 docs/evaluation_report.md）
 
@@ -112,7 +122,7 @@
 ## 四、已知问题 / 注意事项
 
 1. **OpenCV 冲突（已解决，2026-10-06）**：环境曾同时装了 `opencv-python==5.0.0.93` 与 `opencv-contrib-python==4.10.0.84`。两个包**提供同一个 `cv2` 目录**，后装的会覆盖先装的，不报错、只是静默换版本——属未锁定环境的隐患。
-   **现已卸载 `opencv-python`，只保留 `opencv-contrib-python==4.10.0.84`**（与 requirements.txt 一致）。校验：`cv2.__version__ == 4.10.0`、CLAHE 与 `intersectConvexConvex` 等功能正常、42 项单测通过、真实推理正常。
+   **现已卸载 `opencv-python`，只保留 `opencv-contrib-python==4.10.0.84`**（与 requirements.txt 一致）。校验：`cv2.__version__ == 4.10.0`、CLAHE 与 `intersectConvexConvex` 等功能正常、71 项单测通过、真实推理正常。
    ⚠️ **操作提醒**：直接 `pip uninstall opencv-python` **会带走 contrib 也需要的共享文件**，导致 `cv2` 损坏（表现为 `module 'cv2' has no attribute '__version__'`）。必须随后执行
    `pip install --force-reinstall --no-deps opencv-contrib-python==4.10.0.84` 修复。本次即如此处理。
    **切勿再安装 `opencv-python`**。
@@ -135,7 +145,8 @@
 | --- | --- |
 | `config.yaml` / `src/config.py` | 系统配置 + 加载 |
 | `main.py` | CLI 单图识别（模型默认读 config；`--preprocess` 显式全开，仅对比实验用） |
-| `app.py` | Gradio 界面（用户所有，改动前先沟通） |
+| `app.py` | Gradio 界面（用户所有，改动前先沟通）。**导入不再加载模型/gradio**（懒加载） |
+| `src/visualize/draw.py` | 绘制与坐标映射（`draw_results` / `annotate_results` / `map_boxes_to_original`），**不依赖 gradio/模型**，供界面、图表与测试共用 |
 | `evaluate.py` | 评估 CLI（`--task`、`--limit`、`--model medium/small`） |
 | `evaluate_ablation.py` | 预处理消融（`--mode clean/degraded/lowcontrast/blur/skew/small`） |
 | `evaluate_linelevel.py` | 行级口径检测评估 |
@@ -145,7 +156,8 @@
 | `src/detector/` / `src/recognizer/` | TextDetector / TextRecognizer |
 | `src/evaluator/` | 评估指标 / 解析 / 执行 |
 | `src/preprocess/enhancer.py` | ImageEnhancer（8 算子） |
-| `tests/` | 单元测试（纯函数，不加载模型） |
+| `tests/` | 单元测试（**95 项，1.5s，全部不加载模型**）|
+| `scripts/validate_app_display.py` | **真机验证**界面坐标映射（跑真实模型，产出报告与对照图） |
 | `docs/evaluation_report.md` | 评估总报告（含 medium vs small、消融、端到端 §3.1/§5.1/§5.2） |
 | `docs/figures/` | 论文图表 PNG |
 | `docs/PROJECT_AUDIT.md` | **项目审计与待办清单**（31 项 + 逐轮实测记录 + 自纠） |
