@@ -15,6 +15,7 @@
 """
 import json
 import re
+import sys
 from pathlib import Path
 
 PROJ = Path(__file__).resolve().parent.parent
@@ -140,8 +141,9 @@ def ablation(name):
     return out
 
 
-def main():
-    OUT.mkdir(parents=True, exist_ok=True)
+def main(out_dir=None):
+    out = Path(out_dir) if out_dir else OUT
+    out.mkdir(parents=True, exist_ok=True)
 
     med_det_final = read("eval_medium_det_final.md")
     sml_det = read("eval_small_det_deteval.md")
@@ -215,10 +217,14 @@ def main():
     for name, payload in (("detection", detection), ("recognition", recognition),
                           ("linelevel", linelevel_data), ("ablation", ablation_data),
                           ("timing", timing), ("manual", manual)):
-        p = OUT / f"{name}.json"
+        p = out / f"{name}.json"
         p.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        print(f"  写入 {p.relative_to(PROJ)}")
+        try:
+            shown = p.relative_to(PROJ)
+        except ValueError:
+            shown = p
+        print(f"  写入 {shown}")
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1] if len(sys.argv) > 1 else None)

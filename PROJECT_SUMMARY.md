@@ -134,6 +134,7 @@
 | `evaluate_end2end.py` | **端到端（整图）系统评测** CLI |
 | `metrics/` | **图表数值的单一数据源**（JSON，由 `tools/gen_metrics.py` 从产物解析生成） |
 | `tools/gen_metrics.py` | 从 `data/results/` 产物生成 `metrics/*.json` |
+| `tools/check_consistency.py` | **一致性校验**：文档数字 ↔ `metrics/` ↔ 产物（改完数字请跑一次） |
 
 ## 六、论文写作要点提示
 
