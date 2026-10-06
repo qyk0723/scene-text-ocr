@@ -118,6 +118,12 @@ def main() -> int:
         check(f"报告 §2.1 small deteval {lbl}", "docs/evaluation_report.md",
               _pct(get(det, f"small.deteval.{k}")) + "%")
 
+    # ---- 检测：medium deteval（主口径，第 12 轮补跑）----
+    if get(det, "medium.deteval") is not None:
+        for k, lbl in (("precision", "P"), ("recall", "R"), ("f1", "F1")):
+            check(f"报告 §2.1 medium deteval {lbl}", "docs/evaluation_report.md",
+                  _pct(get(det, f"medium.deteval.{k}")) + "%")
+
     # ---- 检测：legacy 两模型（历史口径）----
     check("报告 §2.2 medium legacy F1", "docs/evaluation_report.md",
           _pct(get(det, "medium.legacy.f1")) + "%")
@@ -166,7 +172,7 @@ def main() -> int:
     check("README 清晰图全开代价", "README.md", f"{all_on:.0f} 字符点")
 
     # ---- 结构性断言：核心结论不得回退到旧表述 ----
-    check("报告 §五 有口径更正块", "docs/evaluation_report.md", "本节口径更正")
+    check("报告 §五 有按官方口径重写的结论", "docs/evaluation_report.md", "5.0 结论（2026-10-06 按官方口径重写）")
     check_absent("README 不得再说 CLAHE 中性", "README.md", "CLAHE | 不暴露（实测中性）")
     check("make_figures 检测口径为 deteval", "make_figures.py", 'DETECTION_PROTOCOL = "deteval"')
     check_absent("README 不得再写「小字放大 +55.4 最强」", "README.md", "小字放大（+55.4，最强）")
