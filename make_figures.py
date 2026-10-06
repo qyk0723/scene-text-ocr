@@ -24,11 +24,36 @@ from PIL import Image as PILImage
 from PIL import ImageDraw
 
 from app import _load_font, draw_results
+from src.evaluator.metrics_store import by_iou, get, load, pct
 from src.pipeline.ocr_pipeline import SceneTextOCR, imread_unicode
 from src.preprocess.enhancer import ImageEnhancer
 
 FIG_DIR = Path("docs/figures")
 DATA = Path("data")
+
+# ---- 图表数值的唯一来源（审计 P1-16）：全部从 metrics/*.json 读取，不得硬编码 ----
+# 这些数字曾经以字面量形式写在绘图代码里，与结果产物没有程序化关联，已经漂移过。
+_DET = load("detection")
+_REC = load("recognition")
+_LL = load("linelevel")
+_ABL = load("ablation")
+_TIMING = load("timing")
+_MANUAL = load("manual")
+
+# 检测指标口径：'legacy'（历史口径，全部 GT 计入，**不可与已发表结果比较**）
+# 或 'deteval'（ICDAR2015 官方口径，do-not-care 不计入）。
+# 论文最终采用哪一套由 docs/PROJECT_AUDIT.md 的 P0-1 决定；切换只需改这一行。
+DETECTION_PROTOCOL = "legacy"
+
+
+def _det(model: str, key: str) -> float:
+    """取某模型某口径的检测指标，转成百分数。"""
+    return pct(get(_DET, f"{model}.{DETECTION_PROTOCOL}.{key}"))
+
+
+def _abl(mode: str, config: str) -> float:
+    """取某图像条件下某配置的字符准确率（百分数）。"""
+    return pct(get(_ABL, f"{mode}.configs.{config}.char_acc"))
 
 # 中文字体
 plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "sans-serif"]
@@ -87,7 +112,7 @@ def _h_bar(labels, values, title, xlabel, fmt, out_name, log=False, xlim=None):
 def make_metric_charts():
     _h_bar(
         ["字符准确率", "行级准确率"],
-        [91.28, 80.62],
+        [pct(get(_REC, "medium.char_acc")), pct(get(_REC, "medium.line_acc"))],
         "识别性能（ICDAR2015 recognition/test，2074 张）",
         "准确率（%）",
         "{:.2f}%",
@@ -96,7 +121,7 @@ def make_metric_charts():
     )
     _h_bar(
         ["精确率", "召回率", "F1"],
-        [61.37, 25.91, 36.43],
+        [_det("medium", "precision"), _det("medium", "recall"), _det("medium", "f1")],
         "检测性能（ICDAR2015 detection/test，500 张）",
         "指标值（%）",
         "{:.2f}%",
@@ -105,7 +130,9 @@ def make_metric_charts():
     )
     _h_bar(
         ["预处理（整图）", "识别（单行图）", "检测（整图）"],
-        [0.10, 0.111, 2.78],
+        [get(_MANUAL, "preprocess_whole_image_s.value"),
+         get(_TIMING, "recognition_single_line_s.small"),
+         get(_TIMING, "detection_whole_image_s.small")],
         "平均耗时对比（CPU，PP-OCRv6 small）",
         "耗时（秒，对数刻度）",
         "{:.3g}s",
@@ -128,8 +155,8 @@ def make_model_comparison():
     """medium vs small 对比图：精度 + 速度。"""
     # 精度对比（分组柱状图，全量口径）
     categories = ["识别字符准确率", "检测 F1"]
-    medium = [91.28, 36.43]
-    small = [89.66, 30.62]
+    medium = [pct(get(_REC, "medium.char_acc")), _det("medium", "f1")]
+    small = [pct(get(_REC, "small.char_acc")), _det("small", "f1")]
     fig, ax = plt.subplots(figsize=(6.6, 3.9))
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
@@ -164,8 +191,10 @@ def make_model_comparison():
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
     x = np.arange(1)
-    bars_m = ax.bar(x - width / 2, [82.0], width, color=BLUE, label="medium")
-    bars_s = ax.bar(x + width / 2, [11.1], width, color=ORANGE, label="small")
+    bars_m = ax.bar(x - width / 2, [get(_MANUAL, "test_jpg_end_to_end_s.medium.value")],
+                    width, color=BLUE, label="medium")
+    bars_s = ax.bar(x + width / 2, [get(_MANUAL, "test_jpg_end_to_end_s.small.value")],
+                    width, color=ORANGE, label="small")
     for bars in (bars_m, bars_s):
         for b in bars:
             ax.text(
@@ -192,8 +221,10 @@ def make_model_comparison():
 def make_wordline_chart():
     """检测指标口径对照：词级 vs 行级 F1。"""
     categories = ["词级口径", "行级口径"]
-    medium = [38.04, 36.71]
-    small = [29.80, 31.98]
+    medium = [pct(by_iou(get(_LL, "medium.iou"), 0.5)["word"]["f1"]),
+              pct(by_iou(get(_LL, "medium.iou"), 0.5)["line"]["f1"])]
+    small = [pct(by_iou(get(_LL, "small.iou"), 0.5)["word"]["f1"]),
+             pct(by_iou(get(_LL, "small.iou"), 0.5)["line"]["f1"])]
     fig, ax = plt.subplots(figsize=(5.8, 3.9))
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
@@ -227,8 +258,9 @@ def make_wordline_chart():
 def make_iou_sensitivity_chart():
     """检测 IoU 敏感性：词级 vs 行级 F1（medium，30 张）。"""
     categories = ["IoU 0.3", "IoU 0.5", "IoU 0.7"]
-    word_f1 = [51.98, 38.04, 25.24]
-    line_f1 = [47.12, 36.71, 19.18]
+    _med_iou = get(_LL, "medium.iou")
+    word_f1 = [pct(by_iou(_med_iou, i)["word"]["f1"]) for i in (0.3, 0.5, 0.7)]
+    line_f1 = [pct(by_iou(_med_iou, i)["line"]["f1"]) for i in (0.3, 0.5, 0.7)]
     fig, ax = plt.subplots(figsize=(6.4, 3.9))
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
@@ -263,8 +295,12 @@ def make_operator_chart():
     """各算子在适用场景下的效果：基线 vs 算子开启。"""
     categories = ["去噪\n（噪声图）", "锐化\n（模糊图）", "CLAHE\n（低对比图）",
                   "倾斜校正\n（±12°图）", "小字放大\n（小字图）"]
-    baseline = [15.38, 28.80, 61.40, 59.56, 22.55]
-    with_op = [32.26, 34.36, 48.31, 20.03, 77.96]
+    baseline = [_abl("degraded", "无预处理"), _abl("blur", "无预处理"),
+                _abl("lowcontrast", "无预处理"), _abl("skew", "无预处理"),
+                _abl("small", "无预处理")]
+    with_op = [_abl("degraded", "仅去噪"), _abl("blur", "仅锐化"),
+               _abl("lowcontrast", "仅CLAHE"), _abl("skew", "仅倾斜校正"),
+               _abl("small", "仅放大")]
     fig, ax = plt.subplots(figsize=(9.5, 4.4))
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
@@ -299,7 +335,7 @@ def make_ablation_chart():
     """预处理消融柱状图（按准确率降序）。"""
     _h_bar(
         ["无预处理", "仅去噪", "仅锐化", "仅CLAHE", "全开（默认）"],
-        [63.02, 61.11, 52.97, 41.51, 33.10],
+        [_abl("clean", c) for c in ["无预处理", "仅去噪", "仅锐化", "仅CLAHE", "全开（默认）"]],
         "预处理消融（清晰图）：识别字符准确率（200 张单行图，PP-OCRv6 small）",
         "字符准确率（%）",
         "{:.2f}%",
@@ -308,7 +344,7 @@ def make_ablation_chart():
     )
     _h_bar(
         ["仅去噪", "无预处理", "仅CLAHE", "全开（默认）"],
-        [32.26, 15.38, 9.43, 7.85],
+        [_abl("degraded", c) for c in ["仅去噪", "无预处理", "仅CLAHE", "全开（默认）"]],
         "预处理消融（退化图）：识别字符准确率（200 张单行图，PP-OCRv6 small）",
         "字符准确率（%）",
         "{:.2f}%",

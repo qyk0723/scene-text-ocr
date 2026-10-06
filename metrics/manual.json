@@ -1,0 +1,18 @@
+{
+  "_note": "以下数值**没有任何产物支撑**，是历史手工记录。审计（P1-5）已指出它们不可复现；重测前请勿在论文中作为精确值引用。",
+  "preprocess_whole_image_s": {
+    "value": 0.1,
+    "provenance": "make_figures.py 历史字面量，无产物"
+  },
+  "test_jpg_end_to_end_s": {
+    "medium": {
+      "value": 82.0,
+      "provenance": "历史字面量，无产物"
+    },
+    "small": {
+      "value": 11.1,
+      "provenance": "历史字面量，无产物"
+    },
+    "note": "同一操作实测见过 11.1s 与 29.0s，波动极大"
+  }
+}

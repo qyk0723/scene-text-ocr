@@ -1,0 +1,168 @@
+{
+  "clean": {
+    "source": "data/results/ablation_results.md",
+    "configs": {
+      "无预处理": {
+        "char_acc": 0.6302,
+        "line_acc": 0.545,
+        "boxes_per_image": 0.72,
+        "median_s": 0.118,
+        "mean_s": 0.102,
+        "p95_s": 0.174
+      },
+      "仅去噪": {
+        "char_acc": 0.6111,
+        "line_acc": 0.52,
+        "boxes_per_image": 0.67,
+        "median_s": 0.12,
+        "mean_s": 0.098,
+        "p95_s": 0.167
+      },
+      "仅CLAHE": {
+        "char_acc": 0.4151,
+        "line_acc": 0.35,
+        "boxes_per_image": 0.55,
+        "median_s": 0.11,
+        "mean_s": 0.089,
+        "p95_s": 0.18
+      },
+      "仅锐化": {
+        "char_acc": 0.5297,
+        "line_acc": 0.425,
+        "boxes_per_image": 0.68,
+        "median_s": 0.118,
+        "mean_s": 0.1,
+        "p95_s": 0.187
+      },
+      "全开（默认）": {
+        "char_acc": 0.331,
+        "line_acc": 0.3,
+        "boxes_per_image": 0.39,
+        "median_s": 0.038,
+        "mean_s": 0.072,
+        "p95_s": 0.175
+      }
+    }
+  },
+  "degraded": {
+    "source": "data/results/ablation_degraded.md",
+    "configs": {
+      "无预处理": {
+        "char_acc": 0.1538,
+        "line_acc": 0.13,
+        "boxes_per_image": 0.17,
+        "median_s": 0.033,
+        "mean_s": 0.05,
+        "p95_s": 0.148
+      },
+      "全开（默认）": {
+        "char_acc": 0.0785,
+        "line_acc": 0.07,
+        "boxes_per_image": 0.11,
+        "median_s": 0.036,
+        "mean_s": 0.048,
+        "p95_s": 0.162
+      },
+      "仅去噪": {
+        "char_acc": 0.3226,
+        "line_acc": 0.25,
+        "boxes_per_image": 0.36,
+        "median_s": 0.037,
+        "mean_s": 0.068,
+        "p95_s": 0.152
+      },
+      "仅CLAHE": {
+        "char_acc": 0.0943,
+        "line_acc": 0.075,
+        "boxes_per_image": 0.14,
+        "median_s": 0.036,
+        "mean_s": 0.051,
+        "p95_s": 0.158
+      }
+    }
+  },
+  "lowcontrast": {
+    "source": "data/results/ablation_lowcontrast.md",
+    "configs": {
+      "无预处理": {
+        "char_acc": 0.614,
+        "line_acc": 0.53,
+        "boxes_per_image": 0.68,
+        "median_s": 0.12,
+        "mean_s": 0.098,
+        "p95_s": 0.168
+      },
+      "仅CLAHE": {
+        "char_acc": 0.4831,
+        "line_acc": 0.405,
+        "boxes_per_image": 0.65,
+        "median_s": 0.121,
+        "mean_s": 0.103,
+        "p95_s": 0.19
+      }
+    }
+  },
+  "blur": {
+    "source": "data/results/ablation_blur.md",
+    "configs": {
+      "无预处理": {
+        "char_acc": 0.288,
+        "line_acc": 0.24,
+        "boxes_per_image": 0.32,
+        "median_s": 0.035,
+        "mean_s": 0.064,
+        "p95_s": 0.155
+      },
+      "仅锐化": {
+        "char_acc": 0.3436,
+        "line_acc": 0.305,
+        "boxes_per_image": 0.39,
+        "median_s": 0.037,
+        "mean_s": 0.07,
+        "p95_s": 0.166
+      }
+    }
+  },
+  "skew": {
+    "source": "data/results/ablation_skew.md",
+    "configs": {
+      "无预处理": {
+        "char_acc": 0.5956,
+        "line_acc": 0.51,
+        "boxes_per_image": 0.66,
+        "median_s": 0.118,
+        "mean_s": 0.095,
+        "p95_s": 0.163
+      },
+      "仅倾斜校正": {
+        "char_acc": 0.2003,
+        "line_acc": 0.145,
+        "boxes_per_image": 0.54,
+        "median_s": 0.106,
+        "mean_s": 0.085,
+        "p95_s": 0.153
+      }
+    }
+  },
+  "small": {
+    "source": "data/results/ablation_small.md",
+    "configs": {
+      "无预处理": {
+        "char_acc": 0.2255,
+        "line_acc": 0.195,
+        "boxes_per_image": 0.37,
+        "median_s": 0.024,
+        "mean_s": 0.062,
+        "p95_s": 0.143
+      },
+      "仅放大": {
+        "char_acc": 0.7796,
+        "line_acc": 0.665,
+        "boxes_per_image": 0.87,
+        "median_s": 0.406,
+        "mean_s": 0.418,
+        "p95_s": 0.666
+      }
+    }
+  }
+}

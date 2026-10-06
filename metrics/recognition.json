@@ -1,0 +1,14 @@
+{
+  "medium": {
+    "source": "data/results/eval_medium_final.md",
+    "char_acc": 0.9128,
+    "line_acc": 0.8062,
+    "seconds_per_image": 0.877
+  },
+  "small": {
+    "source": "data/results/eval_small_v2.md",
+    "char_acc": 0.8966,
+    "line_acc": 0.7705,
+    "seconds_per_image": 0.111
+  }
+}

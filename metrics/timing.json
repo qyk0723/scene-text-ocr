@@ -1,0 +1,11 @@
+{
+  "preprocess_whole_image_s": null,
+  "recognition_single_line_s": {
+    "small": 0.111,
+    "medium": 0.877
+  },
+  "detection_whole_image_s": {
+    "small": 2.779,
+    "medium": 11.264
+  }
+}
