@@ -14,12 +14,16 @@ venv/
 .venv/
 env/
 
-# 数据与模型（本地大文件，不入库）
-data/
+# 数据与模型（数据集本身是本地大文件，不入库）
+# 但 data/results/ 是**证据**（评估报告、预测框落盘、离线分析），只有 0.5 MB，
+# 必须入库——审计 P1-15：证据不入库等于无法复核，且丢失后无法重建。
+# 注意：不能用 `data/` + `!data/results/`——git 不允许重新包含被排除目录下的内容，
+# 必须先 `data/*` 再取反。
+data/*
+!data/results/
 *.pdmodel
 *.pdiparams
 *.pdopt
-*.log
 
 # IDE / 系统
 .idea/

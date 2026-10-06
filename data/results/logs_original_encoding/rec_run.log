@@ -1,0 +1,51 @@
+﻿[rec] 共 2074 张单行图（ignore_case=True）
+D:/miniconda3/envs/scene-text/python.exe : [32mCreating model: ('PP-OCRv6_medium_det', None, None)[0m
+所在位置 行:1 字符: 189
++ ... n.log 2>&1; D:/miniconda3/envs/scene-text/python.exe -u evaluate.py - ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([32mCreating m...None, None)[0m:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\8615
+5\.paddlex\official_models\PP-OCRv6_medium_det`.[0m
+INFO: Could not find files for the given pattern(s).
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccac
+he found. Please be aware that recompiling all source files may be required. You can download and install ccache from: 
+https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-OCRv6_medium_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\8615
+5\.paddlex\official_models\PP-OCRv6_medium_rec`.[0m
+  100/2074
+  200/2074
+  300/2074
+  400/2074
+  500/2074
+  600/2074
+  700/2074
+  800/2074
+  900/2074
+  1000/2074
+  1100/2074
+  1200/2074
+  1300/2074
+  1400/2074
+  1500/2074
+  1600/2074
+  1700/2074
+  1800/2074
+  1900/2074
+  2000/2074
+  2074/2074
+
+# ICDAR2015 评估报告
+
+生成时间：2026-09-25 06:36:23
+
+| 任务 | 图片数 | 指标 | 平均耗时/图 |
+| --- | --- | --- | --- |
+| 识别 | 2074 | 字符准确率 0.8289 / 行级准确率 0.7150 | 1.757s |
+
+说明：检测框匹配采用 IoU 阈值 0.5 贪心一对一；识别字符准确率按编辑距离计算，默认忽略大小写。
+
+报告已写入 data\results\evaluation_rec.md

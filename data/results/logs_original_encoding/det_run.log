@@ -1,0 +1,55 @@
+﻿[det] 共 500 张图，IoU 阈值 0.5
+D:/miniconda3/envs/scene-text/python.exe : [32mCreating model: ('PP-OCRv6_medium_det', None, None)[0m
+所在位置 行:1 字符: 48
++ ... -text-ocr"; D:/miniconda3/envs/scene-text/python.exe -u evaluate.py - ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([32mCreating m...None, None)[0m:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\8615
+5\.paddlex\official_models\PP-OCRv6_medium_det`.[0m
+INFO: Could not find files for the given pattern(s).
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccac
+he found. Please be aware that recompiling all source files may be required. You can download and install ccache from: 
+https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-OCRv6_medium_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\8615
+5\.paddlex\official_models\PP-OCRv6_medium_rec`.[0m
+  20/500 累计 GT=234 Pred=103 匹配=66
+  40/500 累计 GT=482 Pred=196 匹配=128
+  60/500 累计 GT=715 Pred=306 匹配=188
+  80/500 累计 GT=874 Pred=386 匹配=243
+  100/500 累计 GT=1036 Pred=450 匹配=288
+  120/500 累计 GT=1315 Pred=543 匹配=349
+  140/500 累计 GT=1529 Pred=608 匹配=387
+  160/500 累计 GT=1698 Pred=668 匹配=422
+  180/500 累计 GT=1947 Pred=758 匹配=469
+  200/500 累计 GT=2147 Pred=831 匹配=514
+  220/500 累计 GT=2332 Pred=912 匹配=565
+  240/500 累计 GT=2482 Pred=987 匹配=618
+  260/500 累计 GT=2662 Pred=1064 匹配=670
+  280/500 累计 GT=2808 Pred=1128 匹配=707
+  300/500 累计 GT=3025 Pred=1198 匹配=747
+  320/500 累计 GT=3177 Pred=1276 匹配=807
+  340/500 累计 GT=3354 Pred=1370 匹配=867
+  360/500 累计 GT=3531 Pred=1467 匹配=922
+  380/500 累计 GT=3711 Pred=1557 匹配=980
+  400/500 累计 GT=3933 Pred=1658 匹配=1050
+  420/500 累计 GT=4220 Pred=1783 匹配=1129
+  440/500 累计 GT=4486 Pred=1891 匹配=1189
+  460/500 累计 GT=4709 Pred=1993 匹配=1252
+  480/500 累计 GT=4994 Pred=2122 匹配=1314
+  500/500 累计 GT=5230 Pred=2218 匹配=1372
+
+# ICDAR2015 评估报告
+
+生成时间：2026-09-25 05:35:13
+
+| 任务 | 图片数 | 指标 | 平均耗时/图 |
+| --- | --- | --- | --- |
+| 检测 | 500 | 精确率 0.6186 / 召回率 0.2623 / F1 0.3684（GT 5230 框，Pred 2218 框，匹配 1372） | 27.130s |
+
+说明：检测框匹配采用 IoU 阈值 0.5 贪心一对一；识别字符准确率按编辑距离计算，默认忽略大小写。
+
+报告已写入 data\results\evaluation_det.md

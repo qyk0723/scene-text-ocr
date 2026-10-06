@@ -1,0 +1,36 @@
+[medium] 共 30 张图，IoU [0.3, 0.5, 0.7]
+[32mCreating model: ('PP-OCRv6_medium_det', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_medium_det`.[0m
+信息: 用提供的模式无法找到文件。
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-OCRv6_medium_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_medium_rec`.[0m
+  10/30 累计 词级GT=110 行级GT=61 Pred=44
+  20/30 累计 词级GT=234 行级GT=129 Pred=103
+  30/30 累计 词级GT=373 行级GT=207 Pred=162
+============================================================
+[medium] 词级GT=373 行级GT=207 Pred=162
+IoU 0.3: 词级 P 0.8827/R 0.3834/F1 0.5346 | 行级 P 0.5617/R 0.4396/F1 0.4932
+IoU 0.5: 词级 P 0.6481/R 0.2815/F1 0.3925 | 行级 P 0.4136/R 0.3237/F1 0.3631
+IoU 0.7: 词级 P 0.4321/R 0.1877/F1 0.2617 | 行级 P 0.2037/R 0.1594/F1 0.1789
+结果已写入 data\results\linelevel_medium_iou.md
+[small] 共 30 张图，IoU [0.3, 0.5, 0.7]
+E:\project\毕业设计\scene-text-ocr\src\pipeline\ocr_pipeline.py:88: UserWarning: `lang` and `ocr_version` will be ignored when model names or model directories are not `None`.
+  self._engine = PaddleOCR(**kwargs)
+[32mCreating model: ('PP-OCRv6_small_det', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_det`.[0m
+信息: 用提供的模式无法找到文件。
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mCreating model: ('PP-OCRv6_small_rec', None, None)[0m
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_rec`.[0m
+  10/30 累计 词级GT=110 行级GT=61 Pred=41
+  20/30 累计 词级GT=234 行级GT=129 Pred=88
+  30/30 累计 词级GT=373 行级GT=207 Pred=139
+============================================================
+[small] 词级GT=373 行级GT=207 Pred=139
+IoU 0.3: 词级 P 0.8993/R 0.3351/F1 0.4883 | 行级 P 0.5827/R 0.3913/F1 0.4682
+IoU 0.5: 词级 P 0.6187/R 0.2306/F1 0.3359 | 行级 P 0.4245/R 0.2850/F1 0.3410
+IoU 0.7: 词级 P 0.4245/R 0.1582/F1 0.2305 | 行级 P 0.2086/R 0.1401/F1 0.1676
+结果已写入 data\results\linelevel_small_iou.md

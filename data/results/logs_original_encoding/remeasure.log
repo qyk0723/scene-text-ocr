@@ -1,0 +1,136 @@
+[det] 共 500 张图，IoU 阈值 0.5
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_det`.[0m
+��Ϣ: ���ṩ��ģʽ�޷��ҵ��ļ���
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+  20/500 累计 GT=234 Pred=86 匹配=45
+  40/500 累计 GT=482 Pred=168 匹配=93
+  60/500 累计 GT=715 Pred=255 匹配=133
+  80/500 累计 GT=874 Pred=317 匹配=169
+  100/500 累计 GT=1036 Pred=375 匹配=211
+  120/500 累计 GT=1315 Pred=442 匹配=250
+  140/500 累计 GT=1529 Pred=500 匹配=282
+  160/500 累计 GT=1698 Pred=553 匹配=310
+  180/500 累计 GT=1947 Pred=644 匹配=352
+  200/500 累计 GT=2147 Pred=714 匹配=394
+  220/500 累计 GT=2332 Pred=792 匹配=444
+  240/500 累计 GT=2482 Pred=866 匹配=491
+  260/500 累计 GT=2662 Pred=928 匹配=529
+  280/500 累计 GT=2808 Pred=985 匹配=558
+  300/500 累计 GT=3025 Pred=1039 匹配=586
+  320/500 累计 GT=3177 Pred=1109 匹配=638
+  340/500 累计 GT=3354 Pred=1195 匹配=691
+  360/500 累计 GT=3531 Pred=1288 匹配=738
+  380/500 累计 GT=3711 Pred=1356 匹配=780
+  400/500 累计 GT=3933 Pred=1439 匹配=820
+  420/500 累计 GT=4220 Pred=1545 匹配=884
+  440/500 累计 GT=4486 Pred=1638 匹配=938
+  460/500 累计 GT=4709 Pred=1730 匹配=990
+  480/500 累计 GT=4994 Pred=1844 匹配=1045
+  500/500 累计 GT=5230 Pred=1936 匹配=1097
+[rec] 共 2074 张单行图（ignore_case=True）
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_rec`.[0m
+  100/2074
+  200/2074
+  300/2074
+  400/2074
+  500/2074
+  600/2074
+  700/2074
+  800/2074
+  900/2074
+  1000/2074
+  1100/2074
+  1200/2074
+  1300/2074
+  1400/2074
+  1500/2074
+  1600/2074
+  1700/2074
+  1800/2074
+  1900/2074
+  2000/2074
+  2074/2074
+
+# ICDAR2015 评估报告
+
+生成时间：2026-10-05 21:22:33
+模型：PP-OCRv6 small（det + rec）
+
+| 任务 | 图片数 | 指标 | 平均耗时/图 |
+| --- | --- | --- | --- |
+| 检测 | 500 | 精确率 0.5666 / 召回率 0.2098 / F1 0.3062（GT 5230 框，Pred 1936 框，匹配 1097） | 2.779s |
+| 识别 | 2074 | 字符准确率 0.8966 / 行级准确率 0.7705 | 0.111s |
+
+说明：检测框匹配采用 IoU 阈值 0.5 贪心一对一；识别字符准确率按编辑距离计算，默认忽略大小写。
+
+报告已写入 data\results\eval_small_v2.md
+=== small done ===
+[det] 共 500 张图，IoU 阈值 0.5
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_det`.[0m
+��Ϣ: ���ṩ��ģʽ�޷��ҵ��ļ���
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+  20/500 累计 GT=234 Pred=86 匹配=45
+  40/500 累计 GT=482 Pred=168 匹配=93
+  60/500 累计 GT=715 Pred=255 匹配=133
+  80/500 累计 GT=874 Pred=317 匹配=169
+  100/500 累计 GT=1036 Pred=375 匹配=211
+  120/500 累计 GT=1315 Pred=442 匹配=250
+  140/500 累计 GT=1529 Pred=500 匹配=282
+  160/500 累计 GT=1698 Pred=553 匹配=310
+  180/500 累计 GT=1947 Pred=644 匹配=352
+  200/500 累计 GT=2147 Pred=714 匹配=394
+  220/500 累计 GT=2332 Pred=792 匹配=444
+  240/500 累计 GT=2482 Pred=866 匹配=491
+  260/500 累计 GT=2662 Pred=928 匹配=529
+  280/500 累计 GT=2808 Pred=985 匹配=558
+  300/500 累计 GT=3025 Pred=1039 匹配=586
+  320/500 累计 GT=3177 Pred=1109 匹配=638
+  340/500 累计 GT=3354 Pred=1195 匹配=691
+  360/500 累计 GT=3531 Pred=1288 匹配=738
+  380/500 累计 GT=3711 Pred=1356 匹配=780
+  400/500 累计 GT=3933 Pred=1439 匹配=820
+  420/500 累计 GT=4220 Pred=1545 匹配=884
+  440/500 累计 GT=4486 Pred=1638 匹配=938
+  460/500 累计 GT=4709 Pred=1730 匹配=990
+  480/500 累计 GT=4994 Pred=1844 匹配=1045
+  500/500 累计 GT=5230 Pred=1936 匹配=1097
+[rec] 共 2074 张单行图（ignore_case=True）
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_rec`.[0m
+  100/2074
+  200/2074
+  300/2074
+  400/2074
+  500/2074
+  600/2074
+  700/2074
+  800/2074
+  900/2074
+  1000/2074
+  1100/2074
+  1200/2074
+  1300/2074
+  1400/2074
+  1500/2074
+  1600/2074
+  1700/2074
+  1800/2074
+  1900/2074
+  2000/2074
+  2074/2074
+
+# ICDAR2015 评估报告
+
+生成时间：2026-10-05 21:42:35
+模型：PP-OCRv6 medium（det + rec）
+
+| 任务 | 图片数 | 指标 | 平均耗时/图 |
+| --- | --- | --- | --- |
+| 检测 | 500 | 精确率 0.5666 / 召回率 0.2098 / F1 0.3062（GT 5230 框，Pred 1936 框，匹配 1097） | 2.065s |
+| 识别 | 2074 | 字符准确率 0.8966 / 行级准确率 0.7705 | 0.081s |
+
+说明：检测框匹配采用 IoU 阈值 0.5 贪心一对一；识别字符准确率按编辑距离计算，默认忽略大小写。
+
+报告已写入 data\results\eval_medium_v2.md
+=== medium done ===

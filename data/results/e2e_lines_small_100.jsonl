@@ -1,0 +1,524 @@
+{"image": "img_105", "level": "line", "index": 0, "gt_text": "AIGONLOTUS", "status": "wrong_text", "matched_pred_texts": ["AIGONLOTU"], "n_matched": 1, "best_iou": 0.5088}
+{"image": "img_107", "level": "line", "index": 0, "gt_text": "SQUARE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4101}
+{"image": "img_107", "level": "line", "index": 1, "gt_text": "MARINA", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4397}
+{"image": "img_107", "level": "line", "index": 2, "gt_text": "MARINA", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3188}
+{"image": "img_107", "level": "line", "index": 3, "gt_text": "MORELINK", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.372}
+{"image": "img_107", "level": "line", "index": 4, "gt_text": "SHOPPING", "status": "correct", "matched_pred_texts": ["SHOPPING"], "n_matched": 1, "best_iou": 0.7015}
+{"image": "img_107", "level": "line", "index": 5, "gt_text": "&DINING!@B1", "status": "wrong_text", "matched_pred_texts": ["&DINING!"], "n_matched": 1, "best_iou": 0.568}
+{"image": "img_107", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["MARINA:SQUARE"], "n_matched": 0}
+{"image": "img_107", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["MARINA"], "n_matched": 0}
+{"image": "img_107", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["MORE"], "n_matched": 0}
+{"image": "img_107", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["@B1"], "n_matched": 0}
+{"image": "img_108", "level": "line", "index": 0, "gt_text": "B1MARINALINK", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.2593}
+{"image": "img_108", "level": "line", "index": 1, "gt_text": "DININGOPTIONS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.2416}
+{"image": "img_108", "level": "line", "index": 2, "gt_text": "MORESHOPPING", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.2669}
+{"image": "img_108", "level": "line", "index": 3, "gt_text": "THISWAY", "status": "wrong_text", "matched_pred_texts": ["THISWAYTO"], "n_matched": 1, "best_iou": 0.6421}
+{"image": "img_108", "level": "line", "index": 4, "gt_text": "STATION", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3131}
+{"image": "img_108", "level": "line", "index": 5, "gt_text": "ESPLANADE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4811}
+{"image": "img_108", "level": "line", "index": 6, "gt_text": "MARINA:SQUARE", "status": "correct", "matched_pred_texts": ["MARINA:SQUARE"], "n_matched": 1, "best_iou": 0.5271}
+{"image": "img_108", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["MORESHOPPING&DININGOPTIONSATB1,MARINALINK"], "n_matched": 0}
+{"image": "img_108", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["ESPLANADESTATION"], "n_matched": 0}
+{"image": "img_109", "level": "line", "index": 0, "gt_text": "LOVE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4244}
+{"image": "img_109", "level": "line", "index": 1, "gt_text": "LOVE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3359}
+{"image": "img_109", "level": "line", "index": 2, "gt_text": "ORGANTO", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_109", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["LOVBNBUAD"], "n_matched": 0}
+{"image": "img_109", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["LOVEINS"], "n_matched": 0}
+{"image": "img_109", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["VE"], "n_matched": 0}
+{"image": "img_111", "level": "line", "index": 0, "gt_text": "DEFYEMPIRE", "status": "wrong_text", "matched_pred_texts": ["DEFYENFRE"], "n_matched": 1, "best_iou": 0.5864}
+{"image": "img_111", "level": "line", "index": 1, "gt_text": "DEFYENAE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4473}
+{"image": "img_111", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["DEPYBIPPE"], "n_matched": 0}
+{"image": "img_111", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["DEFYENPLE"], "n_matched": 0}
+{"image": "img_112", "level": "line", "index": 0, "gt_text": "LUSH", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_112", "level": "line", "index": 1, "gt_text": "GOLDENVILLAGE", "status": "wrong_text", "matched_pred_texts": ["GOLDENVILLABE"], "n_matched": 1, "best_iou": 0.7391}
+{"image": "img_112", "level": "line", "index": 2, "gt_text": "EASTWINGNEXTHABA", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.2197}
+{"image": "img_112", "level": "line", "index": 3, "gt_text": "LEVEL3", "status": "correct", "matched_pred_texts": ["LEVEL3"], "n_matched": 1, "best_iou": 0.8555}
+{"image": "img_112", "level": "line", "index": 4, "gt_text": "GOLDCLASS", "status": "correct", "matched_pred_texts": ["GOLDCLASS"], "n_matched": 1, "best_iou": 0.8564}
+{"image": "img_112", "level": "line", "index": 5, "gt_text": "GRABGOLD", "status": "wrong_text", "matched_pred_texts": ["GRAB&GOLD"], "n_matched": 1, "best_iou": 0.7817}
+{"image": "img_112", "level": "line", "index": 6, "gt_text": "#GVSUNTECCITY", "status": "wrong_text", "matched_pred_texts": ["#GVSUNTECCTY"], "n_matched": 1, "best_iou": 0.7718}
+{"image": "img_112", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["EASTWING,NEXTTOTOWE"], "n_matched": 0}
+{"image": "img_112", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["HABA"], "n_matched": 0}
+{"image": "img_112", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["O0"], "n_matched": 0}
+{"image": "img_112", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["国"], "n_matched": 0}
+{"image": "img_112", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["三"], "n_matched": 0}
+{"image": "img_112", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["三"], "n_matched": 0}
+{"image": "img_112", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["#GOLDCLASSSUNTECCH"], "n_matched": 0}
+{"image": "img_113", "level": "line", "index": 0, "gt_text": "SALE", "status": "correct", "matched_pred_texts": ["SALE"], "n_matched": 1, "best_iou": 0.8523}
+{"image": "img_113", "level": "line", "index": 1, "gt_text": "SALSALE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3347}
+{"image": "img_113", "level": "line", "index": 2, "gt_text": "SALE", "status": "correct", "matched_pred_texts": ["SALE"], "n_matched": 1, "best_iou": 0.7818}
+{"image": "img_113", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["UI"], "n_matched": 0}
+{"image": "img_113", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["705"], "n_matched": 0}
+{"image": "img_113", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["汽"], "n_matched": 0}
+{"image": "img_113", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["SALESALESALE"], "n_matched": 0}
+{"image": "img_113", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SAL"], "n_matched": 0}
+{"image": "img_113", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SALE"], "n_matched": 0}
+{"image": "img_113", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["SALL"], "n_matched": 0}
+{"image": "img_113", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["SALESALESALE"], "n_matched": 0}
+{"image": "img_12", "level": "line", "index": 0, "gt_text": "CARE", "status": "correct", "matched_pred_texts": ["CARE"], "n_matched": 1, "best_iou": 0.6632}
+{"image": "img_12", "level": "line", "index": 1, "gt_text": "FORTHOSE", "status": "correct", "matched_pred_texts": ["FORTHOSE"], "n_matched": 1, "best_iou": 0.8276}
+{"image": "img_12", "level": "line", "index": 2, "gt_text": "NEED!", "status": "wrong_text", "matched_pred_texts": ["INNEED!"], "n_matched": 1, "best_iou": 0.6387}
+{"image": "img_12", "level": "line", "index": 3, "gt_text": "LOOK", "status": "wrong_text", "matched_pred_texts": ["LOOKO."], "n_matched": 1, "best_iou": 0.5615}
+{"image": "img_12", "level": "line", "index": 4, "gt_text": "CARE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.2468}
+{"image": "img_12", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["GUARDIAN"], "n_matched": 0}
+{"image": "img_12", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["THECARESTURKES"], "n_matched": 0}
+{"image": "img_120", "level": "line", "index": 0, "gt_text": "SINCERE", "status": "correct", "matched_pred_texts": ["SINCERE"], "n_matched": 1, "best_iou": 0.8745}
+{"image": "img_120", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["BE"], "n_matched": 0}
+{"image": "img_120", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["NG"], "n_matched": 0}
+{"image": "img_120", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["BERING"], "n_matched": 0}
+{"image": "img_121", "level": "line", "index": 0, "gt_text": "THATGIVESYOUESPRIT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.1316}
+{"image": "img_121", "level": "line", "index": 1, "gt_text": "SINCEREEXCITING", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.1895}
+{"image": "img_121", "level": "line", "index": 2, "gt_text": "PRIVILEGES", "status": "wrong_text", "matched_pred_texts": ["PRIVILEGES."], "n_matched": 1, "best_iou": 0.7089}
+{"image": "img_121", "level": "line", "index": 3, "gt_text": "ENJOY", "status": "correct", "matched_pred_texts": ["ENJOY"], "n_matched": 1, "best_iou": 0.6337}
+{"image": "img_121", "level": "line", "index": 4, "gt_text": "GREATDEALS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4957}
+{"image": "img_121", "level": "line", "index": 5, "gt_text": "SUNTECCITY", "status": "wrong_text", "matched_pred_texts": ["SUNTECCITY,"], "n_matched": 1, "best_iou": 0.6985}
+{"image": "img_121", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["OSINCERE"], "n_matched": 0}
+{"image": "img_121", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["CARDTHATGIVESYOU"], "n_matched": 0}
+{"image": "img_121", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["EXCITING"], "n_matched": 0}
+{"image": "img_121", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["ESPRIT"], "n_matched": 0}
+{"image": "img_121", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": [""], "n_matched": 0}
+{"image": "img_121", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["GREATDEALS"], "n_matched": 0}
+{"image": "img_134", "level": "line", "index": 0, "gt_text": "BRITISH", "status": "wrong_text", "matched_pred_texts": ["BRIFISH"], "n_matched": 1, "best_iou": 0.5555}
+{"image": "img_134", "level": "line", "index": 1, "gt_text": "SALE", "status": "correct", "matched_pred_texts": ["SALE"], "n_matched": 1, "best_iou": 0.7033}
+{"image": "img_134", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["1"], "n_matched": 0}
+{"image": "img_140", "level": "line", "index": 0, "gt_text": "PRECIOUS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3374}
+{"image": "img_140", "level": "line", "index": 1, "gt_text": "PLACE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_140", "level": "line", "index": 2, "gt_text": "SUSHITHEKIMMIC", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0609}
+{"image": "img_140", "level": "line", "index": 3, "gt_text": "SUSHI", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_140", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["METOUSTHJS"], "n_matched": 0}
+{"image": "img_140", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SUSHITER"], "n_matched": 0}
+{"image": "img_142", "level": "line", "index": 0, "gt_text": "OPE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.1955}
+{"image": "img_142", "level": "line", "index": 1, "gt_text": "TOASTAND", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3214}
+{"image": "img_142", "level": "line", "index": 2, "gt_text": "EARLY", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.151}
+{"image": "img_142", "level": "line", "index": 3, "gt_text": "YOURIMPORTANT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.39}
+{"image": "img_142", "level": "line", "index": 4, "gt_text": "OPENS", "status": "correct", "matched_pred_texts": ["OPENS"], "n_matched": 1, "best_iou": 0.6768}
+{"image": "img_142", "level": "line", "index": 5, "gt_text": "DAILY", "status": "correct", "matched_pred_texts": ["DAILY"], "n_matched": 1, "best_iou": 0.8021}
+{"image": "img_142", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["D"], "n_matched": 0}
+{"image": "img_142", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["至"], "n_matched": 0}
+{"image": "img_142", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["|WEEPRLY"], "n_matched": 0}
+{"image": "img_142", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["TOAST@"], "n_matched": 0}
+{"image": "img_142", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["KAATOASTFRIEDELSVEHOONAND"], "n_matched": 0}
+{"image": "img_142", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["GMAETSTRONGCOFFE"], "n_matched": 0}
+{"image": "img_142", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["HAYEYOURMOATIN"], "n_matched": 0}
+{"image": "img_142", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["THEDAYWITHUA!"], "n_matched": 0}
+{"image": "img_142", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["UA"], "n_matched": 0}
+{"image": "img_142", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["7.30AM"], "n_matched": 0}
+{"image": "img_154", "level": "line", "index": 0, "gt_text": "SALE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_161", "level": "line", "index": 0, "gt_text": "GEOXGEOX", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3481}
+{"image": "img_161", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["GX"], "n_matched": 0}
+{"image": "img_161", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["三"], "n_matched": 0}
+{"image": "img_162", "level": "line", "index": 0, "gt_text": "NAUTI", "status": "correct", "matched_pred_texts": ["NAUTI"], "n_matched": 1, "best_iou": 0.7145}
+{"image": "img_177", "level": "line", "index": 0, "gt_text": "POPOUROREAI#", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4863}
+{"image": "img_177", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["POPBYOURSJOREAI#"], "n_matched": 0}
+{"image": "img_177", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["A"], "n_matched": 0}
+{"image": "img_177", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["00"], "n_matched": 0}
+{"image": "img_177", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["CSION9MMO61\\06"], "n_matched": 0}
+{"image": "img_181", "level": "line", "index": 0, "gt_text": "EPIDOR", "status": "correct", "matched_pred_texts": ["EPIDOR"], "n_matched": 1, "best_iou": 0.7113}
+{"image": "img_19", "level": "line", "index": 0, "gt_text": "WESTCOASTWAY", "status": "correct", "matched_pred_texts": ["WESTCOASTWAY"], "n_matched": 1, "best_iou": 0.534}
+{"image": "img_19", "level": "line", "index": 1, "gt_text": "PIE", "status": "correct", "matched_pred_texts": ["PIE"], "n_matched": 1, "best_iou": 0.7441}
+{"image": "img_19", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["CLEMENTIAVES"], "n_matched": 0}
+{"image": "img_192", "level": "line", "index": 0, "gt_text": "FIREHOSEREEH", "status": "wrong_text", "matched_pred_texts": ["FREHOSEREEL"], "n_matched": 1, "best_iou": 0.8328}
+{"image": "img_192", "level": "line", "index": 1, "gt_text": "WET", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4191}
+{"image": "img_192", "level": "line", "index": 2, "gt_text": "WATER", "status": "correct", "matched_pred_texts": ["WATER"], "n_matched": 1, "best_iou": 0.8692}
+{"image": "img_192", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["WETRISER"], "n_matched": 0}
+{"image": "img_196", "level": "line", "index": 0, "gt_text": "BURGER", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.365}
+{"image": "img_196", "level": "line", "index": 1, "gt_text": "KING", "status": "wrong_text", "matched_pred_texts": ["BKING"], "n_matched": 1, "best_iou": 0.5141}
+{"image": "img_196", "level": "line", "index": 2, "gt_text": "SINCE1954", "status": "correct", "matched_pred_texts": ["SINCE1954"], "n_matched": 1, "best_iou": 0.6348}
+{"image": "img_20", "level": "line", "index": 0, "gt_text": "JOINNOW", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_20", "level": "line", "index": 1, "gt_text": "YOU", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_20", "level": "line", "index": 2, "gt_text": "BEYONDWALLSDRINGWORLD", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_20", "level": "line", "index": 3, "gt_text": "CLASSROOMSTHE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_20", "level": "line", "index": 4, "gt_text": "FOUR", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_20", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["OOON"], "n_matched": 0}
+{"image": "img_215", "level": "line", "index": 0, "gt_text": "EXIT", "status": "correct", "matched_pred_texts": ["EXIT"], "n_matched": 1, "best_iou": 0.71}
+{"image": "img_215", "level": "line", "index": 1, "gt_text": "$8.80", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_216", "level": "line", "index": 0, "gt_text": "BROWHOUS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4493}
+{"image": "img_216", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["BROWHAUS"], "n_matched": 0}
+{"image": "img_22", "level": "line", "index": 0, "gt_text": "TOFFIFEE", "status": "correct", "matched_pred_texts": ["TOFFIFEE"], "n_matched": 1, "best_iou": 0.7602}
+{"image": "img_22", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["ROC"], "n_matched": 0}
+{"image": "img_220", "level": "line", "index": 0, "gt_text": "SWATCH", "status": "wrong_text", "matched_pred_texts": ["SWATCH+"], "n_matched": 1, "best_iou": 0.6549}
+{"image": "img_221", "level": "line", "index": 0, "gt_text": "50%OFFIOS", "status": "wrong_text", "matched_pred_texts": ["50OFF"], "n_matched": 1, "best_iou": 0.5811}
+{"image": "img_221", "level": "line", "index": 1, "gt_text": "UMPSME", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_221", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["30"], "n_matched": 0}
+{"image": "img_221", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["UPTO"], "n_matched": 0}
+{"image": "img_221", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["\"SELECTEDTINESONTY"], "n_matched": 0}
+{"image": "img_223", "level": "line", "index": 0, "gt_text": "ANYSIS", "status": "correct", "matched_pred_texts": ["ANYSIS"], "n_matched": 1, "best_iou": 0.65}
+{"image": "img_223", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": [""], "n_matched": 0}
+{"image": "img_227", "level": "line", "index": 0, "gt_text": "EETT", "status": "wrong_text", "matched_pred_texts": ["RETT"], "n_matched": 1, "best_iou": 0.8821}
+{"image": "img_227", "level": "line", "index": 1, "gt_text": "DOCKERS", "status": "wrong_text", "matched_pred_texts": ["DÓCKERS"], "n_matched": 1, "best_iou": 0.8317}
+{"image": "img_227", "level": "line", "index": 2, "gt_text": "FIGGER", "status": "wrong_text", "matched_pred_texts": ["19QQIT"], "n_matched": 1, "best_iou": 0.675}
+{"image": "img_228", "level": "line", "index": 0, "gt_text": "SEX", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4212}
+{"image": "img_228", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["娄梦"], "n_matched": 0}
+{"image": "img_228", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["ISSEX?"], "n_matched": 0}
+{"image": "img_237", "level": "line", "index": 0, "gt_text": "MEETINGPOINT", "status": "correct", "matched_pred_texts": ["MEETINGPOINT"], "n_matched": 1, "best_iou": 0.7001}
+{"image": "img_237", "level": "line", "index": 1, "gt_text": "THEATRE", "status": "correct", "matched_pred_texts": ["THEATRE"], "n_matched": 1, "best_iou": 0.7388}
+{"image": "img_237", "level": "line", "index": 2, "gt_text": "PASSAGES", "status": "wrong_text", "matched_pred_texts": ["↑PASSAGES"], "n_matched": 1, "best_iou": 0.549}
+{"image": "img_237", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["PE4PIWSNSWY"], "n_matched": 0}
+{"image": "img_239", "level": "line", "index": 0, "gt_text": "AXS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_239", "level": "line", "index": 1, "gt_text": "NETS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4947}
+{"image": "img_239", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["NETS"], "n_matched": 0}
+{"image": "img_245", "level": "line", "index": 0, "gt_text": "TOASTBOX", "status": "correct", "matched_pred_texts": ["TOASTBOX"], "n_matched": 1, "best_iou": 0.8373}
+{"image": "img_245", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["士司汇坊"], "n_matched": 0}
+{"image": "img_247", "level": "line", "index": 0, "gt_text": "QUEEN", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4742}
+{"image": "img_247", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["DUEEN"], "n_matched": 0}
+{"image": "img_247", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SG"], "n_matched": 0}
+{"image": "img_255", "level": "line", "index": 0, "gt_text": "MONTHLY", "status": "correct", "matched_pred_texts": ["MONTHLY"], "n_matched": 1, "best_iou": 0.6624}
+{"image": "img_255", "level": "line", "index": 1, "gt_text": "SPECIAL", "status": "wrong_text", "matched_pred_texts": ["SPLIEL"], "n_matched": 1, "best_iou": 0.7192}
+{"image": "img_255", "level": "line", "index": 2, "gt_text": "2015FISHPEPPER", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4356}
+{"image": "img_255", "level": "line", "index": 3, "gt_text": "HAPPYNEWYEAR", "status": "wrong_text", "matched_pred_texts": ["HAPPYNEUSYEAR"], "n_matched": 1, "best_iou": 0.8451}
+{"image": "img_255", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["2015"], "n_matched": 0}
+{"image": "img_255", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["FEISHPEPPER"], "n_matched": 0}
+{"image": "img_255", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["MASALA"], "n_matched": 0}
+{"image": "img_266", "level": "line", "index": 0, "gt_text": "SWAROVSKI", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4585}
+{"image": "img_266", "level": "line", "index": 1, "gt_text": "TMLEWIN", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4699}
+{"image": "img_266", "level": "line", "index": 2, "gt_text": "LEVIS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_266", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SWAROVSKI"], "n_matched": 0}
+{"image": "img_266", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["IMERAN"], "n_matched": 0}
+{"image": "img_266", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SIL."], "n_matched": 0}
+{"image": "img_266", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["SWAPCMILOI"], "n_matched": 0}
+{"image": "img_269", "level": "line", "index": 0, "gt_text": "SEPH", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4992}
+{"image": "img_269", "level": "line", "index": 1, "gt_text": "LEEHWA", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.2802}
+{"image": "img_269", "level": "line", "index": 2, "gt_text": "DIAMONDGALLERY", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3258}
+{"image": "img_269", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SEPH"], "n_matched": 0}
+{"image": "img_269", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["LEEHWADIAMONDGALLBRY"], "n_matched": 0}
+{"image": "img_27", "level": "line", "index": 0, "gt_text": "QBHOUSE", "status": "correct", "matched_pred_texts": ["QBHOUSE"], "n_matched": 1, "best_iou": 0.6858}
+{"image": "img_27", "level": "line", "index": 1, "gt_text": "OPEN", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_29", "level": "line", "index": 0, "gt_text": "FOR", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_29", "level": "line", "index": 1, "gt_text": "THENEXTDAY!$50ONLYNOTES", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0784}
+{"image": "img_29", "level": "line", "index": 2, "gt_text": "ZALORAPURCHASESAVAILABLE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.1576}
+{"image": "img_29", "level": "line", "index": 3, "gt_text": "HERE", "status": "correct", "matched_pred_texts": ["HERE"], "n_matched": 1, "best_iou": 0.6078}
+{"image": "img_29", "level": "line", "index": 4, "gt_text": "ATM", "status": "correct", "matched_pred_texts": ["ATM"], "n_matched": 1, "best_iou": 0.8285}
+{"image": "img_29", "level": "line", "index": 5, "gt_text": "SIGN-UP", "status": "correct", "matched_pred_texts": ["SIGN-UP"], "n_matched": 1, "best_iou": 0.8757}
+{"image": "img_29", "level": "line", "index": 6, "gt_text": "SHOP", "status": "correct", "matched_pred_texts": ["SHOP"], "n_matched": 1, "best_iou": 0.749}
+{"image": "img_29", "level": "line", "index": 7, "gt_text": "COLLECT", "status": "correct", "matched_pred_texts": ["COLLECT"], "n_matched": 1, "best_iou": 0.8004}
+{"image": "img_29", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["ONLY"], "n_matched": 0}
+{"image": "img_29", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["550NOTES"], "n_matched": 0}
+{"image": "img_29", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["YOURZALRAPURCHASESHERETHENEXTDAY!"], "n_matched": 0}
+{"image": "img_29", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["AVAILABLE"], "n_matched": 0}
+{"image": "img_293", "level": "line", "index": 0, "gt_text": "COFFEECLUB", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4986}
+{"image": "img_293", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["EOEE"], "n_matched": 0}
+{"image": "img_293", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["FFEECLUB"], "n_matched": 0}
+{"image": "img_293", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["州"], "n_matched": 0}
+{"image": "img_295", "level": "line", "index": 0, "gt_text": "SALE", "status": "correct", "matched_pred_texts": ["SALE"], "n_matched": 1, "best_iou": 0.704}
+{"image": "img_295", "level": "line", "index": 1, "gt_text": "SALE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4772}
+{"image": "img_295", "level": "line", "index": 2, "gt_text": "SALESALE", "status": "wrong_text", "matched_pred_texts": ["SALEDALE"], "n_matched": 1, "best_iou": 0.7644}
+{"image": "img_295", "level": "line", "index": 3, "gt_text": "SAL", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3198}
+{"image": "img_295", "level": "line", "index": 4, "gt_text": "SALE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.19}
+{"image": "img_295", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SALESDE"], "n_matched": 0}
+{"image": "img_295", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["O"], "n_matched": 0}
+{"image": "img_297", "level": "line", "index": 0, "gt_text": "OMEGA", "status": "correct", "matched_pred_texts": ["OMEGA"], "n_matched": 1, "best_iou": 0.5563}
+{"image": "img_297", "level": "line", "index": 1, "gt_text": "PARIS", "status": "correct", "matched_pred_texts": ["PARIS"], "n_matched": 1, "best_iou": 0.8609}
+{"image": "img_297", "level": "line", "index": 2, "gt_text": "OMAEXIT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_30", "level": "line", "index": 0, "gt_text": "MRT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4622}
+{"image": "img_30", "level": "line", "index": 1, "gt_text": "140M", "status": "wrong_text", "matched_pred_texts": ["140M→"], "n_matched": 1, "best_iou": 0.6031}
+{"image": "img_30", "level": "line", "index": 2, "gt_text": "INSEAD", "status": "correct", "matched_pred_texts": ["INSEAD"], "n_matched": 1, "best_iou": 0.9325}
+{"image": "img_30", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["MRT"], "n_matched": 0}
+{"image": "img_300", "level": "line", "index": 0, "gt_text": "SWATC", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3996}
+{"image": "img_300", "level": "line", "index": 1, "gt_text": "OMEGA", "status": "correct", "matched_pred_texts": ["OMEGA"], "n_matched": 1, "best_iou": 0.6427}
+{"image": "img_300", "level": "line", "index": 2, "gt_text": "GLAILLOOMEGA", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0776}
+{"image": "img_300", "level": "line", "index": 3, "gt_text": "SALE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_300", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SWATC"], "n_matched": 0}
+{"image": "img_300", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["Q"], "n_matched": 0}
+{"image": "img_300", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["FNITLE"], "n_matched": 0}
+{"image": "img_300", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["OMEG"], "n_matched": 0}
+{"image": "img_300", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["MIG"], "n_matched": 0}
+{"image": "img_306", "level": "line", "index": 0, "gt_text": "EXIT", "status": "correct", "matched_pred_texts": ["EXIT"], "n_matched": 1, "best_iou": 0.8732}
+{"image": "img_307", "level": "line", "index": 0, "gt_text": "BEN'S", "status": "correct", "matched_pred_texts": ["BEN'S"], "n_matched": 1, "best_iou": 0.7085}
+{"image": "img_307", "level": "line", "index": 1, "gt_text": "SALE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.394}
+{"image": "img_307", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["DATCANBIES"], "n_matched": 0}
+{"image": "img_307", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SALE"], "n_matched": 0}
+{"image": "img_309", "level": "line", "index": 0, "gt_text": "GRAND", "status": "wrong_text", "matched_pred_texts": ["GREND"], "n_matched": 1, "best_iou": 0.5691}
+{"image": "img_309", "level": "line", "index": 1, "gt_text": "ANNIVERSARY", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3473}
+{"image": "img_309", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["MRERSAR"], "n_matched": 0}
+{"image": "img_310", "level": "line", "index": 0, "gt_text": "EXIT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_310", "level": "line", "index": 1, "gt_text": "GNC", "status": "correct", "matched_pred_texts": ["GNC"], "n_matched": 1, "best_iou": 0.5516}
+{"image": "img_310", "level": "line", "index": 2, "gt_text": "NGEEANNCITY", "status": "wrong_text", "matched_pred_texts": ["LNGEEANNCITY"], "n_matched": 1, "best_iou": 0.7234}
+{"image": "img_310", "level": "line", "index": 3, "gt_text": "GNC", "status": "wrong_text", "matched_pred_texts": ["GNE"], "n_matched": 1, "best_iou": 0.5831}
+{"image": "img_310", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["B1^"], "n_matched": 0}
+{"image": "img_310", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["NOEEANNOTA"], "n_matched": 0}
+{"image": "img_310", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["TIOKAE"], "n_matched": 0}
+{"image": "img_310", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["Y"], "n_matched": 0}
+{"image": "img_310", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["BRS"], "n_matched": 0}
+{"image": "img_312", "level": "line", "index": 0, "gt_text": "OPENINGGIFTS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.1764}
+{"image": "img_312", "level": "line", "index": 1, "gt_text": "SOONFOR", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0735}
+{"image": "img_312", "level": "line", "index": 2, "gt_text": "ALLYOUR", "status": "wrong_text", "matched_pred_texts": ["ALYOUR"], "n_matched": 1, "best_iou": 0.7112}
+{"image": "img_312", "level": "line", "index": 3, "gt_text": "GIRLS", "status": "wrong_text", "matched_pred_texts": ["GURLS"], "n_matched": 1, "best_iou": 0.6409}
+{"image": "img_312", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["1"], "n_matched": 0}
+{"image": "img_312", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["OPENING"], "n_matched": 0}
+{"image": "img_312", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SOON"], "n_matched": 0}
+{"image": "img_317", "level": "line", "index": 0, "gt_text": "MANGOSALE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.325}
+{"image": "img_317", "level": "line", "index": 1, "gt_text": "UPTO", "status": "correct", "matched_pred_texts": ["UPTO"], "n_matched": 1, "best_iou": 0.5161}
+{"image": "img_317", "level": "line", "index": 2, "gt_text": "OFF", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0089}
+{"image": "img_317", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SALE"], "n_matched": 0}
+{"image": "img_317", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["MANGO"], "n_matched": 0}
+{"image": "img_317", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["70"], "n_matched": 0}
+{"image": "img_318", "level": "line", "index": 0, "gt_text": "FURTHER", "status": "correct", "matched_pred_texts": ["FURTHER"], "n_matched": 1, "best_iou": 0.6946}
+{"image": "img_318", "level": "line", "index": 1, "gt_text": "DISCOUNTS", "status": "correct", "matched_pred_texts": ["DISCOUNTS"], "n_matched": 1, "best_iou": 0.5686}
+{"image": "img_318", "level": "line", "index": 2, "gt_text": "OFF", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_318", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["MES"], "n_matched": 0}
+{"image": "img_318", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["SAIE"], "n_matched": 0}
+{"image": "img_318", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["M·S"], "n_matched": 0}
+{"image": "img_319", "level": "line", "index": 0, "gt_text": "EXIT", "status": "correct", "matched_pred_texts": ["EXIT"], "n_matched": 1, "best_iou": 0.5622}
+{"image": "img_324", "level": "line", "index": 0, "gt_text": "THEWORLD", "status": "correct", "matched_pred_texts": ["THEWORLD"], "n_matched": 1, "best_iou": 0.7952}
+{"image": "img_324", "level": "line", "index": 1, "gt_text": "OYS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.2065}
+{"image": "img_324", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SMYOYE"], "n_matched": 0}
+{"image": "img_327", "level": "line", "index": 0, "gt_text": "BOOKS", "status": "correct", "matched_pred_texts": ["BOOKS"], "n_matched": 1, "best_iou": 0.6184}
+{"image": "img_327", "level": "line", "index": 1, "gt_text": "KINOKUNIYA", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0096}
+{"image": "img_327", "level": "line", "index": 2, "gt_text": "MONEYCHANGER", "status": "correct", "matched_pred_texts": ["MONEYCHANGER"], "n_matched": 1, "best_iou": 0.7824}
+{"image": "img_327", "level": "line", "index": 3, "gt_text": "KNOWLEDGE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4333}
+{"image": "img_327", "level": "line", "index": 4, "gt_text": "NEWCHAPTERONE", "status": "wrong_text", "matched_pred_texts": ["ANEWHATPERBECONS-ELFORDE"], "n_matched": 1, "best_iou": 0.5064}
+{"image": "img_327", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["KNOWLEDGECHUETEE"], "n_matched": 0}
+{"image": "img_334", "level": "line", "index": 0, "gt_text": "ORCHARD", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_334", "level": "line", "index": 1, "gt_text": "FEDEX", "status": "correct", "matched_pred_texts": ["FEDEX"], "n_matched": 1, "best_iou": 0.9141}
+{"image": "img_341", "level": "line", "index": 0, "gt_text": "SPOON", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4945}
+{"image": "img_341", "level": "line", "index": 1, "gt_text": "THESOUP", "status": "correct", "matched_pred_texts": ["THESOUP"], "n_matched": 1, "best_iou": 0.5606}
+{"image": "img_341", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SPOON"], "n_matched": 0}
+{"image": "img_345", "level": "line", "index": 0, "gt_text": "EAUTY", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.1755}
+{"image": "img_345", "level": "line", "index": 1, "gt_text": "PAMPER", "status": "correct", "matched_pred_texts": ["PAMPER"], "n_matched": 1, "best_iou": 0.6693}
+{"image": "img_345", "level": "line", "index": 2, "gt_text": "SKIN!", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4957}
+{"image": "img_345", "level": "line", "index": 3, "gt_text": "PERFECT", "status": "correct", "matched_pred_texts": ["PERFECT"], "n_matched": 1, "best_iou": 0.5986}
+{"image": "img_345", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["BEAUTYES"], "n_matched": 0}
+{"image": "img_345", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["MYSKIN!"], "n_matched": 0}
+{"image": "img_345", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["GETTHE"], "n_matched": 0}
+{"image": "img_345", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["POUM"], "n_matched": 0}
+{"image": "img_350", "level": "line", "index": 0, "gt_text": "IMAGESCHINA", "status": "wrong_text", "matched_pred_texts": ["IMAGESOFCHINA"], "n_matched": 1, "best_iou": 0.8115}
+{"image": "img_350", "level": "line", "index": 1, "gt_text": "COMMUNE", "status": "correct", "matched_pred_texts": ["COMMUNE"], "n_matched": 1, "best_iou": 0.7864}
+{"image": "img_350", "level": "line", "index": 2, "gt_text": "SALE", "status": "wrong_text", "matched_pred_texts": ["SALES"], "n_matched": 1, "best_iou": 0.7101}
+{"image": "img_350", "level": "line", "index": 3, "gt_text": "PARAGON", "status": "correct", "matched_pred_texts": ["PARAGON"], "n_matched": 1, "best_iou": 0.8418}
+{"image": "img_350", "level": "line", "index": 4, "gt_text": "SALE", "status": "correct", "matched_pred_texts": ["SALE"], "n_matched": 1, "best_iou": 0.9026}
+{"image": "img_350", "level": "line", "index": 5, "gt_text": "SALE", "status": "wrong_text", "matched_pred_texts": ["SALESO"], "n_matched": 1, "best_iou": 0.5056}
+{"image": "img_350", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SALE"], "n_matched": 0}
+{"image": "img_350", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["70%"], "n_matched": 0}
+{"image": "img_356", "level": "line", "index": 0, "gt_text": "MARCJACOBS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4554}
+{"image": "img_356", "level": "line", "index": 1, "gt_text": "HARC", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.1447}
+{"image": "img_356", "level": "line", "index": 2, "gt_text": "BREADBUTTER", "status": "wrong_text", "matched_pred_texts": ["BREAD&BUTTER"], "n_matched": 1, "best_iou": 0.7192}
+{"image": "img_356", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["MARCBYMARCJACOBS"], "n_matched": 0}
+{"image": "img_356", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["EMPORONAR"], "n_matched": 0}
+{"image": "img_363", "level": "line", "index": 0, "gt_text": "ROBERT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_363", "level": "line", "index": 1, "gt_text": "TIMMS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_363", "level": "line", "index": 2, "gt_text": "STAKEYOURCLAIM!", "status": "correct", "matched_pred_texts": ["STAKEYOURCLAIM!"], "n_matched": 1, "best_iou": 0.8285}
+{"image": "img_363", "level": "line", "index": 3, "gt_text": "YOURSTEAKDONEYOURWAY!", "status": "wrong_text", "matched_pred_texts": ["YOURSTEAK,DONEYOURWAY"], "n_matched": 1, "best_iou": 0.7914}
+{"image": "img_363", "level": "line", "index": 4, "gt_text": "NTRE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_367", "level": "line", "index": 0, "gt_text": "COTTON", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_367", "level": "line", "index": 1, "gt_text": "NEW", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_380", "level": "line", "index": 0, "gt_text": "EPICENTRE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4573}
+{"image": "img_380", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["R20"], "n_matched": 0}
+{"image": "img_380", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SE"], "n_matched": 0}
+{"image": "img_380", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["EPICENTRE"], "n_matched": 0}
+{"image": "img_393", "level": "line", "index": 0, "gt_text": "CLOSING", "status": "correct", "matched_pred_texts": ["CLOSING"], "n_matched": 1, "best_iou": 0.5964}
+{"image": "img_393", "level": "line", "index": 1, "gt_text": "DOWN", "status": "correct", "matched_pred_texts": ["DOWN"], "n_matched": 1, "best_iou": 0.6}
+{"image": "img_393", "level": "line", "index": 2, "gt_text": "SALE!SALE", "status": "wrong_text", "matched_pred_texts": ["SALE!"], "n_matched": 1, "best_iou": 0.5405}
+{"image": "img_393", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SALE!"], "n_matched": 0}
+{"image": "img_405", "level": "line", "index": 0, "gt_text": "VICTORIA'SSECRET", "status": "correct", "matched_pred_texts": ["VICTORIA'SSECRET"], "n_matched": 1, "best_iou": 0.7278}
+{"image": "img_405", "level": "line", "index": 1, "gt_text": "EPICENTRE", "status": "correct", "matched_pred_texts": ["EPICENTRE"], "n_matched": 1, "best_iou": 0.8863}
+{"image": "img_405", "level": "line", "index": 2, "gt_text": "VICTORIASSECRET", "status": "wrong_text", "matched_pred_texts": ["VICTORLA'SSECRET"], "n_matched": 1, "best_iou": 0.6539}
+{"image": "img_405", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": [""], "n_matched": 0}
+{"image": "img_405", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["W"], "n_matched": 0}
+{"image": "img_405", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["WOS"], "n_matched": 0}
+{"image": "img_405", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["9"], "n_matched": 0}
+{"image": "img_405", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["VICTOLLSECRET"], "n_matched": 0}
+{"image": "img_405", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["000"], "n_matched": 0}
+{"image": "img_405", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["口"], "n_matched": 0}
+{"image": "img_405", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["A"], "n_matched": 0}
+{"image": "img_407", "level": "line", "index": 0, "gt_text": "SALESALESALE", "status": "wrong_text", "matched_pred_texts": ["SALESALESALESALE"], "n_matched": 1, "best_iou": 0.5341}
+{"image": "img_407", "level": "line", "index": 1, "gt_text": "SALE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.214}
+{"image": "img_407", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["6"], "n_matched": 0}
+{"image": "img_407", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["6"], "n_matched": 0}
+{"image": "img_407", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["T0"], "n_matched": 0}
+{"image": "img_407", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["BEREEE"], "n_matched": 0}
+{"image": "img_407", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["10"], "n_matched": 0}
+{"image": "img_407", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["T"], "n_matched": 0}
+{"image": "img_408", "level": "line", "index": 0, "gt_text": "REDEMPTION", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_408", "level": "line", "index": 1, "gt_text": "CONCIERGE", "status": "wrong_text", "matched_pred_texts": ["CIERGE"], "n_matched": 1, "best_iou": 0.557}
+{"image": "img_408", "level": "line", "index": 2, "gt_text": "CLUB313", "status": "correct", "matched_pred_texts": ["CLUB313"], "n_matched": 1, "best_iou": 0.8154}
+{"image": "img_408", "level": "line", "index": 3, "gt_text": "313", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_408", "level": "line", "index": 4, "gt_text": "EIC", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.1972}
+{"image": "img_408", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["OZ"], "n_matched": 0}
+{"image": "img_408", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["PURCHASE&RADOMGTIONOF3130OGMERVTVOUHERS"], "n_matched": 0}
+{"image": "img_408", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["RANHEATLEENG"], "n_matched": 0}
+{"image": "img_408", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["E"], "n_matched": 0}
+{"image": "img_408", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["一"], "n_matched": 0}
+{"image": "img_411", "level": "line", "index": 0, "gt_text": "EXIT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_411", "level": "line", "index": 1, "gt_text": "CHABUTON", "status": "correct", "matched_pred_texts": ["CHABUTON"], "n_matched": 1, "best_iou": 0.6982}
+{"image": "img_411", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["らゃぶ屋とんこつらお趣"], "n_matched": 0}
+{"image": "img_411", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["ABUTON"], "n_matched": 0}
+{"image": "img_415", "level": "line", "index": 0, "gt_text": "CANDY", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_415", "level": "line", "index": 1, "gt_text": "HOLIDAY", "status": "correct", "matched_pred_texts": ["HOLIDAY"], "n_matched": 1, "best_iou": 0.7987}
+{"image": "img_415", "level": "line", "index": 2, "gt_text": "PLATTER", "status": "correct", "matched_pred_texts": ["PLATTER"], "n_matched": 1, "best_iou": 0.8084}
+{"image": "img_415", "level": "line", "index": 3, "gt_text": "$5", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.2148}
+{"image": "img_415", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["EXIT"], "n_matched": 0}
+{"image": "img_415", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": [".50"], "n_matched": 0}
+{"image": "img_419", "level": "line", "index": 0, "gt_text": "EXIT", "status": "correct", "matched_pred_texts": ["EXIT"], "n_matched": 1, "best_iou": 0.7029}
+{"image": "img_419", "level": "line", "index": 1, "gt_text": "#B2-02/03", "status": "correct", "matched_pred_texts": ["#B2-02/03"], "n_matched": 1, "best_iou": 0.7922}
+{"image": "img_419", "level": "line", "index": 2, "gt_text": "SABOTEN", "status": "correct", "matched_pred_texts": ["SABOTEN"], "n_matched": 1, "best_iou": 0.8104}
+{"image": "img_419", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["きてん"], "n_matched": 0}
+{"image": "img_423", "level": "line", "index": 0, "gt_text": "DENIZEN", "status": "correct", "matched_pred_texts": ["DENIZEN"], "n_matched": 1, "best_iou": 0.7913}
+{"image": "img_423", "level": "line", "index": 1, "gt_text": "$108", "status": "correct", "matched_pred_texts": ["$108"], "n_matched": 1, "best_iou": 0.7217}
+{"image": "img_423", "level": "line", "index": 2, "gt_text": "$150", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4056}
+{"image": "img_423", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["S150"], "n_matched": 0}
+{"image": "img_429", "level": "line", "index": 0, "gt_text": "GROUND", "status": "correct", "matched_pred_texts": ["GROUND"], "n_matched": 1, "best_iou": 0.9028}
+{"image": "img_429", "level": "line", "index": 1, "gt_text": "WAKA", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_429", "level": "line", "index": 2, "gt_text": "UNDERGROUND", "status": "correct", "matched_pred_texts": ["UNDERGROUND"], "n_matched": 1, "best_iou": 0.6309}
+{"image": "img_429", "level": "line", "index": 3, "gt_text": "SALE", "status": "correct", "matched_pred_texts": ["SALE"], "n_matched": 1, "best_iou": 0.8668}
+{"image": "img_429", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["NTCA"], "n_matched": 0}
+{"image": "img_431", "level": "line", "index": 0, "gt_text": "ORCHARDGATEWAY", "status": "wrong_text", "matched_pred_texts": ["ORCHARDGATEWUAY"], "n_matched": 1, "best_iou": 0.8894}
+{"image": "img_431", "level": "line", "index": 1, "gt_text": "@EMEROLD", "status": "wrong_text", "matched_pred_texts": ["EMERALD"], "n_matched": 1, "best_iou": 0.7492}
+{"image": "img_431", "level": "line", "index": 2, "gt_text": "NATURAL", "status": "wrong_text", "matched_pred_texts": ["NATURA"], "n_matched": 1, "best_iou": 0.6089}
+{"image": "img_431", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["RERCE"], "n_matched": 0}
+{"image": "img_431", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["CRATEDBANE"], "n_matched": 0}
+{"image": "img_433", "level": "line", "index": 0, "gt_text": "THEUNDERGROUND", "status": "wrong_text", "matched_pred_texts": ["UNDERGROUND"], "n_matched": 1, "best_iou": 0.8365}
+{"image": "img_433", "level": "line", "index": 1, "gt_text": "FASHIONSTREET", "status": "wrong_text", "matched_pred_texts": ["FASHLONSTREET"], "n_matched": 1, "best_iou": 0.8579}
+{"image": "img_44", "level": "line", "index": 0, "gt_text": "MANGA", "status": "correct", "matched_pred_texts": ["MANGA"], "n_matched": 1, "best_iou": 0.7188}
+{"image": "img_44", "level": "line", "index": 1, "gt_text": "MANGA", "status": "correct", "matched_pred_texts": ["MANGA"], "n_matched": 1, "best_iou": 0.7033}
+{"image": "img_44", "level": "line", "index": 2, "gt_text": "KINOKUNIYA", "status": "correct", "matched_pred_texts": ["KINOKUNIYA"], "n_matched": 1, "best_iou": 0.5897}
+{"image": "img_44", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["MANSA"], "n_matched": 0}
+{"image": "img_442", "level": "line", "index": 0, "gt_text": "313@SOMERSET", "status": "correct", "matched_pred_texts": ["313@SOMERSET"], "n_matched": 1, "best_iou": 0.5629}
+{"image": "img_442", "level": "line", "index": 1, "gt_text": "OLATE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_442", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": [""], "n_matched": 0}
+{"image": "img_443", "level": "line", "index": 0, "gt_text": "MARCHÉ", "status": "wrong_text", "matched_pred_texts": ["MARCHE"], "n_matched": 1, "best_iou": 0.5252}
+{"image": "img_443", "level": "line", "index": 1, "gt_text": "BAR", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.1198}
+{"image": "img_443", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["OONICSSHRESTAURANTABAR"], "n_matched": 0}
+{"image": "img_444", "level": "line", "index": 0, "gt_text": "EXIT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_444", "level": "line", "index": 1, "gt_text": "BAR", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.1203}
+{"image": "img_444", "level": "line", "index": 2, "gt_text": "MALONESIRISHRESTAURANT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4989}
+{"image": "img_444", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["MAONESIRISHRESTAURANT&BAR"], "n_matched": 0}
+{"image": "img_446", "level": "line", "index": 0, "gt_text": "MANDARIN", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_449", "level": "line", "index": 0, "gt_text": "EXIT", "status": "correct", "matched_pred_texts": ["EXIT"], "n_matched": 1, "best_iou": 0.7879}
+{"image": "img_449", "level": "line", "index": 1, "gt_text": "NOWSHOWING", "status": "correct", "matched_pred_texts": ["NOWSHOWING"], "n_matched": 1, "best_iou": 0.6843}
+{"image": "img_449", "level": "line", "index": 2, "gt_text": "NOWSHOWING", "status": "correct", "matched_pred_texts": ["NOWSHOWING"], "n_matched": 1, "best_iou": 0.7738}
+{"image": "img_449", "level": "line", "index": 3, "gt_text": "EXODUSKINOS", "status": "wrong_text", "matched_pred_texts": ["EXODUS"], "n_matched": 1, "best_iou": 0.5894}
+{"image": "img_449", "level": "line", "index": 4, "gt_text": "AND", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0376}
+{"image": "img_449", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["SHEAKSTODA"], "n_matched": 0}
+{"image": "img_449", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["PADDINGTON"], "n_matched": 0}
+{"image": "img_449", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["EE"], "n_matched": 0}
+{"image": "img_449", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["ADELNSR"], "n_matched": 0}
+{"image": "img_450", "level": "line", "index": 0, "gt_text": "NOWSHOWING", "status": "correct", "matched_pred_texts": ["NOWSHOWING"], "n_matched": 1, "best_iou": 0.762}
+{"image": "img_450", "level": "line", "index": 1, "gt_text": "NOWSHOWING", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_450", "level": "line", "index": 2, "gt_text": "PACT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_450", "level": "line", "index": 3, "gt_text": "SERENA", "status": "correct", "matched_pred_texts": ["SERENA"], "n_matched": 1, "best_iou": 0.6865}
+{"image": "img_450", "level": "line", "index": 4, "gt_text": "HOBBIT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_450", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["INTHEATRESIJAN"], "n_matched": 0}
+{"image": "img_452", "level": "line", "index": 0, "gt_text": "CATHAY", "status": "correct", "matched_pred_texts": ["CATHAY"], "n_matched": 1, "best_iou": 0.787}
+{"image": "img_452", "level": "line", "index": 1, "gt_text": "THEORY", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.2344}
+{"image": "img_452", "level": "line", "index": 2, "gt_text": "EVERYTHING", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4183}
+{"image": "img_452", "level": "line", "index": 3, "gt_text": "CINEMASJANUARY8", "status": "wrong_text", "matched_pred_texts": ["INCINEMASJANUARY8"], "n_matched": 1, "best_iou": 0.8005}
+{"image": "img_452", "level": "line", "index": 4, "gt_text": "REAL", "status": "wrong_text", "matched_pred_texts": ["REEL"], "n_matched": 1, "best_iou": 0.6784}
+{"image": "img_452", "level": "line", "index": 5, "gt_text": "INTOTHEWOODS", "status": "correct", "matched_pred_texts": ["INTOTHEWOODS"], "n_matched": 1, "best_iou": 0.9026}
+{"image": "img_452", "level": "line", "index": 6, "gt_text": "CATHAJAN", "status": "wrong_text", "matched_pred_texts": ["INCATHAYCNERLEXESISJAN2015"], "n_matched": 1, "best_iou": 0.7627}
+{"image": "img_452", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["SERCDITEEO"], "n_matched": 0}
+{"image": "img_452", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["EVTHYORINGG"], "n_matched": 0}
+{"image": "img_452", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["3"], "n_matched": 0}
+{"image": "img_452", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": [""], "n_matched": 0}
+{"image": "img_454", "level": "line", "index": 0, "gt_text": "SOPHISTICATIONNAM", "status": "wrong_text", "matched_pred_texts": ["SOPHISTICATIONHASANAMI"], "n_matched": 1, "best_iou": 0.7217}
+{"image": "img_454", "level": "line", "index": 1, "gt_text": "MORTDECAI", "status": "correct", "matched_pred_texts": ["MORTDECAI"], "n_matched": 1, "best_iou": 0.666}
+{"image": "img_454", "level": "line", "index": 2, "gt_text": "CATHAYCINEPLEXES", "status": "wrong_text", "matched_pred_texts": ["INCATHAYCINEPLEXES"], "n_matched": 1, "best_iou": 0.647}
+{"image": "img_454", "level": "line", "index": 3, "gt_text": "JANUARY", "status": "wrong_text", "matched_pred_texts": ["29JANUARY"], "n_matched": 1, "best_iou": 0.6069}
+{"image": "img_462", "level": "line", "index": 0, "gt_text": "WWW.FLESHIMP.", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4482}
+{"image": "img_462", "level": "line", "index": 1, "gt_text": "WHOLEDAYCOM", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.2134}
+{"image": "img_462", "level": "line", "index": 2, "gt_text": "ALLYEAR", "status": "correct", "matched_pred_texts": ["ALLYEAR"], "n_matched": 1, "best_iou": 0.6402}
+{"image": "img_462", "level": "line", "index": 3, "gt_text": "ROUND", "status": "correct", "matched_pred_texts": ["ROUND"], "n_matched": 1, "best_iou": 0.7173}
+{"image": "img_462", "level": "line", "index": 4, "gt_text": "TAMANIA", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_462", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["WWW."], "n_matched": 0}
+{"image": "img_462", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["FLESHIMP."], "n_matched": 0}
+{"image": "img_462", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["WHOLEDAY"], "n_matched": 0}
+{"image": "img_462", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["0"], "n_matched": 0}
+{"image": "img_462", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["COM"], "n_matched": 0}
+{"image": "img_462", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["FLESID"], "n_matched": 0}
+{"image": "img_467", "level": "line", "index": 0, "gt_text": "STICKY", "status": "correct", "matched_pred_texts": ["STICKY"], "n_matched": 1, "best_iou": 0.7724}
+{"image": "img_467", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["1"], "n_matched": 0}
+{"image": "img_469", "level": "line", "index": 0, "gt_text": "CAFESEOULGARDENHOTPOT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3527}
+{"image": "img_469", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["O1TT5R"], "n_matched": 0}
+{"image": "img_469", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["GRAFFITRCAFE#"], "n_matched": 0}
+{"image": "img_469", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SEOULGARDENHOTPOT"], "n_matched": 0}
+{"image": "img_469", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["限"], "n_matched": 0}
+{"image": "img_470", "level": "line", "index": 0, "gt_text": "CLEARINGSTATION", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.2613}
+{"image": "img_470", "level": "line", "index": 1, "gt_text": "SERVICE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_470", "level": "line", "index": 2, "gt_text": "HAINA", "status": "correct", "matched_pred_texts": ["HAINA"], "n_matched": 1, "best_iou": 0.8487}
+{"image": "img_470", "level": "line", "index": 3, "gt_text": "CHICKEN", "status": "correct", "matched_pred_texts": ["CHICKEN"], "n_matched": 1, "best_iou": 0.7172}
+{"image": "img_470", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["CLEARINGSTA"], "n_matched": 0}
+{"image": "img_470", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": [""], "n_matched": 0}
+{"image": "img_475", "level": "line", "index": 0, "gt_text": "SALE", "status": "correct", "matched_pred_texts": ["SALE"], "n_matched": 1, "best_iou": 0.7442}
+{"image": "img_475", "level": "line", "index": 1, "gt_text": "GIO", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0905}
+{"image": "img_475", "level": "line", "index": 2, "gt_text": "ENJOY", "status": "wrong_text", "matched_pred_texts": ["ENJOY5%"], "n_matched": 1, "best_iou": 0.6157}
+{"image": "img_475", "level": "line", "index": 3, "gt_text": "EBATEHERE", "status": "correct", "matched_pred_texts": ["EBATEHERE"], "n_matched": 1, "best_iou": 0.7265}
+{"image": "img_475", "level": "line", "index": 4, "gt_text": "BANK", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.365}
+{"image": "img_475", "level": "line", "index": 5, "gt_text": "OCBC", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4514}
+{"image": "img_475", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["10"], "n_matched": 0}
+{"image": "img_475", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["55130"], "n_matched": 0}
+{"image": "img_475", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["RO"], "n_matched": 0}
+{"image": "img_475", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["2"], "n_matched": 0}
+{"image": "img_475", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["B人"], "n_matched": 0}
+{"image": "img_475", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["OCBCBANK"], "n_matched": 0}
+{"image": "img_478", "level": "line", "index": 0, "gt_text": "NAILSPA", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3566}
+{"image": "img_478", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["ONANDNAILSPA"], "n_matched": 0}
+{"image": "img_48", "level": "line", "index": 0, "gt_text": "UOBWEALTH", "status": "wrong_text", "matched_pred_texts": ["UOBWANNGNG"], "n_matched": 1, "best_iou": 0.6658}
+{"image": "img_48", "level": "line", "index": 1, "gt_text": "SALE", "status": "correct", "matched_pred_texts": ["SALE"], "n_matched": 1, "best_iou": 0.7602}
+{"image": "img_48", "level": "line", "index": 2, "gt_text": "FORTHEEVENT", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3937}
+{"image": "img_48", "level": "line", "index": 3, "gt_text": "PPING", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3791}
+{"image": "img_48", "level": "line", "index": 4, "gt_text": "GER", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.3737}
+{"image": "img_48", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["OU"], "n_matched": 0}
+{"image": "img_48", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["SFORTHE"], "n_matched": 0}
+{"image": "img_48", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["GERPRIS"], "n_matched": 0}
+{"image": "img_48", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["OPPINGEVENT"], "n_matched": 0}
+{"image": "img_48", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["AR"], "n_matched": 0}
+{"image": "img_487", "level": "line", "index": 0, "gt_text": "YAMANO", "status": "wrong_text", "matched_pred_texts": ["BYYAMANO"], "n_matched": 1, "best_iou": 0.6116}
+{"image": "img_487", "level": "line", "index": 1, "gt_text": "FACE", "status": "wrong_text", "matched_pred_texts": ["ACE"], "n_matched": 1, "best_iou": 0.5667}
+{"image": "img_487", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["最霸で唯注は"], "n_matched": 0}
+{"image": "img_487", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["やマノだけ。"], "n_matched": 0}
+{"image": "img_487", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["最高金賞20"], "n_matched": 0}
+{"image": "img_487", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["春取得"], "n_matched": 0}
+{"image": "img_487", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["L"], "n_matched": 0}
+{"image": "img_495", "level": "line", "index": 0, "gt_text": "PLAZA", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4135}
+{"image": "img_495", "level": "line", "index": 1, "gt_text": "CORNER", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.1607}
+{"image": "img_495", "level": "line", "index": 2, "gt_text": "LORS", "status": "correct", "matched_pred_texts": ["LORS"], "n_matched": 1, "best_iou": 0.8475}
+{"image": "img_495", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["HDPLAZA"], "n_matched": 0}
+{"image": "img_495", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["A"], "n_matched": 0}
+{"image": "img_495", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["5"], "n_matched": 0}
+{"image": "img_495", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["工"], "n_matched": 0}
+{"image": "img_495", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["30T"], "n_matched": 0}
+{"image": "img_495", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["ARFURFI"], "n_matched": 0}
+{"image": "img_496", "level": "line", "index": 0, "gt_text": "CLEMENCEAUAVE", "status": "correct", "matched_pred_texts": ["CLEMENCEAUAVE"], "n_matched": 1, "best_iou": 0.7024}
+{"image": "img_496", "level": "line", "index": 1, "gt_text": "HAVELOCK", "status": "wrong_text", "matched_pred_texts": ["(HAVELOCKRD)"], "n_matched": 1, "best_iou": 0.5905}
+{"image": "img_496", "level": "line", "index": 2, "gt_text": "CTESLE", "status": "wrong_text", "matched_pred_texts": ["CTE(SLE)"], "n_matched": 1, "best_iou": 0.7754}
+{"image": "img_496", "level": "line", "index": 3, "gt_text": "BRASBASAH", "status": "wrong_text", "matched_pred_texts": ["BRASBASAHRD"], "n_matched": 1, "best_iou": 0.7072}
+{"image": "img_6", "level": "line", "index": 0, "gt_text": "AIROB", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0495}
+{"image": "img_6", "level": "line", "index": 1, "gt_text": "DOORS", "status": "wrong_text", "matched_pred_texts": ["FDOORS"], "n_matched": 1, "best_iou": 0.6146}
+{"image": "img_6", "level": "line", "index": 2, "gt_text": "RESERVED", "status": "correct", "matched_pred_texts": ["RESERVED"], "n_matched": 1, "best_iou": 0.8061}
+{"image": "img_6", "level": "line", "index": 3, "gt_text": "SEATING", "status": "correct", "matched_pred_texts": ["SEATING"], "n_matched": 1, "best_iou": 0.7444}
+{"image": "img_6", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["DEKATPINTU"], "n_matched": 0}
+{"image": "img_6", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["KEEPCLE"], "n_matched": 0}
+{"image": "img_6", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["画"], "n_matched": 0}
+{"image": "img_6", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["山"], "n_matched": 0}
+{"image": "img_60", "level": "line", "index": 0, "gt_text": "SINGAPORE", "status": "correct", "matched_pred_texts": ["SINGAPORE"], "n_matched": 1, "best_iou": 0.6878}
+{"image": "img_60", "level": "line", "index": 1, "gt_text": "CRUISE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.4478}
+{"image": "img_60", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["-ORUCOENE"], "n_matched": 0}
+{"image": "img_64", "level": "line", "index": 0, "gt_text": "GARRETT", "status": "correct", "matched_pred_texts": ["GARRETT"], "n_matched": 1, "best_iou": 0.5258}
+{"image": "img_64", "level": "line", "index": 1, "gt_text": "DBS", "status": "wrong_text", "matched_pred_texts": ["E×DBS"], "n_matched": 1, "best_iou": 0.5128}
+{"image": "img_64", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["CI"], "n_matched": 0}
+{"image": "img_64", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["B:8191000"], "n_matched": 0}
+{"image": "img_64", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["PHAE"], "n_matched": 0}
+{"image": "img_64", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["SJMENBEGOURSIETFOWY"], "n_matched": 0}
+{"image": "img_64", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["2"], "n_matched": 0}
+{"image": "img_67", "level": "line", "index": 0, "gt_text": "FRESHLY", "status": "correct", "matched_pred_texts": ["FRESHLY"], "n_matched": 1, "best_iou": 0.7116}
+{"image": "img_67", "level": "line", "index": 1, "gt_text": "CUT", "status": "correct", "matched_pred_texts": ["CUT"], "n_matched": 1, "best_iou": 0.769}
+{"image": "img_67", "level": "line", "index": 2, "gt_text": "FRUIT", "status": "correct", "matched_pred_texts": ["FRUIT"], "n_matched": 1, "best_iou": 0.7389}
+{"image": "img_67", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["新春特惠"], "n_matched": 0}
+{"image": "img_67", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["纹意"], "n_matched": 0}
+{"image": "img_67", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["MESTLI"], "n_matched": 0}
+{"image": "img_67", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["KAKACRUNCH"], "n_matched": 0}
+{"image": "img_67", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["ASSURTED"], "n_matched": 0}
+{"image": "img_67", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["5"], "n_matched": 0}
+{"image": "img_67", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["65"], "n_matched": 0}
+{"image": "img_67", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["300G"], "n_matched": 0}
+{"image": "img_67", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["565"], "n_matched": 0}
+{"image": "img_69", "level": "line", "index": 0, "gt_text": "SUBWAY", "status": "correct", "matched_pred_texts": ["SUBWAY"], "n_matched": 1, "best_iou": 0.6749}
+{"image": "img_69", "level": "line", "index": 1, "gt_text": "CITY", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.375}
+{"image": "img_69", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["GAIRGITY"], "n_matched": 0}
+{"image": "img_76", "level": "line", "index": 0, "gt_text": "CHEFTONY", "status": "correct", "matched_pred_texts": ["CHEFTONY"], "n_matched": 1, "best_iou": 0.9519}
+{"image": "img_76", "level": "line", "index": 1, "gt_text": "POPCORN", "status": "correct", "matched_pred_texts": ["POPCORN"], "n_matched": 1, "best_iou": 0.723}
+{"image": "img_76", "level": "line", "index": 2, "gt_text": "CHEFTONAJS", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_76", "level": "line", "index": -1, "gt_text": "", "status": "spurious", "matched_pred_texts": ["YNOTLAR"], "n_matched": 0}
+{"image": "img_76", "level": "line", "index": -1, "gt_text": "", "status": "ignored", "matched_pred_texts": ["OM"], "n_matched": 0}
+{"image": "img_86", "level": "line", "index": 0, "gt_text": "SALE", "status": "correct", "matched_pred_texts": ["SALE"], "n_matched": 1, "best_iou": 0.8582}
+{"image": "img_86", "level": "line", "index": 1, "gt_text": "SALE", "status": "missed", "matched_pred_texts": [], "n_matched": 0, "best_iou": 0.0}
+{"image": "img_86", "level": "line", "index": 2, "gt_text": "SALE", "status": "correct", "matched_pred_texts": ["SALE"], "n_matched": 1, "best_iou": 0.875}
+{"image": "img_93", "level": "line", "index": 0, "gt_text": "BURGER", "status": "correct", "matched_pred_texts": ["BURGER"], "n_matched": 1, "best_iou": 0.6701}
+{"image": "img_93", "level": "line", "index": 1, "gt_text": "KING", "status": "correct", "matched_pred_texts": ["KING"], "n_matched": 1, "best_iou": 0.672}

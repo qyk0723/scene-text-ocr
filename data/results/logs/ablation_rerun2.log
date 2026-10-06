@@ -1,0 +1,65 @@
+共 200 张图 × 5 配置（原图）
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_det`.[0m
+信息: 用提供的模式无法找到文件。
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_rec`.[0m
+无预处理: char=0.6302 line=0.5450 avg=0.124s
+仅去噪: char=0.6111 line=0.5200 avg=0.128s
+仅CLAHE: char=0.4151 line=0.3500 avg=0.120s
+仅锐化: char=0.5297 line=0.4250 avg=0.128s
+全开（默认）: char=0.3310 line=0.3000 avg=0.091s
+结果已写入 data\results\ablation_results.md
+=== clean done ===
+共 200 张图 × 4 配置（退化图（模糊+噪声+低对比））
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_det`.[0m
+信息: 用提供的模式无法找到文件。
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_rec`.[0m
+无预处理: char=0.1538 line=0.1300 avg=0.055s
+全开（默认）: char=0.0785 line=0.0700 avg=0.049s
+仅去噪: char=0.3226 line=0.2500 avg=0.074s
+仅CLAHE: char=0.0943 line=0.0750 avg=0.051s
+结果已写入 data\results\ablation_degraded.md
+=== degraded done ===
+共 200 张图 × 2 配置（低对比图（×0.45 -30））
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_det`.[0m
+信息: 用提供的模式无法找到文件。
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_rec`.[0m
+无预处理: char=0.6140 line=0.5300 avg=0.108s
+仅CLAHE: char=0.4831 line=0.4050 avg=0.095s
+结果已写入 data\results\ablation_lowcontrast.md
+=== lowcontrast done ===
+共 200 张图 × 2 配置（重模糊图（9×9 σ=2.5））
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_det`.[0m
+信息: 用提供的模式无法找到文件。
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_rec`.[0m
+无预处理: char=0.2880 line=0.2400 avg=0.058s
+仅锐化: char=0.3436 line=0.3050 avg=0.064s
+结果已写入 data\results\ablation_blur.md
+=== blur done ===
+共 200 张图 × 2 配置（倾斜图（±12°））
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_det`.[0m
+信息: 用提供的模式无法找到文件。
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_rec`.[0m
+无预处理: char=0.5956 line=0.5100 avg=0.090s
+仅倾斜校正: char=0.2003 line=0.1450 avg=0.074s
+结果已写入 data\results\ablation_skew.md
+=== skew done ===
+共 200 张图 × 2 配置（小字图（缩小 2 倍））
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_det`.[0m
+信息: 用提供的模式无法找到文件。
+D:\miniconda3\envs\scene-text\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+[32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\86155\.paddlex\official_models\PP-OCRv6_small_rec`.[0m
+无预处理: char=0.2255 line=0.1950 avg=0.054s
+仅放大: char=0.7796 line=0.6650 avg=0.384s
+结果已写入 data\results\ablation_small.md
+=== small done ===
