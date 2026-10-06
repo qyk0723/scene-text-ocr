@@ -14,6 +14,75 @@ import numpy as np
 from src.config import get_config
 
 
+def estimate_skew_angle(
+    thresh: np.ndarray,
+    max_angle: float = 15.0,
+    coarse: float = 1.0,
+    fine: float = 0.1,
+    max_side: int = 500,
+) -> Optional[float]:
+    """估计文本倾斜角（度）；无法可靠估计时返回 ``None``。
+
+    使用**投影轮廓方差法**：文本行与图像行对齐时，逐行前景像素数的分布最尖锐
+    （方差最大）。在候选角度上旋转并计算该方差，取最大者。
+
+    **为什么不再用 ``cv2.minAreaRect``**（审计 P2-19 的深入核查结论）：
+    原实现对全部前景像素取一个最小外接矩形，实测在**单行裁剪图**与**整页图**上
+    都给出不可用的结果——典型输出是 ``-90`` / ``0`` 这类量化值，带符号误差平均达
+    **−59.5°**。根因是 OpenCV ``minAreaRect`` 的角度定义**按宽高谁更长而模 90° 歧义**
+    （同一个矩形可能报成 ``a`` 或 ``a-90``），原代码的
+    ``-(90 + angle) if angle < -45 else -angle`` 只能处理其中一种情形。
+    这解释了消融里「仅倾斜校正」把字符准确率从 0.5956 打到 0.2003——
+    它不是"转得不够准"，而是**按一个无意义的角度乱转**。
+
+    本方法在注入已知旋转的验证里误差 ≈ 0.1–0.5°（见 `tests/test_skew.py`）。
+    """
+    if thresh.ndim != 2:
+        raise ValueError("estimate_skew_angle 需要单通道二值图")
+
+    binary = thresh > 0
+    fg = float(binary.mean())
+    if fg < 1e-4 or fg > 0.98:
+        return None  # 近乎全空或近乎全满，无法判断
+
+    h, w = thresh.shape[:2]
+    scale = min(1.0, max_side / float(max(h, w)))
+    if scale < 1.0:
+        small = cv2.resize(thresh, None, fx=scale, fy=scale,
+                           interpolation=cv2.INTER_AREA)
+    else:
+        small = thresh
+    sh, sw = small.shape[:2]
+    if sh < 8 or sw < 8:
+        return None
+
+    center = (sw / 2.0, sh / 2.0)
+    cache: dict = {}
+
+    def score(a: float) -> float:
+        """角度 a 下的投影轮廓方差；越大说明行越对齐。"""
+        key = round(a, 4)
+        if key in cache:
+            return cache[key]
+        m = cv2.getRotationMatrix2D(center, a, 1.0)
+        rot = cv2.warpAffine(small, m, (sw, sh), flags=cv2.INTER_NEAREST,
+                             borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+        prof = (rot > 0).sum(axis=1).astype(np.float64)
+        cache[key] = float(prof.var())
+        return cache[key]
+
+    best_a, best_s = 0.0, -1.0
+    for a in np.arange(-max_angle, max_angle + 1e-9, coarse):
+        s = score(float(a))
+        if s > best_s:
+            best_s, best_a = s, float(a)
+    for a in np.arange(best_a - coarse, best_a + coarse + 1e-9, fine):
+        s = score(float(a))
+        if s > best_s:
+            best_s, best_a = s, float(a)
+    return float(best_a)
+
+
 class ImageEnhancer:
     """可开关的图像预处理管线。
 
@@ -125,12 +194,9 @@ class ImageEnhancer:
         # 前景占比过半说明选到的是背景（深色底图），反相
         if thresh.mean() > 127.5:
             thresh = 255 - thresh
-        coords = np.column_stack(np.where(thresh > 0))
-        if len(coords) < 10:
-            return img  # 几乎无内容，不旋转
-        angle = cv2.minAreaRect(coords)[-1]
-        angle = -(90 + angle) if angle < -45 else -angle
-        if abs(angle) < 0.5:
+
+        angle = estimate_skew_angle(thresh)
+        if angle is None or abs(angle) < 0.5:
             return img
 
         h, w = img.shape[:2]
