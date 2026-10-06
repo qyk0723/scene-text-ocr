@@ -79,6 +79,15 @@ def check_metrics_in_sync() -> None:
     spec.loader.exec_module(mod)
     with tempfile.TemporaryDirectory() as td:
         mod.main(td)
+        derived = {p.name for p in Path(td).glob("*.json")}
+        # 结构性检查：metrics/ 下每个文件都必须"有归属"——要么由 gen_metrics 从产物派生，
+        # 要么在 directly_produced 里显式声明。新增指标文件却忘了归类，这里会报出来，
+        # 免得出现"这个数字从哪来的没人知道"的文件（正是审计要防的那类问题）。
+        present = {p.name for p in (PROJ / "metrics").glob("*.json")}
+        for extra in sorted(present - derived - directly_produced):
+            FAILURES.append(("metrics 文件未归类", f"metrics/{extra}", "-",
+                             "既非 gen_metrics 从产物派生，也不在 directly_produced 中；"
+                             "请归类，否则无法判断其数字来源"))
         for p in sorted((PROJ / "metrics").glob("*.json")):
             if p.name in directly_produced:
                 continue
