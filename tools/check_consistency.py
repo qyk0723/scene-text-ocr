@@ -205,6 +205,15 @@ def main() -> int:
     check_absent("报告不得再写倾斜校正「-39.5 有害」为结论", "docs/evaluation_report.md",
                  "| **-39.5 有害** |")
 
+    # ---- 跨文档扫描：已被推翻的结论不得以肯定语气残留 ----
+    #
+    # 为什么需要这一层（2026-10-07 A1 的教训）：上面那些 check_absent 只盯**某一个文件、
+    # 某一种措辞**，于是「小字放大 +55.4 最强」在 README 被清掉后，又以
+    # 「+55.4（最强，作用于检测侧）」的形式留在 PROJECT_SUMMARY 里整整一轮没人发现。
+    # 这正是审计的核心病灶：同一结论多处各写一遍、没有机制发现漂移。
+    # 所以这里改为**按"结论 + 数值"跨文档扫描**，而不是按某个文件的某句话。
+    scan_revoked_claims()
+
     print()
     if FAILURES:
         print(f"❌ 发现 {len(FAILURES)} 处不一致（共检查 {CHECKS} 项）：")
@@ -213,6 +222,45 @@ def main() -> int:
         return 1
     print(f"✅ 全部一致（共检查 {CHECKS} 项）")
     return 0
+
+
+# 已被推翻、不得再以肯定语气出现的结论。
+# 每项 = (人类可读的结论描述, 数值串, 允许出现的"更正语境"关键词)
+REVOKED_CLAIMS = [
+    ("小字放大是 +55.4 的最强正收益算子", "55.4", ("已推翻", "推翻", "旧结论", "不可复现", "实验设计的产物")),
+]
+# 跨文档扫描范围：这些是**给人看的结论性文档**（不含审计档案本身——它必须保留原始论断）
+SCAN_DOCS = ["README.md", "PROJECT_SUMMARY.md", "docs/evaluation_report.md"]
+
+
+def scan_revoked_claims() -> None:
+    """扫描结论性文档，防止"已推翻的结论"回流。
+
+    规则：若某个文档里出现了被推翻结论的**数值**，那么**同一行**必须同时出现
+    「已推翻/推翻/旧结论/…」之一，否则报错。这样：
+    - 「原 +55.4 已推翻」→ 通过（同一行有更正语境）
+    - 「小字放大 +55.4（最强）」→ 失败（肯定语气回流）
+    - 「22.55% → 77.96%」这类历史表格行 → 若整行无更正语境则失败（提示补标注）
+    """
+    global CHECKS
+    for desc, value, markers in REVOKED_CLAIMS:
+        for doc in SCAN_DOCS:
+            path = PROJ / doc
+            if not path.is_file():
+                continue
+            CHECKS += 1  # 计一项：该文档不得让该结论以肯定语气残留
+            for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                if value not in line:
+                    continue
+                if any(m in line for m in markers):
+                    continue
+                FAILURES.append((
+                    f"已被推翻的结论回流：{desc}",
+                    f"{doc}:{lineno}",
+                    value,
+                    f"该行出现了 {value} 但没有更正语境（{'/'.join(markers)} 之一）；"
+                    "请补上「已推翻」说明，或删除该论断",
+                ))
 
 
 if __name__ == "__main__":
