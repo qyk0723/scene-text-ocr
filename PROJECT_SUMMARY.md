@@ -40,7 +40,8 @@
 | **环境** | 卸载 `opencv-python`，只留 `opencv-contrib-python==4.10.0.84` |
 | **界面缺陷修复（第 14–15 轮）** | `app.py` 勾选「小字放大」时检测框画错位置（框属放大图坐标系却画在原图上，实测 299×400 的图 **79% 坐标点越界**）。改为 `ImageEnhancer.process_with_info()` 返回坐标映射，绘制前映射回原图；**并用真实模型端到端验证**（`data/results/app_display_validation.md`：映射后框内文字密度 0.0509 vs 旧行为 **0.0**）。顺带缓存字体、按实际渲染尺寸量标注底宽 |
 | **系统完善（第 15 轮，§待办 5 项全部完成）** | ①检测框坐标（上）②`main.py --preprocess` 的裸 `cv2.imread` → `imread_unicode` ③补齐 `SceneTextOCR` 管线集成测试（原先**零覆盖**）④P2-21 三项隐患：路径输入不再读两遍、**缓存键统一为"解码后数组内容哈希"**（原先路径/数组是两种身份）、`import app` 不再加载模型也不再拉起 gradio（**8.5s → 0.6s**）⑤绘制函数拆到 `src/visualize/draw.py`（`make_figures` 不再依赖 Gradio）。单测 **95 项 1.5s** 跑完 |
-| **测试** | 单测 23 → **95 项**，全部通过（1.5s 跑完，不加载模型） |
+| **一致性清理与实测（第 16–17 轮）** | ①清掉两处"已推翻结论仍留在文档里"的残留，并加**跨文档回流扫描**（校验 30 → 33 项）②修 P2-25 错误标签「全开（默认）」→「三算子组合（去噪+CLAHE+锐化）」并重生成图表（数值未动）③P2-24 补写算子交互（−33.5 vs −29.9）④删孤儿数据清单 16.7 MB + 补 `data/DATA_PROVENANCE.md` ⑤**B2**：`evaluate_end2end.py` 100 张重跑，**准确率逐位相同**⑥**B1**：检测分辨率 100 张大样本复测——1280/max **+2.76 点**（1.49×）、960/min **+3.93 点**（2.66×），旧 30 张结论 +4.6 被高估；**未改 config.yaml**（见 `docs/P1-8_RESOLUTION_RETEST.md`） |
+| **测试** | 单测 23 → **100 项**，全部通过（1.3s 跑完，不加载模型） |
 
 **✅ medium 的 deteval 全量重跑已完成（2026-10-06 23:11，500 张，耗时约 3 小时）**：
 **deteval P 0.5115 / R 0.4299 / F1 0.4672**；同一次运行算出的 legacy 为 0.6137/0.2591/0.3643，
@@ -61,7 +62,7 @@
 - ✅ **`docs/PROJECT_AUDIT.md` §待办：系统完善 5 项已全部完成**（第 14–15 轮）：
   ①`app.py` 检测框坐标系（已真机验证）②`main.py --preprocess` 读图
   ③`SceneTextOCR` 管线集成测试 ④P2-21 三项隐患 ⑤界面打磨。
-  单测 23 → **95 项**（1.5s），`tools/check_consistency.py` 30 项一致。
+  单测 23 → **100 项**（1.3s），`tools/check_consistency.py` 33 项一致。
 - ⏭ **下一步方向待用户确认**（系统侧建议项已清空）。
 
 **剩余工作**：系统侧暂无 —— 上表第 1、2 项（论文阶段）仍按用户要求推后。
@@ -156,7 +157,7 @@
 | `src/detector/` / `src/recognizer/` | TextDetector / TextRecognizer |
 | `src/evaluator/` | 评估指标 / 解析 / 执行 |
 | `src/preprocess/enhancer.py` | ImageEnhancer（8 算子） |
-| `tests/` | 单元测试（**95 项，1.5s，全部不加载模型**）|
+| `tests/` | 单元测试（**100 项，1.3s，全部不加载模型**）|
 | `scripts/validate_app_display.py` | **真机验证**界面坐标映射（跑真实模型，产出报告与对照图） |
 | `docs/evaluation_report.md` | 评估总报告（含 medium vs small、消融、端到端 §3.1/§5.1/§5.2） |
 | `docs/figures/` | 论文图表 PNG |

@@ -48,14 +48,14 @@ D:/miniconda3/envs/scene-text/python.exe app.py
 
 ## 测试
 
-单测 **95 项**，约 1.5s 跑完，**不加载模型**（纯函数、`ImageEnhancer`、坐标映射、
+单测 **100 项**，约 1.3s 跑完，**不加载模型**（纯函数、`ImageEnhancer`、坐标映射、
 `SceneTextOCR` 管线用假检测/识别器、CLI 分支）：
 
 ```bash
 D:/miniconda3/envs/scene-text/python.exe -m unittest discover -s tests -p "test_*.py"
 ```
 
-改过文档里的数字或 `data/results/` 产物后，再跑一次一致性校验（30 项）：
+改过文档里的数字或 `data/results/` 产物后，再跑一次一致性校验（33 项）：
 
 ```bash
 D:/miniconda3/envs/scene-text/python.exe tools/check_consistency.py
@@ -102,7 +102,7 @@ Gradio 界面只暴露三个算子，默认全不勾：**去噪 / 锐化 / 小�
 - `src/evaluator/` 评估模块（metrics / parsing / runner）
 - `evaluate.py` 评估 CLI；`evaluate_ablation.py` 预处理消融；`evaluate_linelevel.py` 行级口径评估；`evaluate_end2end.py` 端到端系统评测
 - `make_figures.py` 论文图表生成；`docs/evaluation_report.md` 评估总报告；`docs/figures/` 图表
-- `tests/` 单元测试（95 项，不加载模型）；`tools/check_consistency.py` 文档↔指标一致性校验
+- `tests/` 单元测试（100 项，不加载模型）；`tools/check_consistency.py` 文档↔指标一致性校验
 - `src/visualize/draw.py` 绘制与坐标映射（不依赖 gradio/模型）
 - `data/` 样张与公开数据集（**被 gitignore 排除，不入库**）；
   `data/results/` 是**评估证据**（例外入库）；
