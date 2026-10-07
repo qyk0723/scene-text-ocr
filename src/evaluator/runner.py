@@ -316,6 +316,14 @@ def evaluate_end2end(
     times: List[float] = []
     print(f"[e2e] 共 {len(img_paths)} 张整图，IoU 阈值 {iou_thresh}（端到端 det→crop→rec）")
 
+    # 逐张清空结果缓存，让 `times` 反映**冷推理**的真实耗时。
+    # 缓存键是「解码后图像内容的哈希」，因此**两个内容完全相同的文件**
+    # （重复样本、同一张图的不同副本）会命中同一键并返回 elapsed≈0 ——
+    # 那会把 avg_time 拉低而不报任何错。清缓存让该列可信；
+    # 代价是重复图会被真实重算（准确性指标不受影响）。
+    # 同一理由见 evaluate_ablation.py 的 `ocr._cache.clear()`。
+    ocr._cache.clear()
+
     dump_handle = None
     if dump_lines is not None:
         dump_path = Path(dump_lines)
