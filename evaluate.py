@@ -44,6 +44,16 @@ def main() -> None:
              "可用于检验「输出粒度介于词/行之间」的假设",
     )
     parser.add_argument(
+        "--det-limit-side-len", type=int, default=None,
+        help="检测输入的长边限制，默认用模型内置值（PP-OCRv6 为 960）。"
+             "配合 --det-limit-type 可检验审计 P1-8 的「0.75 倍下采样损失小字召回」："
+             "1280/max = 不下采样；960/min = 反而放大到短边 960。注意耗时约按面积增长",
+    )
+    parser.add_argument(
+        "--det-limit-type", choices=["max", "min"], default=None,
+        help="长边限制的方向：max 只缩不放（模型默认），min 会放大过小的图",
+    )
+    parser.add_argument(
         "--model", choices=["medium", "small"], default="medium",
         help="模型档位：评估基准用 medium，部署系统用 small",
     )
@@ -59,6 +69,8 @@ def main() -> None:
         det_thresh=args.det_thresh,
         det_box_thresh=args.det_box_thresh,
         det_unclip_ratio=args.det_unclip_ratio,
+        det_limit_side_len=args.det_limit_side_len,
+        det_limit_type=args.det_limit_type,
     )
     if args.model == "small":
         kwargs["det_model_name"] = "PP-OCRv6_small_det"

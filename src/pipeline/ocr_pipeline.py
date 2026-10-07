@@ -60,6 +60,8 @@ class SceneTextOCR:
         det_unclip_ratio: Optional[float] = None,
         det_model_name: Optional[str] = None,
         rec_model_name: Optional[str] = None,
+        det_limit_side_len: Optional[int] = None,
+        det_limit_type: Optional[str] = None,
     ) -> None:
         cfg = get_config()
         model = cfg.get("model", {})
@@ -73,8 +75,15 @@ class SceneTextOCR:
         self.det_unclip_ratio = (
             det_unclip_ratio if det_unclip_ratio is not None else det.get("unclip_ratio")
         )
-        self.det_limit_side_len = det.get("limit_side_len")
-        self.det_limit_type = det.get("limit_type")
+        # 长边限制：显式参数优先，其次 config.yaml，最后交给模型自带默认（960/max）。
+        # 对应审计 P1-8 的分辨率杠杆（1280/max 不下采样；960/min 反而放大）。
+        self.det_limit_side_len = (
+            det_limit_side_len if det_limit_side_len is not None
+            else det.get("limit_side_len")
+        )
+        self.det_limit_type = (
+            det_limit_type if det_limit_type is not None else det.get("limit_type")
+        )
 
         # 懒加载
         self._detector = None
