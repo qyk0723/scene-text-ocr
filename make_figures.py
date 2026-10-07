@@ -380,8 +380,8 @@ def make_operator_chart():
 def make_ablation_chart():
     """预处理消融柱状图（按准确率降序）。"""
     _h_bar(
-        ["无预处理", "仅去噪", "仅锐化", "仅CLAHE", "全开（默认）"],
-        [_abl("clean", c) for c in ["无预处理", "仅去噪", "仅锐化", "仅CLAHE", "全开（默认）"]],
+        ["无预处理", "仅去噪", "仅锐化", "仅CLAHE", "三算子组合（去噪+CLAHE+锐化）"],
+        [_abl("clean", c) for c in ["无预处理", "仅去噪", "仅锐化", "仅CLAHE", "三算子组合（去噪+CLAHE+锐化）"]],
         "预处理消融（清晰图）：识别字符准确率（200 张单行图，PP-OCRv6 small）",
         "字符准确率（%）",
         "{:.2f}%",
@@ -389,8 +389,8 @@ def make_ablation_chart():
         xlim=100,
     )
     _h_bar(
-        ["仅去噪", "无预处理", "仅CLAHE", "全开（默认）"],
-        [_abl("degraded", c) for c in ["仅去噪", "无预处理", "仅CLAHE", "全开（默认）"]],
+        ["仅去噪", "无预处理", "仅CLAHE", "三算子组合（去噪+CLAHE+锐化）"],
+        [_abl("degraded", c) for c in ["仅去噪", "无预处理", "仅CLAHE", "三算子组合（去噪+CLAHE+锐化）"]],
         "预处理消融（退化图）：识别字符准确率（200 张单行图，PP-OCRv6 small）",
         "字符准确率（%）",
         "{:.2f}%",

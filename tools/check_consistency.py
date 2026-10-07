@@ -191,11 +191,11 @@ def main() -> int:
     up = delta("small", "仅放大", "无预处理")
     dn = delta("degraded", "仅去噪", "无预处理")
     sh = delta("blur", "仅锐化", "无预处理")
-    all_on = -delta("clean", "无预处理", "全开（默认）")
+    all_on = -delta("clean", "无预处理", "三算子组合（去噪+CLAHE+锐化）")
     check("README 小字放大差值", "README.md", f"+{up:.1f}")
     check("README 去噪差值", "README.md", f"+{dn:.1f}")
     check("README 锐化差值", "README.md", f"+{sh:.1f}")
-    check("README 清晰图全开代价", "README.md", f"{all_on:.0f} 字符点")
+    check("README 清晰图三算子组合代价", "README.md", f"{all_on:.0f} 字符点")
 
     # ---- 结构性断言：核心结论不得回退到旧表述 ----
     check("报告 §五 有按官方口径重写的结论", "docs/evaluation_report.md", "5.0 结论（2026-10-06 按官方口径重写）")

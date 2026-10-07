@@ -32,18 +32,22 @@ from src.pipeline.ocr_pipeline import SceneTextOCR, imread_unicode
 from src.preprocess.enhancer import ImageEnhancer
 
 # 配置名 -> ImageEnhancer 构造参数（其余开关默认关）
+#
+# ⚠️ 命名注意（审计 P2-25）：这组"三个算子一起开"的配置曾叫「三算子组合（去噪+CLAHE+锐化）」，
+# 两个词都是错的——它只开了 denoise+contrast+sharpen（8 个算子里还关着 5 个），
+# 而"默认"在出厂配置里是**全关**。名字会直接进产物表格与图表，所以改成自解释的名字。
 CONFIGS: Dict[str, dict] = {
     "无预处理": dict(denoise=False, contrast=False, sharpen=False),
     "仅去噪": dict(denoise=True, contrast=False, sharpen=False),
     "仅CLAHE": dict(denoise=False, contrast=True, sharpen=False),
     "仅锐化": dict(denoise=False, contrast=False, sharpen=True),
-    "全开（默认）": dict(denoise=True, contrast=True, sharpen=True),
+    "三算子组合（去噪+CLAHE+锐化）": dict(denoise=True, contrast=True, sharpen=True),
 }
 
 # 退化图消融用（去掉仅锐化——噪声图上锐化必然有害）
 DEGRADED_CONFIGS: Dict[str, dict] = {
     "无预处理": dict(denoise=False, contrast=False, sharpen=False),
-    "全开（默认）": dict(denoise=True, contrast=True, sharpen=True),
+    "三算子组合（去噪+CLAHE+锐化）": dict(denoise=True, contrast=True, sharpen=True),
     "仅去噪": dict(denoise=True, contrast=False, sharpen=False),
     "仅CLAHE": dict(denoise=False, contrast=True, sharpen=False),
 }
@@ -204,7 +208,7 @@ def main() -> None:
     lines.append(
         "> ⚠️ **耗时必须与「检出框数」一起看**：每个检出框都要跑一次识别，所以耗时主要由"
         "**检出框数**决定。一个把检测弄坏的配置会因为框变少而显得很快（例如清晰图下的"
-        "「全开」），把它解读为「算法更快」是错的。"
+        "「三算子组合」），把它解读为「算法更快」是错的。"
     )
     if args.mode == "degraded":
         lines.append("")
