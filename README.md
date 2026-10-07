@@ -48,10 +48,17 @@ D:/miniconda3/envs/scene-text/python.exe app.py
 
 ## 测试
 
-纯函数单元测试（编辑距离、标注解析、框 IoU/匹配、行合并），不加载模型：
+单测 **95 项**，约 1.5s 跑完，**不加载模型**（纯函数、`ImageEnhancer`、坐标映射、
+`SceneTextOCR` 管线用假检测/识别器、CLI 分支）：
 
 ```bash
 D:/miniconda3/envs/scene-text/python.exe -m unittest discover -s tests -p "test_*.py"
+```
+
+改过文档里的数字或 `data/results/` 产物后，再跑一次一致性校验（30 项）：
+
+```bash
+D:/miniconda3/envs/scene-text/python.exe tools/check_consistency.py
 ```
 
 ## 图像预处理
@@ -72,11 +79,11 @@ D:/miniconda3/envs/scene-text/python.exe -m unittest discover -s tests -p "test_
   而**根本无效**（带符号误差均值 −59.5°，即按无意义角度乱转）。已换成投影轮廓方差法（误差 −0.05°），
   重测后官方消融为**轻微有害 −1.3 点**（受控实验 −1.8 点；识别模型自身对 ±12° 已有容差）
 
-Gradio 界面只暴露正收益算子，默认全不勾：**去噪 / 锐化 / 小字放大**（后者待重做后确认）。
+Gradio 界面只暴露三个算子，默认全不勾：**去噪 / 锐化 / 小字放大**（最后一个已按上面的重做结论定稿）。
 
 | 功能 | 说明 | 界面默认 |
 | --- | --- | --- |
-| 小字放大 | 长边不足时放大 | 关（可勾选，收益待重做确认） |
+| 小字放大 | 长边不足时放大到 800 | 关（可勾选；重做后为 det +2.9 / rec +0.8 点，**不是**"最强算子"） |
 | 去噪 | 中值 / 高斯 | 关（可勾选） |
 | 锐化 | 拉普拉斯 | 关（可勾选） |
 | 对比度增强 | CLAHE | 不暴露（实测有害 −13.1） |
@@ -93,9 +100,13 @@ Gradio 界面只暴露正收益算子，默认全不勾：**去噪 / 锐化 / �
 - `src/detector/` 文字检测（`TextDetector`）；`src/recognizer/` 文字识别（`TextRecognizer`）
 - `src/pipeline/` 检测 + 识别编排（`SceneTextOCR`，含排序 / 透视裁剪 / 缓存）
 - `src/evaluator/` 评估模块（metrics / parsing / runner）
-- `evaluate.py` 评估 CLI；`evaluate_ablation.py` 预处理消融；`evaluate_linelevel.py` 行级口径评估
+- `evaluate.py` 评估 CLI；`evaluate_ablation.py` 预处理消融；`evaluate_linelevel.py` 行级口径评估；`evaluate_end2end.py` 端到端系统评测
 - `make_figures.py` 论文图表生成；`docs/evaluation_report.md` 评估总报告；`docs/figures/` 图表
-- `tests/` 单元测试；`data/` 样张、公开数据集、实验结果（已 gitignore）
+- `tests/` 单元测试（95 项，不加载模型）；`tools/check_consistency.py` 文档↔指标一致性校验
+- `src/visualize/draw.py` 绘制与坐标映射（不依赖 gradio/模型）
+- `data/` 样张与公开数据集（**被 gitignore 排除，不入库**）；
+  `data/results/` 是**评估证据**（例外入库）；
+  `data/DATA_PROVENANCE.md` 记录数据集来源、规模与原版性核对（需 `git add -f` 入库）
 
 ## 开发进度
 
