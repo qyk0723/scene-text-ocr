@@ -91,6 +91,7 @@ def main() -> int:
           f"limit_type={ocr.det_limit_type}")
 
     with open(out, "a", encoding="utf-8") as fh:
+        t_start = time.perf_counter()
         for i, p in enumerate(todo, 1):
             gt_boxes, gt_dnc = parse_det_gt_flagged(GT_DIR / f"gt_{p.stem}.txt")
             t0 = time.perf_counter()
@@ -108,8 +109,10 @@ def main() -> int:
             }
             fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
             fh.flush()  # 每张都落盘：被杀也只损失当前这一张
-            if i % 5 == 0 or i == len(todo):
-                print(f"  {i}/{len(todo)} 完成（累计 {len(done)+i}）", flush=True)
+            if i % 25 == 0 or i == len(todo):
+                el = time.perf_counter() - t_start
+                print(f"  {i}/{len(todo)} 完成（累计 {len(done)+i}/{len(paths)}）"
+                      f" 已用 {el/60:.1f} min  预计总 {el/i*len(todo)/60:.1f} min", flush=True)
 
     # 汇总
     recs = list(load_done(out).values())
